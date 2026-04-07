@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "849847234464",
+    "project_id": "bet-tracker-app-a2b6b",
+    "storage_bucket": "bet-tracker-app-a2b6b.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:849847234464:android:46ccbd8410a8ce0ef43ec5",
+        "android_client_info": {
+          "package_name": "com.example.bet_tracker_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAxNspaGIUqzhjgpMuOmQlwACuRuyMMNNA"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

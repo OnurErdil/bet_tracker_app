@@ -1,0 +1,1341 @@
+import 'package:bet_tracker_app/models/bet_model.dart';
+import 'package:bet_tracker_app/pages/bets/edit_bet_page.dart';
+import 'package:bet_tracker_app/services/bet_service.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
+
+class BetHistoryPage extends StatefulWidget {
+  const BetHistoryPage({super.key});
+
+  @override
+  State<BetHistoryPage> createState() => _BetHistoryPageState();
+}
+
+class _BetHistoryPageState extends State<BetHistoryPage> {
+  final TextEditingController _searchController = TextEditingController();
+  final TextEditingController _minOddController = TextEditingController();
+  final TextEditingController _maxOddController = TextEditingController();
+  final TextEditingController _minStakeController = TextEditingController();
+  final TextEditingController _maxStakeController = TextEditingController();
+
+  String _selectedSport = 'Tümü';
+  String _selectedCountry = 'Tümü';
+  String _selectedLeague = 'Tümü';
+  String _selectedResult = 'Tümü';
+  String _selectedQuickFilter = 'Yok';
+  String _sortOption = 'Tarih (Yeni → Eski)';
+
+  DateTime? _startDate;
+  DateTime? _endDate;
+
+  bool _showAdvancedFilters = true;
+
+  final List<String> _sportOptions = [
+    'Tümü',
+    'Futbol',
+    'Basketbol',
+    'Tenis',
+    'Voleybol',
+    'Diğer',
+  ];
+
+  final List<String> _resultOptions = [
+    'Tümü',
+    'beklemede',
+    'kazandi',
+    'kaybetti',
+    'iade',
+  ];
+  List<String> _countryOptions(List<BetModel> bets) {
+    final countries = bets
+        .map((bet) => bet.country.trim())
+        .where((country) => country.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+
+    return ['Tümü', ...countries];
+  }
+
+  List<String> _leagueOptions(List<BetModel> bets) {
+    final leagues = bets
+        .where(
+          (bet) => _selectedCountry == 'Tümü' || bet.country == _selectedCountry,
+    )
+        .map((bet) => bet.league.trim())
+        .where((league) => league.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+
+    return ['Tümü', ...leagues];
+  }
+  final List<String> _sortOptions = [
+    'Tarih (Yeni → Eski)',
+    'Tarih (Eski → Yeni)',
+    'Oran (Yüksek → Düşük)',
+    'Oran (Düşük → Yüksek)',
+    'Tutar (Yüksek → Düşük)',
+    'Tutar (Düşük → Yüksek)',
+    'Net (Yüksek → Düşük)',
+    'Net (Düşük → Yüksek)',
+  ];
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    _minOddController.dispose();
+    _maxOddController.dispose();
+    _minStakeController.dispose();
+    _maxStakeController.dispose();
+    super.dispose();
+  }
+
+
+  List<BetModel> _filterBets(List<BetModel> bets) {
+    final query = _searchController.text.trim().toLowerCase();
+
+    final minOdd =
+    double.tryParse(_minOddController.text.trim().replaceAll(',', '.'));
+    final maxOdd =
+    double.tryParse(_maxOddController.text.trim().replaceAll(',', '.'));
+    final minStake =
+    double.tryParse(_minStakeController.text.trim().replaceAll(',', '.'));
+    final maxStake =
+    double.tryParse(_maxStakeController.text.trim().replaceAll(',', '.'));
+
+    final filtered = bets.where((bet) {
+      final matchesSearch =
+          query.isEmpty ||
+              bet.matchName.toLowerCase().contains(query) ||
+              bet.betType.toLowerCase().contains(query) ||
+              bet.sport.toLowerCase().contains(query) ||
+              bet.country.toLowerCase().contains(query) ||
+              bet.league.toLowerCase().contains(query) ||
+              bet.note.toLowerCase().contains(query);
+
+      final matchesSport =
+          _selectedSport == 'Tümü' || bet.sport == _selectedSport;
+
+      final matchesCountry =
+          _selectedCountry == 'Tümü' || bet.country == _selectedCountry;
+
+      final matchesLeague =
+          _selectedLeague == 'Tümü' || bet.league == _selectedLeague;
+
+      final matchesResult =
+          _selectedResult == 'Tümü' || bet.result == _selectedResult;
+
+      final betDateOnly = DateTime(bet.date.year, bet.date.month, bet.date.day);
+
+      final matchesStartDate =
+          _startDate == null ||
+              !betDateOnly.isBefore(
+                DateTime(_startDate!.year, _startDate!.month, _startDate!.day),
+              );
+
+      final matchesEndDate =
+          _endDate == null ||
+              !betDateOnly.isAfter(
+                DateTime(_endDate!.year, _endDate!.month, _endDate!.day),
+              );
+
+      final matchesOdd =
+          (minOdd == null || bet.odd >= minOdd) &&
+              (maxOdd == null || bet.odd <= maxOdd);
+
+      final matchesStake =
+          (minStake == null || bet.stake >= minStake) &&
+              (maxStake == null || bet.stake <= maxStake);
+
+      return matchesSearch &&
+          matchesSport &&
+          matchesCountry &&
+          matchesLeague &&
+          matchesResult &&
+          matchesStartDate &&
+          matchesEndDate &&
+          matchesOdd &&
+          matchesStake;
+    }).toList();
+
+    filtered.sort((a, b) {
+      switch (_sortOption) {
+        case 'Tarih (Eski → Yeni)':
+          return a.date.compareTo(b.date);
+        case 'Oran (Yüksek → Düşük)':
+          return b.odd.compareTo(a.odd);
+        case 'Oran (Düşük → Yüksek)':
+          return a.odd.compareTo(b.odd);
+        case 'Tutar (Yüksek → Düşük)':
+          return b.stake.compareTo(a.stake);
+        case 'Tutar (Düşük → Yüksek)':
+          return a.stake.compareTo(b.stake);
+        case 'Net (Yüksek → Düşük)':
+          return b.netProfit.compareTo(a.netProfit);
+        case 'Net (Düşük → Yüksek)':
+          return a.netProfit.compareTo(b.netProfit);
+        case 'Tarih (Yeni → Eski)':
+        default:
+          return b.date.compareTo(a.date);
+      }
+    });
+
+    return filtered;
+  }
+
+  void _clearFilters() {
+    setState(() {
+      _searchController.clear();
+      _minOddController.clear();
+      _maxOddController.clear();
+      _minStakeController.clear();
+      _maxStakeController.clear();
+      _selectedSport = 'Tümü';
+      _selectedCountry = 'Tümü';
+      _selectedLeague = 'Tümü';
+      _selectedResult = 'Tümü';
+      _selectedQuickFilter = 'Yok';
+      _sortOption = 'Tarih (Yeni → Eski)';
+      _startDate = null;
+      _endDate = null;
+    });
+  }
+
+  void _applyQuickFilter(String filter) {
+    final now = DateTime.now();
+    final today = DateTime(now.year, now.month, now.day);
+
+    setState(() {
+      if (_selectedQuickFilter == filter) {
+        _selectedQuickFilter = 'Yok';
+
+        if (filter == 'Bugün' ||
+            filter == 'Son 7 Gün' ||
+            filter == 'Bu Ay') {
+          _startDate = null;
+          _endDate = null;
+        }
+
+        if (filter == 'Sadece Kaybedenler' ||
+            filter == 'Sadece Bekleyenler') {
+          _selectedResult = 'Tümü';
+        }
+        return;
+      }
+
+      _selectedQuickFilter = filter;
+
+      switch (filter) {
+        case 'Bugün':
+          _startDate = today;
+          _endDate = today;
+          break;
+        case 'Son 7 Gün':
+          _startDate = today.subtract(const Duration(days: 6));
+          _endDate = today;
+          break;
+        case 'Bu Ay':
+          _startDate = DateTime(now.year, now.month, 1);
+          _endDate = DateTime(now.year, now.month + 1, 0);
+          break;
+        case 'Sadece Kaybedenler':
+          _selectedResult = 'kaybetti';
+          break;
+        case 'Sadece Bekleyenler':
+          _selectedResult = 'beklemede';
+          break;
+        case 'Yok':
+        default:
+          break;
+      }
+    });
+  }
+
+  String _resultLabel(String value) {
+    switch (value) {
+      case 'kazandi':
+        return 'Kazandı';
+      case 'kaybetti':
+        return 'Kaybetti';
+      case 'iade':
+        return 'İade';
+      case 'Tümü':
+        return 'Tümü';
+      default:
+        return 'Beklemede';
+    }
+  }
+
+  Color _resultColor(String value) {
+    switch (value) {
+      case 'kazandi':
+        return const Color(0xFF22C55E);
+      case 'kaybetti':
+        return const Color(0xFFEF4444);
+      case 'iade':
+        return const Color(0xFFF59E0B);
+      default:
+        return const Color(0xFF94A3B8);
+    }
+  }
+
+  String _formatDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    return '$day.$month.$year';
+  }
+
+  IconData _sportIcon(String sport) {
+    switch (sport) {
+      case 'Futbol':
+        return Icons.sports_soccer;
+      case 'Basketbol':
+        return Icons.sports_basketball;
+      case 'Tenis':
+        return Icons.sports_tennis;
+      case 'Voleybol':
+        return Icons.sports_volleyball;
+      default:
+        return Icons.emoji_events_outlined;
+    }
+  }
+
+  Future<void> _pickStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedQuickFilter = 'Yok';
+        _startDate = picked;
+      });
+    }
+  }
+
+  Future<void> _pickEndDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _endDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _selectedQuickFilter = 'Yok';
+        _endDate = picked;
+      });
+    }
+  }
+
+  Future<bool> _handleDelete(BetModel bet) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null || bet.id == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Silinecek bahis bulunamadı.'),
+        ),
+      );
+      return false;
+    }
+
+    final result = await BetService.deleteBet(
+      userId: user.uid,
+      betId: bet.id!,
+    );
+
+    if (!mounted) return false;
+
+    if (result != null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(result)),
+      );
+      return false;
+    }
+
+    ScaffoldMessenger.of(context).clearSnackBars();
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text('${bet.matchName} silindi.'),
+        action: SnackBarAction(
+          label: 'Geri Al',
+          onPressed: () async {
+            final restoreResult = await BetService.addBet(
+              BetModel(
+                userId: bet.userId,
+                date: bet.date,
+                sport: bet.sport,
+                country: bet.country,
+                league: bet.league,
+                matchName: bet.matchName,
+                betType: bet.betType,
+                odd: bet.odd,
+                stake: bet.stake,
+                result: bet.result,
+                netProfit: bet.netProfit,
+                note: bet.note,
+                createdAt: bet.createdAt,
+              ),
+            );
+
+            if (!mounted) return;
+
+            if (restoreResult != null) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(content: Text(restoreResult)),
+              );
+              return;
+            }
+
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text('Bahis geri yüklendi.'),
+              ),
+            );
+          },
+        ),
+      ),
+    );
+
+    return true;
+  }
+
+  Future<bool> _confirmDelete(BetModel bet) async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF161A23),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Bahsi Sil'),
+          content: Text(
+            '"${bet.matchName}" kaydını silmek istiyor musun?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Vazgeç'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFDC2626),
+              ),
+              child: const Text('Sil'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed != true) return false;
+
+    return _handleDelete(bet);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final isWide = MediaQuery.of(context).size.width > 800;
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Bahis Geçmişi'),
+      ),
+      body: StreamBuilder<List<BetModel>>(
+        stream: BetService.getUserBets(),
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(
+              child: CircularProgressIndicator(),
+            );
+          }
+
+          if (snapshot.hasError) {
+            return Center(
+              child: Padding(
+                padding: const EdgeInsets.all(24),
+                child: Text(
+                  'Bahisler yüklenirken hata oluştu:\n${snapshot.error}',
+                  textAlign: TextAlign.center,
+                ),
+              ),
+            );
+          }
+
+          final bets = snapshot.data ?? [];
+          final countryOptions = _countryOptions(bets);
+          final leagueOptions = _leagueOptions(bets);
+          final filteredBets = _filterBets(bets);
+
+          final totalProfit =
+          filteredBets.fold<double>(0, (sum, item) => sum + item.netProfit);
+          final totalStake =
+          filteredBets.fold<double>(0, (sum, item) => sum + item.stake);
+          final averageOdd = filteredBets.isEmpty
+              ? 0
+              : filteredBets.fold<double>(0, (sum, item) => sum + item.odd) /
+              filteredBets.length;
+
+          final wonCount =
+              filteredBets.where((bet) => bet.result == 'kazandi').length;
+          final lostCount =
+              filteredBets.where((bet) => bet.result == 'kaybetti').length;
+          final pendingCount =
+              filteredBets.where((bet) => bet.result == 'beklemede').length;
+
+          return Center(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.all(24),
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 1000),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                  children: [
+                    Card(
+                      color: const Color(0xFF161A23),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(18),
+                        child: isWide
+                            ? Row(
+                          children: [
+                            Expanded(
+                              child: _TopStat(
+                                title: 'Kayıt',
+                                value: '${filteredBets.length}',
+                              ),
+                            ),
+                            Expanded(
+                              child: _TopStat(
+                                title: 'Net',
+                                value: '${totalProfit.toStringAsFixed(2)} ₺',
+                                color: totalProfit >= 0
+                                    ? const Color(0xFF22C55E)
+                                    : const Color(0xFFEF4444),
+                              ),
+                            ),
+                            Expanded(
+                              child: _TopStat(
+                                title: 'Toplam Tutar',
+                                value: '${totalStake.toStringAsFixed(2)} ₺',
+                              ),
+                            ),
+                            Expanded(
+                              child: _TopStat(
+                                title: 'Ort. Oran',
+                                value: averageOdd.toStringAsFixed(2),
+                              ),
+                            ),
+                            Expanded(
+                              child: _TopStat(
+                                title: 'Kazanan',
+                                value: '$wonCount',
+                                color: const Color(0xFF22C55E),
+                              ),
+                            ),
+                            Expanded(
+                              child: _TopStat(
+                                title: 'Kaybeden',
+                                value: '$lostCount',
+                                color: const Color(0xFFEF4444),
+                              ),
+                            ),
+                            Expanded(
+                              child: _TopStat(
+                                title: 'Bekleyen',
+                                value: '$pendingCount',
+                                color: const Color(0xFF94A3B8),
+                              ),
+                            ),
+                          ],
+                        )
+                            : Column(
+                          children: [
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _TopStat(
+                                    title: 'Kayıt',
+                                    value: '${filteredBets.length}',
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _TopStat(
+                                    title: 'Net',
+                                    value:
+                                    '${totalProfit.toStringAsFixed(2)} ₺',
+                                    color: totalProfit >= 0
+                                        ? const Color(0xFF22C55E)
+                                        : const Color(0xFFEF4444),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _TopStat(
+                                    title: 'Toplam Tutar',
+                                    value:
+                                    '${totalStake.toStringAsFixed(2)} ₺',
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _TopStat(
+                                    title: 'Ort. Oran',
+                                    value: averageOdd.toStringAsFixed(2),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Row(
+                              children: [
+                                Expanded(
+                                  child: _TopStat(
+                                    title: 'Kazanan',
+                                    value: '$wonCount',
+                                    color: const Color(0xFF22C55E),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _TopStat(
+                                    title: 'Kaybeden',
+                                    value: '$lostCount',
+                                    color: const Color(0xFFEF4444),
+                                  ),
+                                ),
+                                Expanded(
+                                  child: _TopStat(
+                                    title: 'Bekleyen',
+                                    value: '$pendingCount',
+                                    color: const Color(0xFF94A3B8),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 16),
+                    Card(
+                      color: const Color(0xFF161A23),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.all(20),
+                        child: Column(
+                          children: [
+                            TextField(
+                              controller: _searchController,
+                              onChanged: (_) => setState(() {}),
+                              decoration: const InputDecoration(
+                                labelText: 'Ara',
+                                hintText: 'Maç, spor, ülke, lig, bahis türü veya not',
+                                prefixIcon: Icon(Icons.search),
+                              ),
+                            ),
+                            const SizedBox(height: 14),
+                            Wrap(
+                              spacing: 8,
+                              runSpacing: 8,
+                              children: [
+                                _QuickFilterChip(
+                                  label: 'Bugün',
+                                  isSelected: _selectedQuickFilter == 'Bugün',
+                                  onTap: () => _applyQuickFilter('Bugün'),
+                                ),
+                                _QuickFilterChip(
+                                  label: 'Son 7 Gün',
+                                  isSelected: _selectedQuickFilter == 'Son 7 Gün',
+                                  onTap: () => _applyQuickFilter('Son 7 Gün'),
+                                ),
+                                _QuickFilterChip(
+                                  label: 'Bu Ay',
+                                  isSelected: _selectedQuickFilter == 'Bu Ay',
+                                  onTap: () => _applyQuickFilter('Bu Ay'),
+                                ),
+                                _QuickFilterChip(
+                                  label: 'Sadece Kaybedenler',
+                                  isSelected:
+                                  _selectedQuickFilter == 'Sadece Kaybedenler',
+                                  onTap: () =>
+                                      _applyQuickFilter('Sadece Kaybedenler'),
+                                ),
+                                _QuickFilterChip(
+                                  label: 'Sadece Bekleyenler',
+                                  isSelected:
+                                  _selectedQuickFilter == 'Sadece Bekleyenler',
+                                  onTap: () =>
+                                      _applyQuickFilter('Sadece Bekleyenler'),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 14),
+                            Align(
+                              alignment: Alignment.centerLeft,
+                              child: TextButton.icon(
+                                onPressed: () {
+                                  setState(() {
+                                    _showAdvancedFilters =
+                                    !_showAdvancedFilters;
+                                  });
+                                },
+                                icon: Icon(
+                                  _showAdvancedFilters
+                                      ? Icons.expand_less
+                                      : Icons.expand_more,
+                                ),
+                                label: Text(
+                                  _showAdvancedFilters
+                                      ? 'Gelişmiş Filtreleri Gizle'
+                                      : 'Gelişmiş Filtreleri Göster',
+                                ),
+                              ),
+                            ),
+                            if (_showAdvancedFilters) ...[
+                              const SizedBox(height: 10),
+                              if (isWide)
+                                Column(
+                                  children: [
+                                    Row(
+                                      children: [
+                                        Expanded(child: _buildSportDropdown()),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _buildCountryDropdown(countryOptions),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _buildLeagueDropdown(leagueOptions),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(child: _buildResultDropdown()),
+                                      ],
+                                    ),
+                                  ],
+                                )
+                              else
+                                Column(
+                                  children: [
+                                    _buildSportDropdown(),
+                                    const SizedBox(height: 12),
+                                    _buildCountryDropdown(countryOptions),
+                                    const SizedBox(height: 12),
+                                    _buildLeagueDropdown(leagueOptions),
+                                    const SizedBox(height: 12),
+                                    _buildResultDropdown(),
+                                  ],
+                                ),
+                              const SizedBox(height: 14),
+                              DropdownButtonFormField<String>(
+                                value: _sortOption,
+                                decoration: const InputDecoration(
+                                  labelText: 'Sıralama',
+                                  prefixIcon: Icon(Icons.sort),
+                                ),
+                                items: _sortOptions
+                                    .map(
+                                      (option) => DropdownMenuItem(
+                                    value: option,
+                                    child: Text(option),
+                                  ),
+                                )
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _sortOption =
+                                        value ?? 'Tarih (Yeni → Eski)';
+                                  });
+                                },
+                              ),
+                              const SizedBox(height: 14),
+                              if (isWide)
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: _pickStartDate,
+                                        icon: const Icon(Icons.date_range),
+                                        label: Text(
+                                          _startDate == null
+                                              ? 'Başlangıç Tarihi'
+                                              : _formatDate(_startDate!),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: OutlinedButton.icon(
+                                        onPressed: _pickEndDate,
+                                        icon: const Icon(Icons.event),
+                                        label: Text(
+                                          _endDate == null
+                                              ? 'Bitiş Tarihi'
+                                              : _formatDate(_endDate!),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                Column(
+                                  children: [
+                                    OutlinedButton.icon(
+                                      onPressed: _pickStartDate,
+                                      icon: const Icon(Icons.date_range),
+                                      label: Text(
+                                        _startDate == null
+                                            ? 'Başlangıç Tarihi'
+                                            : _formatDate(_startDate!),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    OutlinedButton.icon(
+                                      onPressed: _pickEndDate,
+                                      icon: const Icon(Icons.event),
+                                      label: Text(
+                                        _endDate == null
+                                            ? 'Bitiş Tarihi'
+                                            : _formatDate(_endDate!),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              const SizedBox(height: 14),
+                              if (isWide)
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _minOddController,
+                                        keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        onChanged: (_) => setState(() {}),
+                                        decoration: const InputDecoration(
+                                          labelText: 'Min Oran',
+                                          prefixIcon: Icon(Icons.trending_up),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _maxOddController,
+                                        keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        onChanged: (_) => setState(() {}),
+                                        decoration: const InputDecoration(
+                                          labelText: 'Max Oran',
+                                          prefixIcon: Icon(Icons.trending_down),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                Column(
+                                  children: [
+                                    TextField(
+                                      controller: _minOddController,
+                                      keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                      onChanged: (_) => setState(() {}),
+                                      decoration: const InputDecoration(
+                                        labelText: 'Min Oran',
+                                        prefixIcon: Icon(Icons.trending_up),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextField(
+                                      controller: _maxOddController,
+                                      keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                      onChanged: (_) => setState(() {}),
+                                      decoration: const InputDecoration(
+                                        labelText: 'Max Oran',
+                                        prefixIcon: Icon(Icons.trending_down),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              const SizedBox(height: 14),
+                              if (isWide)
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _minStakeController,
+                                        keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        onChanged: (_) => setState(() {}),
+                                        decoration: const InputDecoration(
+                                          labelText: 'Min Tutar',
+                                          prefixIcon:
+                                          Icon(Icons.payments_outlined),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: _maxStakeController,
+                                        keyboardType:
+                                        const TextInputType.numberWithOptions(
+                                          decimal: true,
+                                        ),
+                                        onChanged: (_) => setState(() {}),
+                                        decoration: const InputDecoration(
+                                          labelText: 'Max Tutar',
+                                          prefixIcon: Icon(
+                                            Icons.account_balance_wallet_outlined,
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                )
+                              else
+                                Column(
+                                  children: [
+                                    TextField(
+                                      controller: _minStakeController,
+                                      keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                      onChanged: (_) => setState(() {}),
+                                      decoration: const InputDecoration(
+                                        labelText: 'Min Tutar',
+                                        prefixIcon:
+                                        Icon(Icons.payments_outlined),
+                                      ),
+                                    ),
+                                    const SizedBox(height: 12),
+                                    TextField(
+                                      controller: _maxStakeController,
+                                      keyboardType:
+                                      const TextInputType.numberWithOptions(
+                                        decimal: true,
+                                      ),
+                                      onChanged: (_) => setState(() {}),
+                                      decoration: const InputDecoration(
+                                        labelText: 'Max Tutar',
+                                        prefixIcon: Icon(
+                                          Icons.account_balance_wallet_outlined,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
+                            const SizedBox(height: 14),
+                            Align(
+                              alignment: Alignment.centerRight,
+                              child: TextButton.icon(
+                                onPressed: _clearFilters,
+                                icon: const Icon(Icons.clear_all),
+                                label: const Text('Filtreleri Temizle'),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20),
+                    Row(
+                      children: [
+                        const Text(
+                          'Kayıtlar',
+                          style: TextStyle(
+                            fontSize: 22,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const Spacer(),
+                        Text(
+                          '${filteredBets.length} kayıt',
+                          style: const TextStyle(color: Colors.white70),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: 12),
+                    if (filteredBets.isEmpty)
+                      Card(
+                        color: const Color(0xFF161A23),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(18),
+                        ),
+                        child: const Padding(
+                          padding: EdgeInsets.all(20),
+                          child: Text(
+                            'Filtreye uygun bahis bulunamadı.',
+                            textAlign: TextAlign.center,
+                          ),
+                        ),
+                      )
+                    else
+                      ...filteredBets.map(
+                            (bet) => Dismissible(
+                          key: ValueKey(
+                            '${bet.id ?? bet.createdAt.millisecondsSinceEpoch}_${bet.matchName}',
+                          ),
+                          direction: DismissDirection.endToStart,
+                          confirmDismiss: (_) => _confirmDelete(bet),
+                          background: Container(
+                            margin: const EdgeInsets.only(bottom: 12),
+                            padding: const EdgeInsets.symmetric(horizontal: 20),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFFDC2626),
+                              borderRadius: BorderRadius.circular(18),
+                            ),
+                            alignment: Alignment.centerRight,
+                            child: const Row(
+                              mainAxisAlignment: MainAxisAlignment.end,
+                              children: [
+                                Icon(Icons.delete_forever, color: Colors.white),
+                                SizedBox(width: 8),
+                                Text(
+                                  'Sil',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          child: _BetCard(
+                            bet: bet,
+                            resultLabel: _resultLabel(bet.result),
+                            resultColor: _resultColor(bet.result),
+                            formattedDate: _formatDate(bet.date),
+                            sportIcon: _sportIcon(bet.sport),
+                          ),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            ),
+          );
+        },
+      ),
+    );
+  }
+
+  Widget _buildSportDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedSport,
+      decoration: const InputDecoration(
+        labelText: 'Spor Dalı',
+        prefixIcon: Icon(Icons.sports_soccer),
+      ),
+      items: _sportOptions
+          .map(
+            (sport) => DropdownMenuItem(
+          value: sport,
+          child: Text(sport),
+        ),
+      )
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedQuickFilter = 'Yok';
+          _selectedSport = value ?? 'Tümü';
+        });
+      },
+    );
+  }
+
+  Widget _buildCountryDropdown(List<String> countryOptions) {
+    return DropdownButtonFormField<String>(
+      value: countryOptions.contains(_selectedCountry) ? _selectedCountry : 'Tümü',
+      decoration: const InputDecoration(
+        labelText: 'Ülke',
+        prefixIcon: Icon(Icons.public),
+      ),
+      items: countryOptions
+          .map(
+            (country) => DropdownMenuItem(
+          value: country,
+          child: Text(country),
+        ),
+      )
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedQuickFilter = 'Yok';
+          _selectedCountry = value ?? 'Tümü';
+          _selectedLeague = 'Tümü';
+        });
+      },
+    );
+  }
+
+  Widget _buildLeagueDropdown(List<String> leagueOptions) {
+    return DropdownButtonFormField<String>(
+      value: leagueOptions.contains(_selectedLeague) ? _selectedLeague : 'Tümü',
+      decoration: const InputDecoration(
+        labelText: 'Lig',
+        prefixIcon: Icon(Icons.emoji_events_outlined),
+      ),
+      items: leagueOptions
+          .map(
+            (league) => DropdownMenuItem(
+          value: league,
+          child: Text(league),
+        ),
+      )
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedQuickFilter = 'Yok';
+          _selectedLeague = value ?? 'Tümü';
+        });
+      },
+    );
+  }
+
+  Widget _buildResultDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedResult,
+      decoration: const InputDecoration(
+        labelText: 'Sonuç',
+        prefixIcon: Icon(Icons.flag_outlined),
+      ),
+      items: _resultOptions
+          .map(
+            (result) => DropdownMenuItem(
+          value: result,
+          child: Text(_resultLabel(result == 'Tümü' ? 'Tümü' : result)),
+        ),
+      )
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedQuickFilter = 'Yok';
+          _selectedResult = value ?? 'Tümü';
+        });
+      },
+    );
+  }
+}
+
+class _BetCard extends StatelessWidget {
+  final BetModel bet;
+  final String resultLabel;
+  final Color resultColor;
+  final String formattedDate;
+  final IconData sportIcon;
+
+  const _BetCard({
+    required this.bet,
+    required this.resultLabel,
+    required this.resultColor,
+    required this.formattedDate,
+    required this.sportIcon,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: const Color(0xFF161A23),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(18),
+      ),
+      margin: const EdgeInsets.only(bottom: 12),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(18),
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (_) => EditBetPage(bet: bet),
+            ),
+          );
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Icon(
+                    sportIcon,
+                    size: 18,
+                    color: const Color(0xFF16A34A),
+                  ),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      bet.matchName,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 8),
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (bet.country.isNotEmpty || bet.league.isNotEmpty)
+                    Text(
+                      '${bet.country} • ${bet.league}',
+                      style: const TextStyle(
+                        color: Color(0xFF16A34A),
+                        fontSize: 12,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                ],
+              ),
+              const SizedBox(height: 6),
+              Text(
+                'Tarih: $formattedDate',
+                style: const TextStyle(color: Colors.white70),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                'Oran: ${bet.odd.toStringAsFixed(2)} | Tutar: ${bet.stake.toStringAsFixed(2)} ₺',
+                style: const TextStyle(color: Colors.white70),
+              ),
+              if (bet.note.trim().isNotEmpty) ...[
+                const SizedBox(height: 6),
+                Text(
+                  'Not: ${bet.note}',
+                  style: const TextStyle(color: Colors.white70),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+              ],
+              const SizedBox(height: 12),
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 4,
+                    ),
+                    decoration: BoxDecoration(
+                      color: resultColor.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(999),
+                    ),
+                    child: Text(
+                      resultLabel,
+                      style: TextStyle(
+                        color: resultColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const Spacer(),
+                  Text(
+                    '${bet.netProfit.toStringAsFixed(2)} ₺',
+                    style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 15,
+                      color: bet.netProfit >= 0
+                          ? const Color(0xFF22C55E)
+                          : const Color(0xFFEF4444),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+class _TopStat extends StatelessWidget {
+  final String title;
+  final String value;
+  final Color? color;
+
+  const _TopStat({
+    required this.title,
+    required this.value,
+    this.color,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      children: [
+        Text(
+          title,
+          style: const TextStyle(color: Colors.white70),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 18,
+            fontWeight: FontWeight.bold,
+            color: color,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class _QuickFilterChip extends StatelessWidget {
+  final String label;
+  final bool isSelected;
+  final VoidCallback onTap;
+
+  const _QuickFilterChip({
+    required this.label,
+    required this.isSelected,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return ChoiceChip(
+      label: Text(label),
+      selected: isSelected,
+      onSelected: (_) => onTap(),
+    );
+  }
+}
