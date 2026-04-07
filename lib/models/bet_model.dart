@@ -7,6 +7,8 @@ class BetModel {
   final String sport;
   final String country;
   final String league;
+  final String homeTeam;
+  final String awayTeam;
   final String matchName;
   final String betType;
   final double odd;
@@ -23,6 +25,8 @@ class BetModel {
     required this.sport,
     required this.country,
     required this.league,
+    this.homeTeam = '',
+    this.awayTeam = '',
     required this.matchName,
     required this.betType,
     required this.odd,
@@ -33,6 +37,29 @@ class BetModel {
     required this.createdAt,
   });
 
+  static Map<String, String> _parseMatchName(String matchName) {
+    final parts = matchName.split(' - ');
+
+    final parsedHome = parts.isNotEmpty ? parts.first.trim() : '';
+    final parsedAway =
+    parts.length > 1 ? parts.sublist(1).join(' - ').trim() : '';
+
+    return {
+      'homeTeam': parsedHome,
+      'awayTeam': parsedAway,
+    };
+  }
+
+  String get resolvedHomeTeam {
+    if (homeTeam.trim().isNotEmpty) return homeTeam.trim();
+    return _parseMatchName(matchName)['homeTeam'] ?? '';
+  }
+
+  String get resolvedAwayTeam {
+    if (awayTeam.trim().isNotEmpty) return awayTeam.trim();
+    return _parseMatchName(matchName)['awayTeam'] ?? '';
+  }
+
   Map<String, dynamic> toMap() {
     return {
       'userId': userId,
@@ -40,6 +67,8 @@ class BetModel {
       'sport': sport,
       'country': country,
       'league': league,
+      'homeTeam': resolvedHomeTeam,
+      'awayTeam': resolvedAwayTeam,
       'matchName': matchName,
       'betType': betType,
       'odd': odd,
@@ -52,6 +81,9 @@ class BetModel {
   }
 
   factory BetModel.fromMap(Map<String, dynamic> map, String documentId) {
+    final rawMatchName = (map['matchName'] ?? '').toString();
+    final parsed = _parseMatchName(rawMatchName);
+
     return BetModel(
       id: documentId,
       userId: map['userId'] ?? '',
@@ -59,7 +91,9 @@ class BetModel {
       sport: map['sport'] ?? '',
       country: map['country'] ?? '',
       league: map['league'] ?? '',
-      matchName: map['matchName'] ?? '',
+      homeTeam: (map['homeTeam'] ?? parsed['homeTeam'] ?? '').toString(),
+      awayTeam: (map['awayTeam'] ?? parsed['awayTeam'] ?? '').toString(),
+      matchName: rawMatchName,
       betType: map['betType'] ?? '',
       odd: (map['odd'] ?? 0).toDouble(),
       stake: (map['stake'] ?? 0).toDouble(),

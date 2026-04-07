@@ -1,3 +1,5 @@
+import 'package:bet_tracker_app/data/bet_form_catalog.dart';
+import 'package:bet_tracker_app/data/bet_form_helpers.dart';
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
@@ -26,157 +28,9 @@ class _AddBetPageState extends State<AddBetPage> {
   final _stakeController = TextEditingController();
   final _noteController = TextEditingController();
 
-  final List<String> _sports = [
-    'Futbol',
-    'Basketbol',
-    'Tenis',
-    'Voleybol',
-    'Diğer',
-  ];
-
-  final Map<String, Map<String, Map<String, List<String>>>> _teamData = {
-    'Futbol': {
-      'Türkiye': {
-        'Süper Lig': [
-          'Kocaelispor',
-          'Beşiktaş',
-          'Galatasaray',
-          'Fenerbahçe',
-          'Trabzonspor',
-          'Başakşehir',
-          'Göztepe',
-        ],
-        '1. Lig': [
-          'Sakaryaspor',
-          'Bursaspor',
-        ],
-      },
-      'İspanya': {
-        'La Liga': [
-          'Real Madrid',
-          'Barcelona',
-          'Atletico Madrid',
-        ],
-      },
-      'İngiltere': {
-        'Premier League': [
-          'Manchester City',
-          'Manchester United',
-          'Liverpool',
-          'Arsenal',
-          'Chelsea',
-        ],
-      },
-      'Almanya': {
-        'Bundesliga': [
-          'Bayern Münih',
-          'Borussia Dortmund',
-        ],
-      },
-      'Fransa': {
-        'Ligue 1': [
-          'PSG',
-        ],
-      },
-      'İtalya': {
-        'Serie A': [
-          'Inter',
-          'Milan',
-          'Juventus',
-          'Napoli',
-        ],
-      },
-    },
-    'Basketbol': {
-      'ABD': {
-        'NBA': [
-          'Los Angeles Lakers',
-          'Boston Celtics',
-          'Golden State Warriors',
-          'Chicago Bulls',
-        ],
-      },
-      'Türkiye': {
-        'Basketbol Süper Ligi': [
-          'Anadolu Efes',
-          'Fenerbahçe Beko',
-          'Galatasaray',
-          'Beşiktaş',
-        ],
-      },
-    },
-    'Tenis': {
-      'Genel': {
-        'ATP': [
-          'Novak Djokovic',
-          'Carlos Alcaraz',
-          'Jannik Sinner',
-        ],
-        'WTA': [
-          'Iga Swiatek',
-          'Aryna Sabalenka',
-          'Coco Gauff',
-        ],
-      },
-    },
-    'Voleybol': {
-      'Türkiye': {
-        'Sultanlar Ligi': [
-          'VakıfBank',
-          'Eczacıbaşı',
-          'Fenerbahçe Medicana',
-        ],
-        'Efeler Ligi': [
-          'Halkbank',
-          'Ziraat Bankkart',
-        ],
-      },
-    },
-  };
-
   List<String> _recentTeams = [];
   List<String> _frequentTeams = [];
 
-  final Map<String, List<String>> _betTypesBySport = {
-    'Futbol': [
-      'MS 1',
-      'MS X',
-      'MS 2',
-      'ÇŞ 1X',
-      'ÇŞ 12',
-      'ÇŞ X2',
-      'Üst 2.5',
-      'Alt 2.5',
-      'Karşılıklı Gol Var',
-      'Karşılıklı Gol Yok',
-    ],
-    'Basketbol': [
-      'Maç Sonucu 1',
-      'Maç Sonucu 2',
-      'Üst',
-      'Alt',
-      'Handikaplı Maç Sonucu',
-    ],
-    'Tenis': [
-      'Maç Sonucu 1',
-      'Maç Sonucu 2',
-      'Set Skoru',
-      'Toplam Oyun Üst',
-      'Toplam Oyun Alt',
-    ],
-    'Voleybol': [
-      'Maç Sonucu 1',
-      'Maç Sonucu 2',
-      'Set Sayısı Üst',
-      'Set Sayısı Alt',
-    ],
-    'Diğer': [
-      'Maç Sonucu',
-      'Üst/Alt',
-      'Handikap',
-      'Diğer',
-    ],
-  };
 
   DateTime _selectedDate = DateTime.now();
   String _selectedResult = 'beklemede';
@@ -226,142 +80,50 @@ class _AddBetPageState extends State<AddBetPage> {
   }
 
   Future<void> _loadTeamSuggestions() async {
-    final betsStream = BetService.getUserBets();
-    final bets = await betsStream.first;
-
-    final List<String> recentOrdered = [];
-    final Map<String, int> frequencyMap = {};
-
-    for (final bet in bets) {
-      if (!bet.matchName.contains(' - ')) continue;
-
-      final parts = bet.matchName.split(' - ');
-
-      for (final rawTeam in parts) {
-        final team = rawTeam.trim();
-        if (team.isEmpty) continue;
-
-        frequencyMap[team] = (frequencyMap[team] ?? 0) + 1;
-
-        if (!recentOrdered.contains(team)) {
-          recentOrdered.add(team);
-        }
-      }
-    }
-
-    final frequentOrdered = frequencyMap.entries.toList()
-      ..sort((a, b) => b.value.compareTo(a.value));
+    final bets = await BetService.getUserBets().first;
+    final suggestionData = BetFormHelpers.extractTeamSuggestionData(bets);
 
     if (!mounted) return;
 
     setState(() {
-      _recentTeams = recentOrdered.take(10).toList();
-      _frequentTeams = frequentOrdered
-          .map((entry) => entry.key)
-          .take(10)
-          .toList();
+      _recentTeams = suggestionData.recentTeams;
+      _frequentTeams = suggestionData.frequentTeams;
     });
   }
 
   List<String> _getFilteredTeams() {
-    if (_sportController.text.isEmpty ||
-        _countryController.text.isEmpty ||
-        _leagueController.text.isEmpty) {
-      return [];
-    }
-
-    return _teamData[_sportController.text]?[_countryController.text]
-    ?[_leagueController.text] ??
-        [];
-  }
-
-  List<String> _getSmartTeamSuggestions(String query) {
-    final normalizedQuery = query.trim().toLowerCase();
-
-    final filteredTeams = _getFilteredTeams();
-
-    final fallbackTeams = _teamData.values
-        .expand((countries) => countries.values)
-        .expand((leagues) => leagues.values)
-        .expand((teams) => teams)
-        .toSet()
-        .toList();
-
-    final sourceTeams = filteredTeams.isNotEmpty ? filteredTeams : fallbackTeams;
-
-    final combined = <String>[
-      ..._recentTeams.where((team) => sourceTeams.contains(team)),
-      ..._frequentTeams.where((team) => sourceTeams.contains(team)),
-      ...sourceTeams,
-    ];
-
-    final uniqueOrdered = <String>[];
-    for (final team in combined) {
-      if (!uniqueOrdered.contains(team)) {
-        uniqueOrdered.add(team);
-      }
-    }
-
-    if (normalizedQuery.isEmpty) {
-      return uniqueOrdered.take(12).toList();
-    }
-
-    final startsWithMatches = uniqueOrdered
-        .where((team) => team.toLowerCase().startsWith(normalizedQuery))
-        .toList();
-
-    final containsMatches = uniqueOrdered
-        .where(
-          (team) =>
-      !startsWithMatches.contains(team) &&
-          team.toLowerCase().contains(normalizedQuery),
-    )
-        .toList();
-
-    return [...startsWithMatches, ...containsMatches].take(12).toList();
+    return BetFormCatalog.getAvailableTeams(
+      _sportController.text,
+      _countryController.text,
+      _leagueController.text,
+    );
   }
 
   List<String> get _availableCountries {
-    return (_teamData[_sportController.text] ?? {}).keys.toList();
+    return BetFormCatalog.getAvailableCountries(_sportController.text);
   }
 
   List<String> get _availableLeagues {
-    return (_teamData[_sportController.text]?[_countryController.text] ?? {})
-        .keys
-        .toList();
+    return BetFormCatalog.getAvailableLeagues(
+      _sportController.text,
+      _countryController.text,
+    );
   }
-
-  Map<String, String>? _findTeamPath(String teamName) {
-    for (final sportEntry in _teamData.entries) {
-      final sport = sportEntry.key;
-      final countries = sportEntry.value;
-
-      for (final countryEntry in countries.entries) {
-        final country = countryEntry.key;
-        final leagues = countryEntry.value;
-
-        for (final leagueEntry in leagues.entries) {
-          final league = leagueEntry.key;
-          final teams = leagueEntry.value;
-
-          if (teams.contains(teamName)) {
-            return {
-              'sport': sport,
-              'country': country,
-              'league': league,
-            };
-          }
-        }
-      }
-    }
-
-    return null;
-  }
-
 
   List<String> get _availableBetTypes {
-    return _betTypesBySport[_sportController.text] ?? [];
+    return BetFormCatalog.getAvailableBetTypes(_sportController.text);
   }
+
+  List<String> _getSmartTeamSuggestions(String query) {
+    return BetFormHelpers.buildSmartTeamSuggestions(
+      query: query,
+      filteredTeams: _getFilteredTeams(),
+      recentTeams: _recentTeams,
+      frequentTeams: _frequentTeams,
+    );
+  }
+
+
 
   Future<void> _loadDisciplineSettings() async {
     final userData = await UserService.getUserProfileOnce();
@@ -701,7 +463,10 @@ class _AddBetPageState extends State<AddBetPage> {
 
     final homeTeam = _homeTeamController.text.trim();
     final awayTeam = _awayTeamController.text.trim();
-    final matchName = '$homeTeam - $awayTeam';
+    final matchName = BetFormHelpers.buildMatchName(
+      homeTeam: homeTeam,
+      awayTeam: awayTeam,
+    );
 
     setState(() => _isLoading = true);
 
@@ -898,14 +663,15 @@ class _AddBetPageState extends State<AddBetPage> {
                         ),
                       ),
                       DropdownButtonFormField<String>(
-                        value: _sportController.text.isEmpty
+                        value: _sportController.text.isEmpty ||
+                            !BetFormCatalog.sports.contains(_sportController.text)
                             ? null
                             : _sportController.text,
                         decoration: const InputDecoration(
                           labelText: 'Spor Dalı',
                           prefixIcon: Icon(Icons.sports_soccer),
                         ),
-                        items: _sports
+                        items: BetFormCatalog.sports
                             .map(
                               (sport) => DropdownMenuItem(
                             value: sport,
@@ -1177,7 +943,7 @@ class _AddBetPageState extends State<AddBetPage> {
       onSelected: (selection) {
         controller.text = selection;
 
-        final teamPath = _findTeamPath(selection);
+        final teamPath = BetFormCatalog.findTeamPath(selection);
         if (teamPath != null) {
           setState(() {
             _sportController.text = teamPath['sport'] ?? _sportController.text;
@@ -1203,13 +969,15 @@ class _AddBetPageState extends State<AddBetPage> {
           );
         }
 
-        textEditingController.addListener(() {
-          controller.value = textEditingController.value;
-        });
-
         return TextFormField(
           controller: textEditingController,
           focusNode: focusNode,
+          onChanged: (value) {
+            controller.value = TextEditingValue(
+              text: value,
+              selection: TextSelection.collapsed(offset: value.length),
+            );
+          },
           validator: (value) {
             if (value == null || value.trim().isEmpty) {
               return 'Bu alan zorunlu';
