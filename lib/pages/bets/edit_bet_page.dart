@@ -478,6 +478,8 @@ class _EditBetPageState extends State<EditBetPage> {
       sport: _sportController.text.trim(),
       country: _countryController.text.trim(),
       league: _leagueController.text.trim(),
+      homeTeam: homeTeam,
+      awayTeam: awayTeam,
       matchName: matchName,
       betType: _betTypeController.text.trim(),
       odd: odd,
@@ -507,7 +509,54 @@ class _EditBetPageState extends State<EditBetPage> {
     _showMessage('Bahis güncellendi.');
     Navigator.pop(context);
   }
+  String _currentMatchNameForDialog() {
+    final homeTeam = _homeTeamController.text.trim();
+    final awayTeam = _awayTeamController.text.trim();
 
+    if (homeTeam.isNotEmpty && awayTeam.isNotEmpty) {
+      return '$homeTeam - $awayTeam';
+    }
+
+    return widget.bet.matchName;
+  }
+  Future<void> _confirmDelete() async {
+    final confirmed = await showDialog<bool>(
+      context: context,
+      builder: (dialogContext) {
+        return AlertDialog(
+          backgroundColor: const Color(0xFF161A23),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          title: const Text('Bahsi Sil'),
+          content: Text(
+            '"${_currentMatchNameForDialog()}" kaydını silmek istiyor musun?',
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, false);
+              },
+              child: const Text('Vazgeç'),
+            ),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.pop(dialogContext, true);
+              },
+              style: ElevatedButton.styleFrom(
+                backgroundColor: const Color(0xFFDC2626),
+              ),
+              child: const Text('Sil'),
+            ),
+          ],
+        );
+      },
+    );
+
+    if (confirmed == true) {
+      await _deleteBet();
+    }
+  }
   Future<void> _deleteBet() async {
     if (widget.bet.id == null) {
       _showMessage('Silinecek bahis bulunamadı.');
@@ -587,53 +636,92 @@ class _EditBetPageState extends State<EditBetPage> {
                           margin: const EdgeInsets.only(bottom: 16),
                           padding: const EdgeInsets.all(14),
                           decoration: BoxDecoration(
-                            color: _isPreviewLimitExceeded
-                                ? const Color(0xFFDC2626).withOpacity(0.12)
-                                : const Color(0xFF1F2937),
+                            color: const Color(0xFF16A34A).withOpacity(0.10),
                             borderRadius: BorderRadius.circular(14),
                             border: Border.all(
-                              color: _isPreviewLimitExceeded
-                                  ? const Color(0xFFDC2626).withOpacity(0.35)
-                                  : const Color(0xFF374151),
+                              color: const Color(0xFF16A34A).withOpacity(0.35),
                             ),
                           ),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               const Text(
-                                'Canlı Hesap',
-                                style: TextStyle(fontWeight: FontWeight.bold),
-                              ),
-                              const SizedBox(height: 10),
-                              Text(
-                                '• Net Etki: ${_previewNetProfit.toStringAsFixed(2)} ₺',
+                                'Aktif Disiplin Kuralları',
                                 style: TextStyle(
-                                  color: _previewNetProfit > 0
-                                      ? const Color(0xFF22C55E)
-                                      : _previewNetProfit < 0
-                                      ? const Color(0xFFEF4444)
-                                      : const Color(0xFFF59E0B),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              Text(
-                                '• Toplam Ödeme: ${_previewPayout.toStringAsFixed(2)} ₺',
-                              ),
+                              const SizedBox(height: 8),
                               if (_currentDynamicMaxStake > 0)
+                                Text(_maxStakeInfoText()),
+                              if (_dailyLossLimit > 0)
                                 Text(
-                                  '• Max: ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺',
+                                  '• Günlük kayıp limiti: ${_dailyLossLimit.toStringAsFixed(2)} ₺',
                                 ),
-                              if (_isPreviewLimitExceeded)
-                                const Text(
-                                  '• Limit aşıldı',
-                                  style: TextStyle(
-                                    color: Color(0xFFFCA5A5),
-                                    fontWeight: FontWeight.bold,
-                                  ),
+                              if (_targetBankroll > 0)
+                                Text(
+                                  '• Hedef kasa: ${_targetBankroll.toStringAsFixed(2)} ₺',
                                 ),
+                              if (_dailyLossLimit > 0)
+                                Text(
+                                  '• Bugünkü gerçekleşmiş kayıp: ${_todayLoss.toStringAsFixed(2)} ₺',
+                                ),
+                              Text(_disciplineModeLabel()),
                             ],
                           ),
                         ),
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: _isPreviewLimitExceeded
+                              ? const Color(0xFFDC2626).withOpacity(0.12)
+                              : const Color(0xFF1F2937),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: _isPreviewLimitExceeded
+                                ? const Color(0xFFDC2626).withOpacity(0.35)
+                                : const Color(0xFF374151),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            const Text(
+                              'Canlı Hesap',
+                              style: TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                            const SizedBox(height: 10),
+                            Text(
+                              '• Net Etki: ${_previewNetProfit.toStringAsFixed(2)} ₺',
+                              style: TextStyle(
+                                color: _previewNetProfit > 0
+                                    ? const Color(0xFF22C55E)
+                                    : _previewNetProfit < 0
+                                    ? const Color(0xFFEF4444)
+                                    : const Color(0xFFF59E0B),
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            Text(
+                              '• Toplam Ödeme: ${_previewPayout.toStringAsFixed(2)} ₺',
+                            ),
+                            if (_currentDynamicMaxStake > 0)
+                              Text(
+                                '• Max: ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺',
+                              ),
+                            if (_isPreviewLimitExceeded)
+                              const Text(
+                                '• Limit aşıldı',
+                                style: TextStyle(
+                                  color: Color(0xFFFCA5A5),
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                          ],
+                        ),
+                      ),
                       DropdownButtonFormField<String>(
                         value: _sportController.text.isEmpty ||
                             !BetFormCatalog.sports.contains(_sportController.text)
@@ -895,7 +983,7 @@ class _EditBetPageState extends State<EditBetPage> {
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed:
-                        (_isLoading || _isDeleting) ? null : _deleteBet,
+                        (_isLoading || _isDeleting) ? null : _confirmDelete,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: const Color(0xFFDC2626),
                         ),

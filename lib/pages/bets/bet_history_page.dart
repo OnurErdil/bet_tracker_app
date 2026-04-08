@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/edit_bet_page.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
@@ -18,6 +19,8 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   final TextEditingController _minStakeController = TextEditingController();
   final TextEditingController _maxStakeController = TextEditingController();
 
+  Timer? _searchDebounce;
+  String _searchQuery = '';
   String _selectedSport = 'Tümü';
   String _selectedCountry = 'Tümü';
   String _selectedLeague = 'Tümü';
@@ -88,12 +91,22 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     _maxOddController.dispose();
     _minStakeController.dispose();
     _maxStakeController.dispose();
+    _searchDebounce?.cancel();
     super.dispose();
   }
+  void _onSearchChanged(String value) {
+    _searchDebounce?.cancel();
 
+    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+      if (!mounted) return;
 
+      setState(() {
+        _searchQuery = value.trim().toLowerCase();
+      });
+    });
+  }
   List<BetModel> _filterBets(List<BetModel> bets) {
-    final query = _searchController.text.trim().toLowerCase();
+    final query = _searchQuery;
 
     final minOdd =
     double.tryParse(_minOddController.text.trim().replaceAll(',', '.'));
@@ -105,9 +118,15 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     double.tryParse(_maxStakeController.text.trim().replaceAll(',', '.'));
 
     final filtered = bets.where((bet) {
+      final displayMatchName = _displayMatchName(bet).toLowerCase();
+      final homeTeam = bet.resolvedHomeTeam.toLowerCase();
+      final awayTeam = bet.resolvedAwayTeam.toLowerCase();
+
       final matchesSearch =
           query.isEmpty ||
-              bet.matchName.toLowerCase().contains(query) ||
+              displayMatchName.contains(query) ||
+              homeTeam.contains(query) ||
+              awayTeam.contains(query) ||
               bet.betType.toLowerCase().contains(query) ||
               bet.sport.toLowerCase().contains(query) ||
               bet.country.toLowerCase().contains(query) ||
@@ -200,6 +219,24 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       _startDate = null;
       _endDate = null;
     });
+    void _clearFilters() {
+      setState(() {
+        _searchController.clear();
+        _searchQuery = '';
+        _minOddController.clear();
+        _maxOddController.clear();
+        _minStakeController.clear();
+        _maxStakeController.clear();
+        _selectedSport = 'Tümü';
+        _selectedCountry = 'Tümü';
+        _selectedLeague = 'Tümü';
+        _selectedResult = 'Tümü';
+        _selectedQuickFilter = 'Yok';
+        _sortOption = 'Tarih (Yeni → Eski)';
+        _startDate = null;
+        _endDate = null;
+      });
+    }
   }
 
   void _applyQuickFilter(String filter) {
@@ -279,7 +316,16 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
         return const Color(0xFF94A3B8);
     }
   }
+  String _displayMatchName(BetModel bet) {
+    final home = bet.resolvedHomeTeam.trim();
+    final away = bet.resolvedAwayTeam.trim();
 
+    if (home.isNotEmpty && away.isNotEmpty) {
+      return '$home - $away';
+    }
+
+    return bet.matchName;
+  }
   String _formatDate(DateTime date) {
     final day = date.day.toString().padLeft(2, '0');
     final month = date.month.toString().padLeft(2, '0');
@@ -363,7 +409,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     ScaffoldMessenger.of(context).clearSnackBars();
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content: Text('${bet.matchName} silindi.'),
+        content: Text('${_displayMatchName(bet)} silindi.'),
         action: SnackBarAction(
           label: 'Geri Al',
           onPressed: () async {
@@ -374,6 +420,8 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                 sport: bet.sport,
                 country: bet.country,
                 league: bet.league,
+                homeTeam: bet.resolvedHomeTeam,
+                awayTeam: bet.resolvedAwayTeam,
                 matchName: bet.matchName,
                 betType: bet.betType,
                 odd: bet.odd,
@@ -418,7 +466,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           ),
           title: const Text('Bahsi Sil'),
           content: Text(
-            '"${bet.matchName}" kaydını silmek istiyor musun?',
+            '"${_displayMatchName(bet)}" kaydını silmek istiyor musun?',
           ),
           actions: [
             TextButton(
@@ -646,7 +694,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                           children: [
                             TextField(
                               controller: _searchController,
-                              onChanged: (_) => setState(() {}),
+                              onChanged: _onSearchChanged,
                               decoration: const InputDecoration(
                                 labelText: 'Ara',
                                 hintText: 'Maç, spor, ülke, lig, bahis türü veya not',
@@ -1202,7 +1250,9 @@ class _BetCard extends StatelessWidget {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      bet.matchName,
+                      bet.resolvedHomeTeam.isNotEmpty && bet.resolvedAwayTeam.isNotEmpty
+                          ? '${bet.resolvedHomeTeam} - ${bet.resolvedAwayTeam}'
+                          : bet.matchName,
                       style: const TextStyle(
                         fontWeight: FontWeight.bold,
                         fontSize: 16,

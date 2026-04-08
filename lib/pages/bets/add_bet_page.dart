@@ -476,6 +476,8 @@ class _AddBetPageState extends State<AddBetPage> {
       sport: _sportController.text.trim(),
       country: _countryController.text.trim(),
       league: _leagueController.text.trim(),
+      homeTeam: homeTeam,
+      awayTeam: awayTeam,
       matchName: matchName,
       betType: _betTypeController.text.trim(),
       odd: odd,
