@@ -228,6 +228,24 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       _startDate = null;
       _endDate = null;
     });
+    void _clearFilters() {
+      setState(() {
+        _searchController.clear();
+        _searchQuery = '';
+        _minOddController.clear();
+        _maxOddController.clear();
+        _minStakeController.clear();
+        _maxStakeController.clear();
+        _selectedSport = 'Tümü';
+        _selectedCountry = 'Tümü';
+        _selectedLeague = 'Tümü';
+        _selectedResult = 'Tümü';
+        _selectedQuickFilter = 'Yok';
+        _sortOption = 'Tarih (Yeni → Eski)';
+        _startDate = null;
+        _endDate = null;
+      });
+    }
   }
 
   void _applyQuickFilter(String filter) {
