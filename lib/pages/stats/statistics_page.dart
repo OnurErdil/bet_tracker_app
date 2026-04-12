@@ -1,4 +1,4 @@
-import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
+import 'package:bet_tracker_app/domain/statistics_calculator.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
@@ -45,20 +45,8 @@ class StatisticsPage extends StatelessWidget {
               }
 
               final userData = userSnapshot.data ?? {};
-              final startingBankroll =
-              (userData['startingBankroll'] ?? 0).toDouble();
-              final maxStakeMode =
-              (userData['maxStakeMode'] ?? 'fixed').toString();
-              final maxStakeValue =
-              (userData['maxStakeValue'] ?? 0).toDouble();
-              final dailyLossLimit =
-              (userData['dailyLossLimit'] ?? 0).toDouble();
-              final targetBankroll =
-              (userData['targetBankroll'] ?? 0).toDouble();
-              final disciplineMode =
-              (userData['disciplineMode'] ?? 'warning').toString();
 
-              return StreamBuilder<List<BankrollTransaction>>(
+              return StreamBuilder<List<dynamic>>(
                 stream: BankrollService.getTransactions(),
                 builder: (context, txSnapshot) {
                   if (txSnapshot.connectionState == ConnectionState.waiting) {
@@ -79,91 +67,11 @@ class StatisticsPage extends StatelessWidget {
 
                   final transactions = txSnapshot.data ?? [];
 
-                  double bankrollMovement = 0;
-                  for (final tx in transactions) {
-                    if (tx.type == 'deposit') {
-                      bankrollMovement += tx.amount;
-                    } else if (tx.type == 'withdraw') {
-                      bankrollMovement -= tx.amount;
-                    }
-                  }
-
-                  final totalBets = bets.length;
-                  final wonCount =
-                      bets.where((e) => e.result == 'kazandi').length;
-                  final lostCount =
-                      bets.where((e) => e.result == 'kaybetti').length;
-                  final refundedCount =
-                      bets.where((e) => e.result == 'iade').length;
-                  final pendingCount =
-                      bets.where((e) => e.result == 'beklemede').length;
-
-                  final totalStake =
-                  bets.fold<double>(0, (sum, item) => sum + item.stake);
-
-                  final totalProfit =
-                  bets.fold<double>(0, (sum, item) => sum + item.netProfit);
-
-                  final settledCount = bets
-                      .where((e) =>
-                  e.result == 'kazandi' ||
-                      e.result == 'kaybetti' ||
-                      e.result == 'iade')
-                      .length;
-
-                  final winRate =
-                  settledCount == 0 ? 0 : (wonCount / settledCount) * 100;
-
-                  final roi =
-                  totalStake == 0 ? 0 : (totalProfit / totalStake) * 100;
-
-                  final currentBankroll =
-                      startingBankroll + totalProfit + bankrollMovement;
-
-                  double computedMaxStake = 0;
-                  if (maxStakeMode == 'percent') {
-                    computedMaxStake = currentBankroll * (maxStakeValue / 100);
-                  } else {
-                    computedMaxStake = maxStakeValue;
-                  }
-
-                  final today = DateTime.now();
-                  double todayLoss = 0;
-
-                  for (final bet in bets) {
-                    final sameDay = bet.date.year == today.year &&
-                        bet.date.month == today.month &&
-                        bet.date.day == today.day;
-
-                    if (sameDay &&
-                        bet.result == 'kaybetti' &&
-                        bet.netProfit < 0) {
-                      todayLoss += bet.netProfit.abs();
-                    }
-                  }
-
-                  final sportStats = _buildSportStats(bets);
-                  final analysis = _buildAdvancedAnalysis(
+                  final overview = StatisticsCalculator.calculate(
                     bets: bets,
-                    sportStats: sportStats,
+                    transactions: transactions.cast(),
+                    userData: userData,
                   );
-
-                  final bestSport = analysis['bestSport'] as String;
-                  final worstSport = analysis['worstSport'] as String;
-                  final mostPlayedSport = analysis['mostPlayedSport'] as String;
-                  final pendingRate = analysis['pendingRate'] as double;
-                  final bestDayLabel = analysis['bestDayLabel'] as String;
-                  final worstDayLabel = analysis['worstDayLabel'] as String;
-                  final winStreak = analysis['winStreak'] as int;
-                  final lossStreak = analysis['lossStreak'] as int;
-                  final mostPlayedBetType =
-                  analysis['mostPlayedBetType'] as String;
-                  final biggestWinLabel = analysis['biggestWinLabel'] as String;
-                  final biggestLossLabel = analysis['biggestLossLabel'] as String;
-                  final last10Form =
-                  analysis['last10Form'] as List<Map<String, String>>;
-                  final betTypeStats =
-                  analysis['betTypeStats'] as Map<String, Map<String, dynamic>>;
 
                   final isWide = MediaQuery.of(context).size.width > 900;
 
@@ -175,13 +83,15 @@ class StatisticsPage extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
-                            if (dailyLossLimit > 0 && todayLoss >= dailyLossLimit)
+                            if (overview.dailyLossLimit > 0 &&
+                                overview.todayLoss >= overview.dailyLossLimit)
                               const _WarningCard(
                                 text:
                                 'Bugünkü kayıp limiti aşıldı. Bugün frene basma zamanı.',
                               ),
-                            if (targetBankroll > 0 &&
-                                currentBankroll >= targetBankroll)
+                            if (overview.targetBankroll > 0 &&
+                                overview.currentBankroll >=
+                                    overview.targetBankroll)
                               const _WarningCard(
                                 text:
                                 'Hedef kasaya ulaştın. Hedef tamam, havaya zıplamak serbest.',
@@ -194,7 +104,8 @@ class StatisticsPage extends StatelessWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(20),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     const Text(
                                       'Kasa Özeti',
@@ -211,7 +122,7 @@ class StatisticsPage extends StatelessWidget {
                                             child: _StatBox(
                                               title: 'Başlangıç Kasası',
                                               value:
-                                              '${startingBankroll.toStringAsFixed(2)} ₺',
+                                              '${overview.startingBankroll.toStringAsFixed(2)} ₺',
                                               icon: Icons.savings_outlined,
                                             ),
                                           ),
@@ -220,11 +131,13 @@ class StatisticsPage extends StatelessWidget {
                                             child: _StatBox(
                                               title: 'Net Kâr / Zarar',
                                               value:
-                                              '${totalProfit.toStringAsFixed(2)} ₺',
-                                              valueColor: totalProfit >= 0
+                                              '${overview.totalProfit.toStringAsFixed(2)} ₺',
+                                              valueColor:
+                                              overview.totalProfit >= 0
                                                   ? const Color(0xFF22C55E)
                                                   : const Color(0xFFEF4444),
-                                              icon: Icons.account_balance_wallet,
+                                              icon:
+                                              Icons.account_balance_wallet,
                                             ),
                                           ),
                                           const SizedBox(width: 12),
@@ -232,8 +145,9 @@ class StatisticsPage extends StatelessWidget {
                                             child: _StatBox(
                                               title: 'Kasa Hareketleri',
                                               value:
-                                              '${bankrollMovement.toStringAsFixed(2)} ₺',
-                                              valueColor: bankrollMovement >= 0
+                                              '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
+                                              valueColor:
+                                              overview.bankrollMovement >= 0
                                                   ? const Color(0xFF22C55E)
                                                   : const Color(0xFFEF4444),
                                               icon: Icons.swap_horiz,
@@ -244,10 +158,11 @@ class StatisticsPage extends StatelessWidget {
                                             child: _StatBox(
                                               title: 'Mevcut Kasa',
                                               value:
-                                              '${currentBankroll.toStringAsFixed(2)} ₺',
+                                              '${overview.currentBankroll.toStringAsFixed(2)} ₺',
                                               valueColor:
-                                              currentBankroll >=
-                                                  startingBankroll
+                                              overview.currentBankroll >=
+                                                  overview
+                                                      .startingBankroll
                                                   ? const Color(0xFF22C55E)
                                                   : const Color(0xFFEF4444),
                                               icon: Icons.paid_outlined,
@@ -261,25 +176,28 @@ class StatisticsPage extends StatelessWidget {
                                           _StatBox(
                                             title: 'Başlangıç Kasası',
                                             value:
-                                            '${startingBankroll.toStringAsFixed(2)} ₺',
+                                            '${overview.startingBankroll.toStringAsFixed(2)} ₺',
                                             icon: Icons.savings_outlined,
                                           ),
                                           const SizedBox(height: 12),
                                           _StatBox(
                                             title: 'Net Kâr / Zarar',
                                             value:
-                                            '${totalProfit.toStringAsFixed(2)} ₺',
-                                            valueColor: totalProfit >= 0
+                                            '${overview.totalProfit.toStringAsFixed(2)} ₺',
+                                            valueColor:
+                                            overview.totalProfit >= 0
                                                 ? const Color(0xFF22C55E)
                                                 : const Color(0xFFEF4444),
-                                            icon: Icons.account_balance_wallet,
+                                            icon:
+                                            Icons.account_balance_wallet,
                                           ),
                                           const SizedBox(height: 12),
                                           _StatBox(
                                             title: 'Kasa Hareketleri',
                                             value:
-                                            '${bankrollMovement.toStringAsFixed(2)} ₺',
-                                            valueColor: bankrollMovement >= 0
+                                            '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
+                                            valueColor:
+                                            overview.bankrollMovement >= 0
                                                 ? const Color(0xFF22C55E)
                                                 : const Color(0xFFEF4444),
                                             icon: Icons.swap_horiz,
@@ -288,10 +206,10 @@ class StatisticsPage extends StatelessWidget {
                                           _StatBox(
                                             title: 'Mevcut Kasa',
                                             value:
-                                            '${currentBankroll.toStringAsFixed(2)} ₺',
+                                            '${overview.currentBankroll.toStringAsFixed(2)} ₺',
                                             valueColor:
-                                            currentBankroll >=
-                                                startingBankroll
+                                            overview.currentBankroll >=
+                                                overview.startingBankroll
                                                 ? const Color(0xFF22C55E)
                                                 : const Color(0xFFEF4444),
                                             icon: Icons.paid_outlined,
@@ -303,7 +221,7 @@ class StatisticsPage extends StatelessWidget {
                                       onPressed: () {
                                         _showBankrollDialog(
                                           context,
-                                          startingBankroll,
+                                          overview.startingBankroll,
                                         );
                                       },
                                       icon: const Icon(Icons.edit),
@@ -324,7 +242,8 @@ class StatisticsPage extends StatelessWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(20),
                                 child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  crossAxisAlignment:
+                                  CrossAxisAlignment.stretch,
                                   children: [
                                     const Text(
                                       'Disiplin Ayarları',
@@ -340,10 +259,12 @@ class StatisticsPage extends StatelessWidget {
                                           Expanded(
                                             child: _StatBox(
                                               title: 'Maksimum Bahis',
-                                              value: maxStakeMode == 'percent'
-                                                  ? '%${maxStakeValue.toStringAsFixed(1)} • ${computedMaxStake.toStringAsFixed(2)} ₺'
-                                                  : '${computedMaxStake.toStringAsFixed(2)} ₺',
-                                              icon: Icons.money_off_csred_outlined,
+                                              value: overview.maxStakeMode ==
+                                                  'percent'
+                                                  ? '%${overview.maxStakeValue.toStringAsFixed(1)} • ${overview.computedMaxStake.toStringAsFixed(2)} ₺'
+                                                  : '${overview.computedMaxStake.toStringAsFixed(2)} ₺',
+                                              icon: Icons
+                                                  .money_off_csred_outlined,
                                             ),
                                           ),
                                           const SizedBox(width: 12),
@@ -351,9 +272,9 @@ class StatisticsPage extends StatelessWidget {
                                             child: _StatBox(
                                               title: 'Günlük Kayıp Limiti',
                                               value:
-                                              '${dailyLossLimit.toStringAsFixed(2)} ₺',
-                                              icon:
-                                              Icons.warning_amber_rounded,
+                                              '${overview.dailyLossLimit.toStringAsFixed(2)} ₺',
+                                              icon: Icons
+                                                  .warning_amber_rounded,
                                             ),
                                           ),
                                           const SizedBox(width: 12),
@@ -361,7 +282,7 @@ class StatisticsPage extends StatelessWidget {
                                             child: _StatBox(
                                               title: 'Hedef Kasa',
                                               value:
-                                              '${targetBankroll.toStringAsFixed(2)} ₺',
+                                              '${overview.targetBankroll.toStringAsFixed(2)} ₺',
                                               icon: Icons.flag_outlined,
                                             ),
                                           ),
@@ -369,8 +290,9 @@ class StatisticsPage extends StatelessWidget {
                                           Expanded(
                                             child: _StatBox(
                                               title: 'Disiplin Modu',
-                                              value:
-                                              _disciplineModeText(disciplineMode),
+                                              value: _disciplineModeText(
+                                                overview.disciplineMode,
+                                              ),
                                               icon: Icons.shield_outlined,
                                             ),
                                           ),
@@ -381,31 +303,34 @@ class StatisticsPage extends StatelessWidget {
                                         children: [
                                           _StatBox(
                                             title: 'Maksimum Bahis',
-                                            value: maxStakeMode == 'percent'
-                                                ? '%${maxStakeValue.toStringAsFixed(1)} • ${computedMaxStake.toStringAsFixed(2)} ₺'
-                                                : '${computedMaxStake.toStringAsFixed(2)} ₺',
-                                            icon: Icons.money_off_csred_outlined,
+                                            value: overview.maxStakeMode ==
+                                                'percent'
+                                                ? '%${overview.maxStakeValue.toStringAsFixed(1)} • ${overview.computedMaxStake.toStringAsFixed(2)} ₺'
+                                                : '${overview.computedMaxStake.toStringAsFixed(2)} ₺',
+                                            icon: Icons
+                                                .money_off_csred_outlined,
                                           ),
                                           const SizedBox(height: 12),
                                           _StatBox(
                                             title: 'Günlük Kayıp Limiti',
                                             value:
-                                            '${dailyLossLimit.toStringAsFixed(2)} ₺',
-                                            icon:
-                                            Icons.warning_amber_rounded,
+                                            '${overview.dailyLossLimit.toStringAsFixed(2)} ₺',
+                                            icon: Icons
+                                                .warning_amber_rounded,
                                           ),
                                           const SizedBox(height: 12),
                                           _StatBox(
                                             title: 'Hedef Kasa',
                                             value:
-                                            '${targetBankroll.toStringAsFixed(2)} ₺',
+                                            '${overview.targetBankroll.toStringAsFixed(2)} ₺',
                                             icon: Icons.flag_outlined,
                                           ),
                                           const SizedBox(height: 12),
                                           _StatBox(
                                             title: 'Disiplin Modu',
-                                            value:
-                                            _disciplineModeText(disciplineMode),
+                                            value: _disciplineModeText(
+                                              overview.disciplineMode,
+                                            ),
                                             icon: Icons.shield_outlined,
                                           ),
                                         ],
@@ -415,16 +340,21 @@ class StatisticsPage extends StatelessWidget {
                                       onPressed: () {
                                         _showDisciplineDialog(
                                           context,
-                                          maxStakeMode: maxStakeMode,
-                                          maxStakeValue: maxStakeValue,
-                                          dailyLossLimit: dailyLossLimit,
-                                          targetBankroll: targetBankroll,
-                                          disciplineMode: disciplineMode,
+                                          maxStakeMode: overview.maxStakeMode,
+                                          maxStakeValue:
+                                          overview.maxStakeValue,
+                                          dailyLossLimit:
+                                          overview.dailyLossLimit,
+                                          targetBankroll:
+                                          overview.targetBankroll,
+                                          disciplineMode:
+                                          overview.disciplineMode,
                                         );
                                       },
                                       icon: const Icon(Icons.tune),
                                       label: const Text(
-                                          'Disiplin Ayarlarını Düzenle'),
+                                        'Disiplin Ayarlarını Düzenle',
+                                      ),
                                     ),
                                     const SizedBox(height: 12),
                                     ElevatedButton.icon(
@@ -479,34 +409,36 @@ class StatisticsPage extends StatelessWidget {
                             GridView.count(
                               crossAxisCount: isWide ? 2 : 1,
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                              physics:
+                              const NeverScrollableScrollPhysics(),
                               mainAxisSpacing: 16,
                               crossAxisSpacing: 16,
                               childAspectRatio: 3.2,
                               children: [
                                 _StatBox(
                                   title: 'En Kârlı Spor',
-                                  value: bestSport,
+                                  value: overview.bestSport,
                                   icon: Icons.emoji_events_outlined,
                                   valueColor: const Color(0xFF22C55E),
                                 ),
                                 _StatBox(
                                   title: 'En Zararlı Spor',
-                                  value: worstSport,
-                                  icon: Icons.sentiment_dissatisfied_outlined,
+                                  value: overview.worstSport,
+                                  icon: Icons
+                                      .sentiment_dissatisfied_outlined,
                                   valueColor: const Color(0xFFEF4444),
                                 ),
                                 _StatBox(
                                   title: 'En Çok Oynanan Spor',
-                                  value: mostPlayedSport,
+                                  value: overview.mostPlayedSport,
                                   icon: Icons.sports_score_outlined,
                                 ),
                                 _StatBox(
                                   title: 'Beklemede Oranı',
                                   value:
-                                  '%${pendingRate.toStringAsFixed(1)}',
+                                  '%${overview.pendingRate.toStringAsFixed(1)}',
                                   icon: Icons.pending_actions_outlined,
-                                  valueColor: pendingRate > 0
+                                  valueColor: overview.pendingRate > 0
                                       ? const Color(0xFFF59E0B)
                                       : null,
                                 ),
@@ -524,32 +456,33 @@ class StatisticsPage extends StatelessWidget {
                             GridView.count(
                               crossAxisCount: isWide ? 2 : 1,
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                              physics:
+                              const NeverScrollableScrollPhysics(),
                               mainAxisSpacing: 16,
                               crossAxisSpacing: 16,
                               childAspectRatio: 3.2,
                               children: [
                                 _StatBox(
                                   title: 'En İyi Gün',
-                                  value: bestDayLabel,
+                                  value: overview.bestDayLabel,
                                   icon: Icons.wb_sunny_outlined,
                                   valueColor: const Color(0xFF22C55E),
                                 ),
                                 _StatBox(
                                   title: 'En Kötü Gün',
-                                  value: worstDayLabel,
+                                  value: overview.worstDayLabel,
                                   icon: Icons.thunderstorm_outlined,
                                   valueColor: const Color(0xFFEF4444),
                                 ),
                                 _StatBox(
                                   title: 'En Uzun Kazanma Serisi',
-                                  value: '$winStreak',
+                                  value: '${overview.winStreak}',
                                   icon: Icons.trending_up,
                                   valueColor: const Color(0xFF22C55E),
                                 ),
                                 _StatBox(
                                   title: 'En Uzun Kaybetme Serisi',
-                                  value: '$lossStreak',
+                                  value: '${overview.lossStreak}',
                                   icon: Icons.trending_down,
                                   valueColor: const Color(0xFFEF4444),
                                 ),
@@ -567,91 +500,100 @@ class StatisticsPage extends StatelessWidget {
                             GridView.count(
                               crossAxisCount: isWide ? 2 : 1,
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                              physics:
+                              const NeverScrollableScrollPhysics(),
                               mainAxisSpacing: 16,
                               crossAxisSpacing: 16,
                               childAspectRatio: 3.2,
                               children: [
                                 _StatBox(
                                   title: 'En Büyük Tek Kazanç',
-                                  value: biggestWinLabel,
+                                  value: overview.biggestWinLabel,
                                   icon: Icons.arrow_upward,
                                   valueColor: const Color(0xFF22C55E),
                                 ),
                                 _StatBox(
                                   title: 'En Büyük Tek Kayıp',
-                                  value: biggestLossLabel,
+                                  value: overview.biggestLossLabel,
                                   icon: Icons.arrow_downward,
                                   valueColor: const Color(0xFFEF4444),
                                 ),
                                 _StatBox(
                                   title: 'En Çok Oynanan Bahis Türü',
-                                  value: mostPlayedBetType,
-                                  icon: Icons.local_fire_department_outlined,
+                                  value: overview.mostPlayedBetType,
+                                  icon: Icons
+                                      .local_fire_department_outlined,
                                 ),
-                                _Last10FormStat(formItems: last10Form),
+                                _Last10FormStat(
+                                  formItems: overview.last10Form,
+                                ),
                               ],
                             ),
                             const SizedBox(height: 20),
                             GridView.count(
                               crossAxisCount: isWide ? 3 : 1,
                               shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
+                              physics:
+                              const NeverScrollableScrollPhysics(),
                               mainAxisSpacing: 16,
                               crossAxisSpacing: 16,
                               childAspectRatio: 2.8,
                               children: [
                                 _StatBox(
                                   title: 'Toplam Bahis',
-                                  value: '$totalBets',
+                                  value: '${overview.totalBets}',
                                   icon: Icons.receipt_long,
                                 ),
                                 _StatBox(
                                   title: 'Toplam Oynanan',
-                                  value: '${totalStake.toStringAsFixed(2)} ₺',
+                                  value:
+                                  '${overview.totalStake.toStringAsFixed(2)} ₺',
                                   icon: Icons.payments_outlined,
                                 ),
                                 _StatBox(
                                   title: 'Kazanma Oranı',
-                                  value: '%${winRate.toStringAsFixed(1)}',
+                                  value:
+                                  '%${overview.winRate.toStringAsFixed(1)}',
                                   icon: Icons.bar_chart,
                                 ),
                                 _StatBox(
                                   title: 'Kazanan',
-                                  value: '$wonCount',
+                                  value: '${overview.wonCount}',
                                   valueColor: const Color(0xFF22C55E),
                                   icon: Icons.check_circle_outline,
                                 ),
                                 _StatBox(
                                   title: 'Kaybeden',
-                                  value: '$lostCount',
+                                  value: '${overview.lostCount}',
                                   valueColor: const Color(0xFFEF4444),
                                   icon: Icons.cancel_outlined,
                                 ),
                                 _StatBox(
                                   title: 'Beklemede',
-                                  value: '$pendingCount',
+                                  value: '${overview.pendingCount}',
                                   valueColor: const Color(0xFF94A3B8),
                                   icon: Icons.hourglass_bottom,
                                 ),
                                 _StatBox(
                                   title: 'İade',
-                                  value: '$refundedCount',
+                                  value: '${overview.refundedCount}',
                                   valueColor: const Color(0xFFF59E0B),
                                   icon: Icons.reply_all_outlined,
                                 ),
                                 _StatBox(
                                   title: 'ROI',
-                                  value: '%${roi.toStringAsFixed(1)}',
-                                  valueColor: roi >= 0
+                                  value:
+                                  '%${overview.roi.toStringAsFixed(1)}',
+                                  valueColor: overview.roi >= 0
                                       ? const Color(0xFF22C55E)
                                       : const Color(0xFFEF4444),
                                   icon: Icons.trending_up,
                                 ),
                                 _StatBox(
                                   title: 'Bugünkü Kayıp',
-                                  value: '${todayLoss.toStringAsFixed(2)} ₺',
-                                  valueColor: todayLoss > 0
+                                  value:
+                                  '${overview.todayLoss.toStringAsFixed(2)} ₺',
+                                  valueColor: overview.todayLoss > 0
                                       ? const Color(0xFFEF4444)
                                       : null,
                                   icon: Icons.today,
@@ -667,7 +609,7 @@ class StatisticsPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            if (betTypeStats.isEmpty)
+                            if (overview.betTypeStats.isEmpty)
                               Card(
                                 color: const Color(0xFF161A23),
                                 shape: RoundedRectangleBorder(
@@ -682,14 +624,15 @@ class StatisticsPage extends StatelessWidget {
                                 ),
                               )
                             else
-                              ...betTypeStats.entries.map((entry) {
+                              ...overview.betTypeStats.entries.map((entry) {
                                 final betType = entry.key;
                                 final data = entry.value;
                                 final typeProfit =
                                     (data['profit'] as double?) ?? 0;
                                 final typeCount =
                                     (data['count'] as int?) ?? 0;
-                                final typeWon = (data['won'] as int?) ?? 0;
+                                final typeWon =
+                                    (data['won'] as int?) ?? 0;
                                 final typeWinRate = typeCount == 0
                                     ? 0
                                     : (typeWon / typeCount) * 100;
@@ -699,7 +642,8 @@ class StatisticsPage extends StatelessWidget {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18),
                                   ),
-                                  margin: const EdgeInsets.only(bottom: 12),
+                                  margin:
+                                  const EdgeInsets.only(bottom: 12),
                                   child: ListTile(
                                     contentPadding:
                                     const EdgeInsets.symmetric(
@@ -740,7 +684,7 @@ class StatisticsPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 12),
-                            if (sportStats.isEmpty)
+                            if (overview.sportStats.isEmpty)
                               Card(
                                 color: const Color(0xFF161A23),
                                 shape: RoundedRectangleBorder(
@@ -755,14 +699,15 @@ class StatisticsPage extends StatelessWidget {
                                 ),
                               )
                             else
-                              ...sportStats.entries.map((entry) {
+                              ...overview.sportStats.entries.map((entry) {
                                 final sport = entry.key;
                                 final data = entry.value;
                                 final sportProfit =
                                     (data['profit'] as double?) ?? 0;
                                 final sportCount =
                                     (data['count'] as int?) ?? 0;
-                                final sportWon = (data['won'] as int?) ?? 0;
+                                final sportWon =
+                                    (data['won'] as int?) ?? 0;
                                 final sportWinRate = sportCount == 0
                                     ? 0
                                     : (sportWon / sportCount) * 100;
@@ -772,7 +717,8 @@ class StatisticsPage extends StatelessWidget {
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(18),
                                   ),
-                                  margin: const EdgeInsets.only(bottom: 12),
+                                  margin:
+                                  const EdgeInsets.only(bottom: 12),
                                   child: ListTile(
                                     contentPadding:
                                     const EdgeInsets.symmetric(
@@ -816,222 +762,6 @@ class StatisticsPage extends StatelessWidget {
         },
       ),
     );
-  }
-
-  static Map<String, Map<String, dynamic>> _buildSportStats(
-      List<BetModel> bets,
-      ) {
-    final Map<String, Map<String, dynamic>> result = {};
-
-    for (final bet in bets) {
-      result.putIfAbsent(bet.sport, () {
-        return {
-          'count': 0,
-          'won': 0,
-          'profit': 0.0,
-        };
-      });
-
-      result[bet.sport]!['count'] = (result[bet.sport]!['count'] as int) + 1;
-
-      if (bet.result == 'kazandi') {
-        result[bet.sport]!['won'] = (result[bet.sport]!['won'] as int) + 1;
-      }
-
-      result[bet.sport]!['profit'] =
-          (result[bet.sport]!['profit'] as double) + bet.netProfit;
-    }
-
-    return result;
-  }
-
-  static Map<String, dynamic> _buildAdvancedAnalysis({
-    required List<BetModel> bets,
-    required Map<String, Map<String, dynamic>> sportStats,
-  }) {
-    if (bets.isEmpty || sportStats.isEmpty) {
-      return {
-        'bestSport': '-',
-        'worstSport': '-',
-        'mostPlayedSport': '-',
-        'pendingRate': 0.0,
-        'bestDayLabel': '-',
-        'worstDayLabel': '-',
-        'winStreak': 0,
-        'lossStreak': 0,
-        'mostPlayedBetType': '-',
-        'biggestWinLabel': '-',
-        'biggestLossLabel': '-',
-        'last10Form': <Map<String, String>>[],
-      };
-    }
-
-    String bestSport = '-';
-    String worstSport = '-';
-    String mostPlayedSport = '-';
-
-    double bestProfit = double.negativeInfinity;
-    double worstProfit = double.infinity;
-    int mostPlayedCount = -1;
-
-    sportStats.forEach((sport, data) {
-      final profit = (data['profit'] as double?) ?? 0;
-      final count = (data['count'] as int?) ?? 0;
-
-      if (profit > bestProfit) {
-        bestProfit = profit;
-        bestSport = sport;
-      }
-
-      if (profit < worstProfit) {
-        worstProfit = profit;
-        worstSport = sport;
-      }
-
-      if (count > mostPlayedCount) {
-        mostPlayedCount = count;
-        mostPlayedSport = sport;
-      }
-    });
-
-    final pendingCount = bets.where((e) => e.result == 'beklemede').length;
-    final pendingRate =
-    bets.isEmpty ? 0.0 : (pendingCount / bets.length) * 100;
-
-    final dailyMap = <String, double>{};
-    for (final bet in bets) {
-      final key =
-          '${bet.date.year}-${bet.date.month.toString().padLeft(2, '0')}-${bet.date.day.toString().padLeft(2, '0')}';
-      dailyMap[key] = (dailyMap[key] ?? 0) + bet.netProfit;
-    }
-
-    String bestDayLabel = '-';
-    String worstDayLabel = '-';
-    double bestDayProfit = double.negativeInfinity;
-    double worstDayProfit = double.infinity;
-
-    dailyMap.forEach((day, profit) {
-      if (profit > bestDayProfit) {
-        bestDayProfit = profit;
-        bestDayLabel = '$day (${profit.toStringAsFixed(2)} ₺)';
-      }
-      if (profit < worstDayProfit) {
-        worstDayProfit = profit;
-        worstDayLabel = '$day (${profit.toStringAsFixed(2)} ₺)';
-      }
-    });
-
-    final settledBets = [...bets]..sort((a, b) => a.date.compareTo(b.date));
-    int currentWinStreak = 0;
-    int currentLossStreak = 0;
-    int maxWinStreak = 0;
-    int maxLossStreak = 0;
-
-    for (final bet in settledBets) {
-      if (bet.result == 'kazandi') {
-        currentWinStreak++;
-        currentLossStreak = 0;
-      } else if (bet.result == 'kaybetti') {
-        currentLossStreak++;
-        currentWinStreak = 0;
-      } else {
-        currentWinStreak = 0;
-        currentLossStreak = 0;
-      }
-
-      if (currentWinStreak > maxWinStreak) {
-        maxWinStreak = currentWinStreak;
-      }
-      if (currentLossStreak > maxLossStreak) {
-        maxLossStreak = currentLossStreak;
-      }
-    }
-
-    final betTypeCounts = <String, int>{};
-    final betTypeStats = <String, Map<String, dynamic>>{};
-    BetModel? biggestWin;
-    BetModel? biggestLoss;
-
-    for (final bet in bets) {
-      betTypeCounts[bet.betType] = (betTypeCounts[bet.betType] ?? 0) + 1;
-
-      if (biggestWin == null || bet.netProfit > biggestWin.netProfit) {
-        biggestWin = bet;
-      }for (final bet in bets) {
-        betTypeCounts[bet.betType] = (betTypeCounts[bet.betType] ?? 0) + 1;
-
-        betTypeStats.putIfAbsent(bet.betType, () {
-          return {
-            'count': 0,
-            'won': 0,
-            'profit': 0.0,
-          };
-        });
-
-        betTypeStats[bet.betType]!['count'] =
-            (betTypeStats[bet.betType]!['count'] as int) + 1;
-
-        betTypeStats[bet.betType]!['profit'] =
-            (betTypeStats[bet.betType]!['profit'] as double) + bet.netProfit;
-
-        if (bet.result == 'kazandi') {
-          betTypeStats[bet.betType]!['won'] =
-              (betTypeStats[bet.betType]!['won'] as int) + 1;
-        }
-
-        if (biggestWin == null || bet.netProfit > biggestWin.netProfit) {
-          biggestWin = bet;
-        }
-        if (biggestLoss == null || bet.netProfit < biggestLoss.netProfit) {
-          biggestLoss = bet;
-        }
-      }
-      if (biggestLoss == null || bet.netProfit < biggestLoss.netProfit) {
-        biggestLoss = bet;
-      }
-    }
-
-    String mostPlayedBetType = '-';
-    int maxBetTypeCount = 0;
-    betTypeCounts.forEach((key, value) {
-      if (value > maxBetTypeCount) {
-        maxBetTypeCount = value;
-        mostPlayedBetType = '$key ($value)';
-      }
-    });
-
-    final last10Sorted = [...bets]..sort((a, b) => b.date.compareTo(a.date));
-    final last10Form = last10Sorted.take(10).map((bet) {
-      switch (bet.result) {
-        case 'kazandi':
-          return {'label': 'W', 'color': 'green'};
-        case 'kaybetti':
-          return {'label': 'L', 'color': 'red'};
-        case 'iade':
-          return {'label': 'I', 'color': 'orange'};
-        default:
-          return {'label': 'B', 'color': 'gray'};
-      }
-    }).toList();
-
-    return {
-      'bestSport': bestSport,
-      'worstSport': worstSport,
-      'mostPlayedSport': mostPlayedSport,
-      'pendingRate': pendingRate,
-      'bestDayLabel': bestDayLabel,
-      'worstDayLabel': worstDayLabel,
-      'winStreak': maxWinStreak,
-      'lossStreak': maxLossStreak,
-      'mostPlayedBetType': mostPlayedBetType,
-      'biggestWinLabel':
-      biggestWin == null ? '-' : '${biggestWin.netProfit.toStringAsFixed(2)} ₺',
-      'biggestLossLabel':
-      biggestLoss == null ? '-' : '${biggestLoss.netProfit.toStringAsFixed(2)} ₺',
-      'last10Form': last10Form,
-      'betTypeStats': betTypeStats,
-      'betTypeStats': betTypeStats,
-    };
   }
 
   static void _showBankrollDialog(
@@ -1479,7 +1209,8 @@ class ProfitChart extends StatelessWidget {
           gridData: FlGridData(
             show: true,
             drawVerticalLine: false,
-            horizontalInterval: ((maxY - minY).abs() / 4).clamp(1, double.infinity),
+            horizontalInterval:
+            ((maxY - minY).abs() / 4).clamp(1, double.infinity),
           ),
           titlesData: FlTitlesData(
             topTitles: const AxisTitles(
@@ -1506,7 +1237,9 @@ class ProfitChart extends StatelessWidget {
             bottomTitles: AxisTitles(
               sideTitles: SideTitles(
                 showTitles: true,
-                interval: spots.length <= 1 ? 1 : (spots.length / 4).ceilToDouble(),
+                interval: spots.length <= 1
+                    ? 1
+                    : (spots.length / 4).ceilToDouble(),
                 getTitlesWidget: (value, meta) {
                   final index = value.toInt();
                   if (index < 0 || index >= sorted.length) {
@@ -1692,7 +1425,12 @@ class _Last10FormStat extends StatelessWidget {
                     spacing: 6,
                     runSpacing: 6,
                     children: formItems.isEmpty
-                        ? [const Text('-', style: TextStyle(fontWeight: FontWeight.bold))]
+                        ? [
+                      const Text(
+                        '-',
+                        style: TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    ]
                         : formItems.map((item) {
                       Color color;
                       switch (item['color']) {

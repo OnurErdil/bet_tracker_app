@@ -41,7 +41,8 @@ class BetFormHelpers {
   static ParsedMatchName parseMatchName(String matchName) {
     final parts = matchName.split(' - ');
     final homeTeam = parts.isNotEmpty ? parts.first.trim() : '';
-    final awayTeam = parts.length > 1 ? parts.sublist(1).join(' - ').trim() : '';
+    final awayTeam =
+    parts.length > 1 ? parts.sublist(1).join(' - ').trim() : '';
 
     return ParsedMatchName(
       homeTeam: homeTeam,
@@ -54,11 +55,9 @@ class BetFormHelpers {
     final Map<String, int> frequencyMap = {};
 
     for (final bet in bets) {
-      final parsed = parseMatchName(bet.matchName);
-
       final teams = [
-        parsed.homeTeam,
-        parsed.awayTeam,
+        bet.resolvedHomeTeam.trim(),
+        bet.resolvedAwayTeam.trim(),
       ];
 
       for (final rawTeam in teams) {
@@ -78,7 +77,8 @@ class BetFormHelpers {
 
     return TeamSuggestionData(
       recentTeams: recentOrdered.take(10).toList(),
-      frequentTeams: frequentOrdered.map((entry) => entry.key).take(10).toList(),
+      frequentTeams:
+      frequentOrdered.map((entry) => entry.key).take(10).toList(),
     );
   }
 
@@ -132,11 +132,12 @@ class BetFormHelpers {
   }
 
   static BetFormInitialData buildInitialDataFromBet(BetModel bet) {
-    final parsed = parseMatchName(bet.matchName);
+    final homeTeam = bet.resolvedHomeTeam.trim();
+    final awayTeam = bet.resolvedAwayTeam.trim();
 
     final detectedTeamPath =
-        BetFormCatalog.findTeamPath(parsed.homeTeam) ??
-            BetFormCatalog.findTeamPath(parsed.awayTeam);
+        BetFormCatalog.findTeamPath(homeTeam) ??
+            BetFormCatalog.findTeamPath(awayTeam);
 
     return BetFormInitialData(
       sport: bet.sport.trim().isNotEmpty
@@ -148,10 +149,12 @@ class BetFormHelpers {
       league: bet.league.trim().isNotEmpty
           ? bet.league.trim()
           : (detectedTeamPath?['league'] ?? ''),
-      homeTeam: parsed.homeTeam,
-      awayTeam: parsed.awayTeam,
+      homeTeam: homeTeam,
+      awayTeam: awayTeam,
     );
-  }  static String buildMatchName({
+  }
+
+  static String buildMatchName({
     required String homeTeam,
     required String awayTeam,
   }) {

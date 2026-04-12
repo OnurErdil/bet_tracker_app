@@ -1,3 +1,4 @@
+import 'package:bet_tracker_app/domain/bet_calculator.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -110,24 +111,6 @@ class BetService {
     return totalLoss;
   }
 
-  static double calculateNetProfit({
-    required double odd,
-    required double stake,
-    required String result,
-  }) {
-    switch (result) {
-      case 'kazandi':
-        return (odd * stake) - stake;
-      case 'kaybetti':
-        return -stake;
-      case 'iade':
-        return 0;
-      case 'beklemede':
-      default:
-        return 0;
-    }
-  }
-
   static Future<String?> settleBetQuick({
     required BetModel bet,
     required String newResult,
@@ -137,7 +120,7 @@ class BetService {
         return 'Güncellenecek bahis bulunamadı.';
       }
 
-      final updatedNetProfit = calculateNetProfit(
+      final updatedNetProfit = BetCalculator.calculateNetProfit(
         odd: bet.odd,
         stake: bet.stake,
         result: newResult,

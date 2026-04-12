@@ -1,5 +1,6 @@
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
+import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 
 class HomeStats {
   final List<BetModel> bets;
@@ -52,9 +53,17 @@ class HomeStats {
     required List<BankrollTransaction> transactions,
     required Map<String, dynamic> userData,
   }) {
+    final now = DateTime.now();
+
+    final snapshot = BankrollDisciplineCalculator.calculate(
+      bets: bets,
+      transactions: transactions,
+      userData: userData,
+      referenceDate: now,
+    );
+
     final totalBets = bets.length;
-    final totalProfit =
-    bets.fold<double>(0, (sum, item) => sum + item.netProfit);
+    final totalProfit = snapshot.totalProfit;
 
     final wonCount = bets.where((e) => e.result == 'kazandi').length;
     final settledCount = bets
@@ -70,27 +79,19 @@ class HomeStats {
 
     final pendingBets = bets.where((e) => e.result == 'beklemede').toList();
 
-    final today = DateTime.now();
     final todayBets = bets.where((bet) {
-      return bet.date.year == today.year &&
-          bet.date.month == today.month &&
-          bet.date.day == today.day;
+      return bet.date.year == now.year &&
+          bet.date.month == now.month &&
+          bet.date.day == now.day;
     }).toList();
 
     final todayProfit =
     todayBets.fold<double>(0, (sum, item) => sum + item.netProfit);
 
-    double todayLoss = 0;
-    for (final bet in todayBets) {
-      if (bet.result == 'kaybetti' && bet.netProfit < 0) {
-        todayLoss += bet.netProfit.abs();
-      }
-    }
-
     final sevenDaysAgo = DateTime(
-      today.year,
-      today.month,
-      today.day,
+      now.year,
+      now.month,
+      now.day,
     ).subtract(const Duration(days: 6));
 
     final last7DaysBets = bets.where((bet) {
@@ -128,30 +129,6 @@ class HomeStats {
       }
     });
 
-    final startingBankroll = (userData['startingBankroll'] ?? 0).toDouble();
-    final maxStakeMode = (userData['maxStakeMode'] ?? 'fixed').toString();
-    final maxStakeValue = (userData['maxStakeValue'] ?? 0).toDouble();
-    final dailyLossLimit = (userData['dailyLossLimit'] ?? 0).toDouble();
-    final disciplineMode = (userData['disciplineMode'] ?? 'warning').toString();
-
-    final transactionNet = transactions.fold<double>(0, (sum, tx) {
-      if (tx.type == 'deposit') return sum + tx.amount;
-      if (tx.type == 'withdraw') return sum - tx.amount;
-      return sum;
-    });
-
-    final currentBankroll = startingBankroll + transactionNet + totalProfit;
-
-    final maxPlayableAmount = maxStakeMode == 'percent'
-        ? currentBankroll * (maxStakeValue / 100)
-        : maxStakeValue;
-
-    final remainingDailyLoss =
-    dailyLossLimit > 0 ? (dailyLossLimit - todayLoss) : 0;
-
-    final isDailyLossExceeded =
-        dailyLossLimit > 0 && todayLoss >= dailyLossLimit;
-
     return HomeStats(
       bets: bets,
       pendingBets: pendingBets,
@@ -160,14 +137,14 @@ class HomeStats {
       totalProfit: totalProfit,
       winRate: winRate,
       todayProfit: todayProfit,
-      todayLoss: todayLoss,
+      todayLoss: snapshot.todayLoss,
       last7DaysProfit: last7DaysProfit,
-      currentBankroll: currentBankroll,
-      maxPlayableAmount: maxPlayableAmount,
-      dailyLossLimit: dailyLossLimit,
-      remainingDailyLoss: remainingDailyLoss,
-      isDailyLossExceeded: isDailyLossExceeded,
-      disciplineMode: disciplineMode,
+      currentBankroll: snapshot.currentBankroll,
+      maxPlayableAmount: snapshot.computedMaxStake,
+      dailyLossLimit: snapshot.dailyLossLimit,
+      remainingDailyLoss: snapshot.remainingDailyLoss,
+      isDailyLossExceeded: snapshot.isDailyLossExceeded,
+      disciplineMode: snapshot.disciplineMode,
       mostPlayedBetType: mostPlayedBetType,
       mostPlayedBetTypeCount: mostPlayedBetTypeCount,
       biggestWin: biggestWin,

@@ -1,11 +1,13 @@
 import 'package:bet_tracker_app/data/bet_form_catalog.dart';
 import 'package:bet_tracker_app/data/bet_form_helpers.dart';
+import 'package:bet_tracker_app/domain/bet_calculator.dart';
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/services/user_service.dart';
 import 'package:flutter/material.dart';
+import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 
 class EditBetPage extends StatefulWidget {
   final BetModel bet;
@@ -56,6 +58,7 @@ class _EditBetPageState extends State<EditBetPage> {
   String _disciplineMode = 'warning'; // warning | block_bet | lock_day
   bool _isLockedForToday = false;
   double _todayLoss = 0;
+  late int _confidenceScore;
 
   @override
   void initState() {
@@ -76,6 +79,7 @@ class _EditBetPageState extends State<EditBetPage> {
 
     _selectedDate = widget.bet.date;
     _selectedResult = widget.bet.result;
+    _confidenceScore = widget.bet.confidenceScore;
 
     _loadDisciplineSettings();
     _loadTeamSuggestions();
@@ -148,73 +152,26 @@ class _EditBetPageState extends State<EditBetPage> {
     final userData = await UserService.getUserProfileOnce();
     if (!mounted || userData == null) return;
 
-    final startingBankroll = (userData['startingBankroll'] ?? 0).toDouble();
-    final maxStakeMode = (userData['maxStakeMode'] ?? 'fixed').toString();
-    final maxStakeValue = (userData['maxStakeValue'] ?? 0).toDouble();
-    final dailyLossLimit = (userData['dailyLossLimit'] ?? 0).toDouble();
-    final targetBankroll = (userData['targetBankroll'] ?? 0).toDouble();
-    final disciplineMode = (userData['disciplineMode'] ?? 'warning').toString();
-
     final bets = await BetService.getUserBets().first;
     final transactions = await BankrollService.getTransactions().first;
 
-    final totalProfit = bets.fold<double>(0, (sum, item) => sum + item.netProfit);
-
-    double bankrollMovement = 0;
-    for (final tx in transactions) {
-      if (tx.type == 'deposit') {
-        bankrollMovement += tx.amount;
-      } else if (tx.type == 'withdraw') {
-        bankrollMovement -= tx.amount;
-      }
-    }
-
-    final currentBankroll = startingBankroll + totalProfit + bankrollMovement;
-
-    double currentDynamicMaxStake = 0;
-    if (maxStakeMode == 'percent' && maxStakeValue > 0) {
-      currentDynamicMaxStake = currentBankroll * (maxStakeValue / 100);
-    } else {
-      currentDynamicMaxStake = maxStakeValue;
-    }
-
-    final todayLoss = await BetService.getDailyLossForDate(DateTime.now());
-
-    bool isLockedForToday = false;
-    if (disciplineMode == 'lock_day' &&
-        dailyLossLimit > 0 &&
-        todayLoss >= dailyLossLimit) {
-      isLockedForToday = true;
-    }
+    final snapshot = BankrollDisciplineCalculator.calculate(
+      bets: bets,
+      transactions: transactions,
+      userData: userData,
+      referenceDate: DateTime.now(),
+    );
 
     setState(() {
-      _maxStakeMode = maxStakeMode;
-      _maxStakeValue = maxStakeValue;
-      _dailyLossLimit = dailyLossLimit;
-      _targetBankroll = targetBankroll;
-      _currentDynamicMaxStake = currentDynamicMaxStake;
-      _disciplineMode = disciplineMode;
-      _isLockedForToday = isLockedForToday;
-      _todayLoss = todayLoss;
+      _maxStakeMode = snapshot.maxStakeMode;
+      _maxStakeValue = snapshot.maxStakeValue;
+      _dailyLossLimit = snapshot.dailyLossLimit;
+      _targetBankroll = snapshot.targetBankroll;
+      _currentDynamicMaxStake = snapshot.computedMaxStake;
+      _disciplineMode = snapshot.disciplineMode;
+      _isLockedForToday = snapshot.isLockedForToday;
+      _todayLoss = snapshot.todayLoss;
     });
-  }
-
-  double _calculateNetProfit({
-    required double odd,
-    required double stake,
-    required String result,
-  }) {
-    switch (result) {
-      case 'kazandi':
-        return (odd * stake) - stake;
-      case 'kaybetti':
-        return -stake;
-      case 'iade':
-        return 0;
-      case 'beklemede':
-      default:
-        return 0;
-    }
   }
 
   void _refreshPreview() {
@@ -228,6 +185,16 @@ class _EditBetPageState extends State<EditBetPage> {
 
   double? get _previewStake =>
       double.tryParse(_stakeController.text.replaceAll(',', '.'));
+  double get _effectiveMaxStake {
+    return BankrollDisciplineCalculator.calculateAllowedStakeForConfidence(
+      baseMaxStake: _currentDynamicMaxStake,
+      confidenceScore: _confidenceScore,
+    );
+  }
+
+  bool get _isHighConfidenceSelected {
+    return BankrollDisciplineCalculator.isHighConfidence(_confidenceScore);
+  }
 
   double get _previewNetProfit {
     final odd = _previewOdd;
@@ -235,7 +202,7 @@ class _EditBetPageState extends State<EditBetPage> {
 
     if (odd == null || stake == null) return 0;
 
-    return _calculateNetProfit(
+    return BetCalculator.calculateNetProfit(
       odd: odd,
       stake: stake,
       result: _selectedResult,
@@ -248,17 +215,18 @@ class _EditBetPageState extends State<EditBetPage> {
 
     if (odd == null || stake == null) return 0;
 
-    if (_selectedResult == 'kazandi') return odd * stake;
-    if (_selectedResult == 'iade') return stake;
-
-    return 0;
+    return BetCalculator.calculatePayout(
+      odd: odd,
+      stake: stake,
+      result: _selectedResult,
+    );
   }
 
   bool get _isPreviewLimitExceeded {
     final stake = _previewStake;
     if (stake == null) return false;
-    if (_currentDynamicMaxStake <= 0) return false;
-    return stake > _currentDynamicMaxStake;
+    if (_effectiveMaxStake <= 0) return false;
+    return stake > _effectiveMaxStake;
   }
 
   Future<void> _pickDate() async {
@@ -295,6 +263,14 @@ class _EditBetPageState extends State<EditBetPage> {
 
   String _maxStakeInfoText() {
     if (_currentDynamicMaxStake <= 0) return '';
+
+    final multiplier =
+    BankrollDisciplineCalculator.confidenceMultiplier(_confidenceScore);
+    final effectiveLimit = _effectiveMaxStake;
+
+    if (_isHighConfidenceSelected && multiplier > 1) {
+      return '• Güven $_confidenceScore/10 → Limit ${multiplier.toStringAsFixed(multiplier.truncateToDouble() == multiplier ? 0 : 1)}x = ${effectiveLimit.toStringAsFixed(2)} ₺';
+    }
 
     if (_maxStakeMode == 'percent') {
       return '• Maksimum bahis: %${_maxStakeValue.toStringAsFixed(1)} ≈ ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺';
@@ -409,13 +385,17 @@ class _EditBetPageState extends State<EditBetPage> {
   Future<bool> _handleMaxStakeLimitBeforeUpdate({
     required double stake,
   }) async {
-    if (_currentDynamicMaxStake <= 0 || stake <= _currentDynamicMaxStake) {
+    final effectiveLimit = _effectiveMaxStake;
+
+    if (effectiveLimit <= 0 || stake <= effectiveLimit) {
       return true;
     }
 
-    final limitText = _maxStakeMode == 'percent'
-        ? '%${_maxStakeValue.toStringAsFixed(1)} moduna göre limit: ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺'
-        : 'Limit: ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺';
+    final limitText = _isHighConfidenceSelected
+        ? 'Güven puanı $_confidenceScore için izin verilen limit: ${effectiveLimit.toStringAsFixed(2)} ₺'
+        : _maxStakeMode == 'percent'
+        ? '%${_maxStakeValue.toStringAsFixed(1)} moduna göre limit: ${effectiveLimit.toStringAsFixed(2)} ₺'
+        : 'Limit: ${effectiveLimit.toStringAsFixed(2)} ₺';
 
     if (_disciplineMode == 'block_bet') {
       _showMessage('Bu bahis tutarı maksimum bahis limitini aşıyor. $limitText');
@@ -485,13 +465,14 @@ class _EditBetPageState extends State<EditBetPage> {
       odd: odd,
       stake: stake,
       result: _selectedResult,
-      netProfit: _calculateNetProfit(
+      netProfit: BetCalculator.calculateNetProfit(
         odd: odd,
         stake: stake,
         result: _selectedResult,
       ),
       note: _noteController.text.trim(),
       createdAt: widget.bet.createdAt,
+      confidenceScore: _confidenceScore,
     );
 
     final result = await BetService.updateBet(updatedBet);
@@ -608,26 +589,7 @@ class _EditBetPageState extends State<EditBetPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      if (_isLockedForToday)
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(14),
-                          decoration: BoxDecoration(
-                            color: const Color(0xFFDC2626).withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(14),
-                            border: Border.all(
-                              color: const Color(0xFFDC2626).withOpacity(0.35),
-                            ),
-                          ),
-                          child: const Text(
-                            'Bugün bahis kilitli. Disiplin modu aktif.',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: Color(0xFFFCA5A5),
-                            ),
-                          ),
-                        ),
+
                       if (_currentDynamicMaxStake > 0 ||
                           _dailyLossLimit > 0 ||
                           _targetBankroll > 0)
@@ -654,6 +616,11 @@ class _EditBetPageState extends State<EditBetPage> {
                               const SizedBox(height: 8),
                               if (_currentDynamicMaxStake > 0)
                                 Text(_maxStakeInfoText()),
+                              Text('• Güven puanı: $_confidenceScore / 10'),
+                              if (_isHighConfidenceSelected && _currentDynamicMaxStake > 0)
+                                Text(
+                                  '• Bu güven için izin verilen üst limit: ${_effectiveMaxStake.toStringAsFixed(2)} ₺',
+                                ),
                               if (_dailyLossLimit > 0)
                                 Text(
                                   '• Günlük kayıp limiti: ${_dailyLossLimit.toStringAsFixed(2)} ₺',
@@ -707,9 +674,9 @@ class _EditBetPageState extends State<EditBetPage> {
                             Text(
                               '• Toplam Ödeme: ${_previewPayout.toStringAsFixed(2)} ₺',
                             ),
-                            if (_currentDynamicMaxStake > 0)
+                            if (_effectiveMaxStake > 0)
                               Text(
-                                '• Max: ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺',
+                                '• Bu güven için max: ${_effectiveMaxStake.toStringAsFixed(2)} ₺',
                               ),
                             if (_isPreviewLimitExceeded)
                               const Text(
@@ -877,6 +844,69 @@ class _EditBetPageState extends State<EditBetPage> {
                         },
                       ),
                       const SizedBox(height: 14),
+                      Container(
+                        width: double.infinity,
+                        margin: const EdgeInsets.only(bottom: 16),
+                        padding: const EdgeInsets.all(14),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFF1F2937),
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: const Color(0xFF374151),
+                          ),
+                        ),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                const Icon(Icons.verified_outlined, size: 20),
+                                const SizedBox(width: 8),
+                                const Text(
+                                  'Güven Puanı',
+                                  style: TextStyle(fontWeight: FontWeight.bold),
+                                ),
+                                const Spacer(),
+                                Text(
+                                  '$_confidenceScore / 10',
+                                  style: TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: _isHighConfidenceSelected
+                                        ? const Color(0xFFF59E0B)
+                                        : Colors.white,
+                                  ),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 10),
+                            Slider(
+                              value: _confidenceScore.toDouble(),
+                              min: 1,
+                              max: 10,
+                              divisions: 9,
+                              label: '$_confidenceScore',
+                              onChanged: (value) {
+                                setState(() {
+                                  _confidenceScore = value.round();
+                                });
+                              },
+                            ),
+                            Text(
+                              _isHighConfidenceSelected
+                                  ? 'Yüksek güven aktif • Bu seçim için max: ${_effectiveMaxStake.toStringAsFixed(2)} ₺'
+                                  : 'Normal güven • Standart max limit geçerli',
+                              style: TextStyle(
+                                color: _isHighConfidenceSelected
+                                    ? const Color(0xFFF59E0B)
+                                    : Colors.white70,
+                                fontWeight: _isHighConfidenceSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
                       Row(
                         children: [
                           Expanded(
@@ -895,8 +925,8 @@ class _EditBetPageState extends State<EditBetPage> {
                             child: _buildTextField(
                               controller: _stakeController,
                               label: 'Tutar',
-                              hint: _currentDynamicMaxStake > 0
-                                  ? 'Max ${_currentDynamicMaxStake.toStringAsFixed(0)}'
+                              hint: _effectiveMaxStake > 0
+                                  ? 'Max ${_effectiveMaxStake.toStringAsFixed(0)}'
                                   : 'Örn: 100',
                               keyboardType:
                               const TextInputType.numberWithOptions(

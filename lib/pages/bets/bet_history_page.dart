@@ -51,6 +51,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   ];
   List<String> _countryOptions(List<BetModel> bets) {
     final countries = bets
+        .where((bet) => _selectedSport == 'Tümü' || bet.sport == _selectedSport)
         .map((bet) => bet.country.trim())
         .where((country) => country.isNotEmpty)
         .toSet()
@@ -62,9 +63,14 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
   List<String> _leagueOptions(List<BetModel> bets) {
     final leagues = bets
-        .where(
-          (bet) => _selectedCountry == 'Tümü' || bet.country == _selectedCountry,
-    )
+        .where((bet) {
+      final matchesSport =
+          _selectedSport == 'Tümü' || bet.sport == _selectedSport;
+      final matchesCountry =
+          _selectedCountry == 'Tümü' || bet.country == _selectedCountry;
+
+      return matchesSport && matchesCountry;
+    })
         .map((bet) => bet.league.trim())
         .where((league) => league.isNotEmpty)
         .toSet()
@@ -204,8 +210,11 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   }
 
   void _clearFilters() {
+    _searchDebounce?.cancel();
+
     setState(() {
       _searchController.clear();
+      _searchQuery = '';
       _minOddController.clear();
       _maxOddController.clear();
       _minStakeController.clear();
@@ -219,24 +228,6 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       _startDate = null;
       _endDate = null;
     });
-    void _clearFilters() {
-      setState(() {
-        _searchController.clear();
-        _searchQuery = '';
-        _minOddController.clear();
-        _maxOddController.clear();
-        _minStakeController.clear();
-        _maxStakeController.clear();
-        _selectedSport = 'Tümü';
-        _selectedCountry = 'Tümü';
-        _selectedLeague = 'Tümü';
-        _selectedResult = 'Tümü';
-        _selectedQuickFilter = 'Yok';
-        _sortOption = 'Tarih (Yeni → Eski)';
-        _startDate = null;
-        _endDate = null;
-      });
-    }
   }
 
   void _applyQuickFilter(String filter) {
@@ -430,6 +421,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                 netProfit: bet.netProfit,
                 note: bet.note,
                 createdAt: bet.createdAt,
+                confidenceScore: bet.confidenceScore,
               ),
             );
 
@@ -1123,6 +1115,8 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
         setState(() {
           _selectedQuickFilter = 'Yok';
           _selectedSport = value ?? 'Tümü';
+          _selectedCountry = 'Tümü';
+          _selectedLeague = 'Tümü';
         });
       },
     );

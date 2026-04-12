@@ -17,6 +17,7 @@ class BetModel {
   final double netProfit;
   final String note;
   final DateTime createdAt;
+  final int confidenceScore;
 
   BetModel({
     this.id,
@@ -35,6 +36,7 @@ class BetModel {
     required this.netProfit,
     required this.note,
     required this.createdAt,
+    this.confidenceScore = 5,
   });
 
   static Map<String, String> _parseMatchName(String matchName) {
@@ -77,6 +79,7 @@ class BetModel {
       'netProfit': netProfit,
       'note': note,
       'createdAt': Timestamp.fromDate(createdAt),
+      'confidenceScore': confidenceScore,
     };
   }
 
@@ -101,6 +104,7 @@ class BetModel {
       netProfit: (map['netProfit'] ?? 0).toDouble(),
       note: map['note'] ?? '',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
+      confidenceScore: ((map['confidenceScore'] ?? 5) as num).toInt(),
     );
   }
 }
