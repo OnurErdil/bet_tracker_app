@@ -21,6 +21,10 @@ class BankrollDisciplineSnapshot {
   final bool isDailyLossExceeded;
   final bool isLockedForToday;
 
+  final bool highConfidenceEnabled;
+  final double confidence9Multiplier;
+  final double confidence10Multiplier;
+
   const BankrollDisciplineSnapshot({
     required this.startingBankroll,
     required this.maxStakeMode,
@@ -36,13 +40,17 @@ class BankrollDisciplineSnapshot {
     required this.remainingDailyLoss,
     required this.isDailyLossExceeded,
     required this.isLockedForToday,
+    required this.highConfidenceEnabled,
+    required this.confidence9Multiplier,
+    required this.confidence10Multiplier,
   });
 }
 
 class BankrollDisciplineCalculator {
+  static const bool defaultHighConfidenceEnabled = true;
   static const int highConfidenceThreshold = 9;
-  static const double confidence9Multiplier = 2.0;
-  static const double confidence10Multiplier = 3.0;
+  static const double defaultConfidence9Multiplier = 2.0;
+  static const double defaultConfidence10Multiplier = 3.0;
 
   static BankrollDisciplineSnapshot calculate({
     required List<BetModel> bets,
@@ -58,6 +66,18 @@ class BankrollDisciplineCalculator {
     final dailyLossLimit = (userData['dailyLossLimit'] ?? 0).toDouble();
     final targetBankroll = (userData['targetBankroll'] ?? 0).toDouble();
     final disciplineMode = (userData['disciplineMode'] ?? 'warning').toString();
+
+    final highConfidenceEnabled =
+    (userData['highConfidenceEnabled'] ?? defaultHighConfidenceEnabled)
+    as bool;
+
+    final confidence9Multiplier =
+    (userData['confidence9Multiplier'] ?? defaultConfidence9Multiplier)
+        .toDouble();
+
+    final confidence10Multiplier =
+    (userData['confidence10Multiplier'] ?? defaultConfidence10Multiplier)
+        .toDouble();
 
     final totalProfit =
     bets.fold<double>(0, (sum, item) => sum + item.netProfit);
@@ -109,33 +129,52 @@ class BankrollDisciplineCalculator {
       remainingDailyLoss: remainingDailyLoss,
       isDailyLossExceeded: isDailyLossExceeded,
       isLockedForToday: isLockedForToday,
+      highConfidenceEnabled: highConfidenceEnabled,
+      confidence9Multiplier: confidence9Multiplier,
+      confidence10Multiplier: confidence10Multiplier,
     );
   }
 
   static double calculateAllowedStakeForConfidence({
     required double baseMaxStake,
     required int confidenceScore,
+    required bool highConfidenceEnabled,
+    required double confidence9Multiplier,
+    required double confidence10Multiplier,
   }) {
     if (baseMaxStake <= 0) return 0;
+    if (!highConfidenceEnabled) return baseMaxStake;
+
+    final safe9Multiplier = math.max(1.0, confidence9Multiplier);
+    final safe10Multiplier = math.max(1.0, confidence10Multiplier);
 
     if (confidenceScore >= 10) {
-      return baseMaxStake * confidence10Multiplier;
+      return baseMaxStake * safe10Multiplier;
     }
 
     if (confidenceScore >= 9) {
-      return baseMaxStake * confidence9Multiplier;
+      return baseMaxStake * safe9Multiplier;
     }
 
     return baseMaxStake;
   }
 
-  static bool isHighConfidence(int confidenceScore) {
-    return confidenceScore >= highConfidenceThreshold;
+  static bool isHighConfidence(
+      int confidenceScore, {
+        bool highConfidenceEnabled = true,
+      }) {
+    return highConfidenceEnabled && confidenceScore >= highConfidenceThreshold;
   }
 
-  static double confidenceMultiplier(int confidenceScore) {
-    if (confidenceScore >= 10) return confidence10Multiplier;
-    if (confidenceScore >= 9) return confidence9Multiplier;
+  static double confidenceMultiplier(
+      int confidenceScore, {
+        required bool highConfidenceEnabled,
+        required double confidence9Multiplier,
+        required double confidence10Multiplier,
+      }) {
+    if (!highConfidenceEnabled) return 1.0;
+    if (confidenceScore >= 10) return math.max(1.0, confidence10Multiplier);
+    if (confidenceScore >= 9) return math.max(1.0, confidence9Multiplier);
     return 1.0;
   }
 

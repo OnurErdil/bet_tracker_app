@@ -48,6 +48,11 @@ class _AddBetPageState extends State<AddBetPage> {
   bool _isLockedForToday = false;
   double _todayLoss = 0;
   int _confidenceScore = 5;
+  bool _highConfidenceEnabled = true;
+  double _confidence9Multiplier =
+      BankrollDisciplineCalculator.defaultConfidence9Multiplier;
+  double _confidence10Multiplier =
+      BankrollDisciplineCalculator.defaultConfidence10Multiplier;
   @override
   void initState() {
     super.initState();
@@ -150,6 +155,9 @@ class _AddBetPageState extends State<AddBetPage> {
       _disciplineMode = snapshot.disciplineMode;
       _isLockedForToday = snapshot.isLockedForToday;
       _todayLoss = snapshot.todayLoss;
+      _highConfidenceEnabled = snapshot.highConfidenceEnabled;
+      _confidence9Multiplier = snapshot.confidence9Multiplier;
+      _confidence10Multiplier = snapshot.confidence10Multiplier;
     });
   }
 
@@ -164,11 +172,17 @@ class _AddBetPageState extends State<AddBetPage> {
     return BankrollDisciplineCalculator.calculateAllowedStakeForConfidence(
       baseMaxStake: _currentDynamicMaxStake,
       confidenceScore: _confidenceScore,
+      highConfidenceEnabled: _highConfidenceEnabled,
+      confidence9Multiplier: _confidence9Multiplier,
+      confidence10Multiplier: _confidence10Multiplier,
     );
   }
 
   bool get _isHighConfidenceSelected {
-    return BankrollDisciplineCalculator.isHighConfidence(_confidenceScore);
+    return BankrollDisciplineCalculator.isHighConfidence(
+      _confidenceScore,
+      highConfidenceEnabled: _highConfidenceEnabled,
+    );
   }
   double get _previewNetProfit {
     final odd = _previewOdd;
@@ -252,8 +266,12 @@ class _AddBetPageState extends State<AddBetPage> {
   String _maxStakeInfoText() {
     if (_currentDynamicMaxStake <= 0) return '';
 
-    final multiplier =
-    BankrollDisciplineCalculator.confidenceMultiplier(_confidenceScore);
+    final multiplier = BankrollDisciplineCalculator.confidenceMultiplier(
+      _confidenceScore,
+      highConfidenceEnabled: _highConfidenceEnabled,
+      confidence9Multiplier: _confidence9Multiplier,
+      confidence10Multiplier: _confidence10Multiplier,
+    );
     final effectiveLimit = _effectiveMaxStake;
 
     if (_isHighConfidenceSelected && multiplier > 1) {

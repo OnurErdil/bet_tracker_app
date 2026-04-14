@@ -53,11 +53,14 @@ class UserService {
   }
 
   static Future<String?> updateDisciplineSettings({
-    required String maxStakeMode, // fixed | percent
+    required String maxStakeMode,
     required double maxStakeValue,
     required double dailyLossLimit,
     required double targetBankroll,
-    required String disciplineMode, // warning | block_bet | lock_day
+    required String disciplineMode,
+    required bool highConfidenceEnabled,
+    required double confidence9Multiplier,
+    required double confidence10Multiplier,
   }) async {
     try {
       final user = FirebaseAuth.instance.currentUser;
@@ -73,6 +76,9 @@ class UserService {
         'dailyLossLimit': dailyLossLimit,
         'targetBankroll': targetBankroll,
         'disciplineMode': disciplineMode,
+        'highConfidenceEnabled': highConfidenceEnabled,
+        'confidence9Multiplier': confidence9Multiplier,
+        'confidence10Multiplier': confidence10Multiplier,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 
@@ -97,6 +103,9 @@ class UserService {
         'dailyLossLimit': 0.0,
         'targetBankroll': 0.0,
         'disciplineMode': 'warning',
+        'highConfidenceEnabled': true,
+        'confidence9Multiplier': 2.0,
+        'confidence10Multiplier': 3.0,
         'updatedAt': FieldValue.serverTimestamp(),
       }, SetOptions(merge: true));
 

@@ -5,6 +5,45 @@ import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
+Color _confidenceBadgeColor(int score) {
+  if (score >= 10) return const Color(0xFFEA580C);
+  if (score >= 9) return const Color(0xFFF59E0B);
+  if (score >= 7) return const Color(0xFF16A34A);
+  if (score >= 5) return const Color(0xFF0EA5E9);
+  return const Color(0xFF64748B);
+}
+
+Widget _confidenceBadge(int score) {
+  final color = _confidenceBadgeColor(score);
+
+  return Container(
+    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    decoration: BoxDecoration(
+      color: color.withOpacity(0.14),
+      borderRadius: BorderRadius.circular(999),
+      border: Border.all(color: color.withOpacity(0.45)),
+    ),
+    child: Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(
+          Icons.verified_outlined,
+          size: 14,
+          color: color,
+        ),
+        const SizedBox(width: 4),
+        Text(
+          'G $score',
+          style: TextStyle(
+            color: color,
+            fontSize: 12,
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+      ],
+    ),
+  );
+}
 class BetHistoryPage extends StatefulWidget {
   const BetHistoryPage({super.key});
 
@@ -25,6 +64,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   String _selectedCountry = 'Tümü';
   String _selectedLeague = 'Tümü';
   String _selectedResult = 'Tümü';
+  String _selectedConfidence = 'Tümü';
   String _selectedQuickFilter = 'Yok';
   String _sortOption = 'Tarih (Yeni → Eski)';
 
@@ -48,6 +88,21 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     'kazandi',
     'kaybetti',
     'iade',
+  ];
+
+  final List<String> _confidenceOptions = [
+    'Tümü',
+    '1',
+    '2',
+    '3',
+    '4',
+    '5',
+    '6',
+    '7',
+    '8',
+    '9',
+    '10',
+    '9-10',
   ];
   List<String> _countryOptions(List<BetModel> bets) {
     final countries = bets
@@ -151,6 +206,12 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       final matchesResult =
           _selectedResult == 'Tümü' || bet.result == _selectedResult;
 
+      final matchesConfidence = _selectedConfidence == 'Tümü'
+          ? true
+          : _selectedConfidence == '9-10'
+          ? bet.confidenceScore >= 9
+          : bet.confidenceScore.toString() == _selectedConfidence;
+
       final betDateOnly = DateTime(bet.date.year, bet.date.month, bet.date.day);
 
       final matchesStartDate =
@@ -178,6 +239,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           matchesCountry &&
           matchesLeague &&
           matchesResult &&
+          matchesConfidence &&
           matchesStartDate &&
           matchesEndDate &&
           matchesOdd &&
@@ -223,29 +285,12 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       _selectedCountry = 'Tümü';
       _selectedLeague = 'Tümü';
       _selectedResult = 'Tümü';
+      _selectedConfidence = 'Tümü';
       _selectedQuickFilter = 'Yok';
       _sortOption = 'Tarih (Yeni → Eski)';
       _startDate = null;
       _endDate = null;
     });
-    void _clearFilters() {
-      setState(() {
-        _searchController.clear();
-        _searchQuery = '';
-        _minOddController.clear();
-        _maxOddController.clear();
-        _minStakeController.clear();
-        _maxStakeController.clear();
-        _selectedSport = 'Tümü';
-        _selectedCountry = 'Tümü';
-        _selectedLeague = 'Tümü';
-        _selectedResult = 'Tümü';
-        _selectedQuickFilter = 'Yok';
-        _sortOption = 'Tarih (Yeni → Eski)';
-        _startDate = null;
-        _endDate = null;
-      });
-    }
   }
 
   void _applyQuickFilter(String filter) {
@@ -266,6 +311,10 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
         if (filter == 'Sadece Kaybedenler' ||
             filter == 'Sadece Bekleyenler') {
           _selectedResult = 'Tümü';
+        }
+
+        if (filter == 'Yüksek Güven') {
+          _selectedConfidence = 'Tümü';
         }
         return;
       }
@@ -290,6 +339,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           break;
         case 'Sadece Bekleyenler':
           _selectedResult = 'beklemede';
+          break;
+        case 'Yüksek Güven':
+          _selectedConfidence = '9-10';
           break;
         case 'Yok':
         default:
@@ -745,6 +797,11 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                   onTap: () =>
                                       _applyQuickFilter('Sadece Bekleyenler'),
                                 ),
+                                _QuickFilterChip(
+                                  label: 'Yüksek Güven',
+                                  isSelected: _selectedQuickFilter == 'Yüksek Güven',
+                                  onTap: () => _applyQuickFilter('Yüksek Güven'),
+                                ),
                               ],
                             ),
                             const SizedBox(height: 14),
@@ -793,6 +850,14 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                         Expanded(child: _buildResultDropdown()),
                                       ],
                                     ),
+                                    const SizedBox(height: 12),
+                                    Row(
+                                      children: [
+                                        Expanded(child: _buildConfidenceDropdown()),
+                                        const SizedBox(width: 12),
+                                        const Expanded(child: SizedBox()),
+                                      ],
+                                    ),
                                   ],
                                 )
                               else
@@ -805,6 +870,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                     _buildLeagueDropdown(leagueOptions),
                                     const SizedBox(height: 12),
                                     _buildResultDropdown(),
+                                    const SizedBox(height: 12),
+                                    _buildConfidenceDropdown(),
+
                                   ],
                                 ),
                               const SizedBox(height: 14),
@@ -1212,6 +1280,35 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       },
     );
   }
+  Widget _buildConfidenceDropdown() {
+    return DropdownButtonFormField<String>(
+      value: _selectedConfidence,
+      decoration: const InputDecoration(
+        labelText: 'Güven',
+        prefixIcon: Icon(Icons.verified_outlined),
+      ),
+      items: _confidenceOptions
+          .map(
+            (confidence) => DropdownMenuItem(
+          value: confidence,
+          child: Text(
+            confidence == 'Tümü'
+                ? 'Tümü'
+                : confidence == '9-10'
+                ? '9-10 (Yüksek Güven)'
+                : 'Güven $confidence',
+          ),
+        ),
+      )
+          .toList(),
+      onChanged: (value) {
+        setState(() {
+          _selectedQuickFilter = 'Yok';
+          _selectedConfidence = value ?? 'Tümü';
+        });
+      },
+    );
+  }
 }
 
 class _BetCard extends StatelessWidget {
@@ -1271,6 +1368,8 @@ class _BetCard extends StatelessWidget {
                       ),
                     ),
                   ),
+                  const SizedBox(width: 8),
+                  _confidenceBadge(bet.confidenceScore),
                 ],
               ),
               const SizedBox(height: 8),

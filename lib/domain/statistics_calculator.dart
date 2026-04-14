@@ -26,8 +26,18 @@ class StatisticsOverview {
   final double computedMaxStake;
   final double todayLoss;
 
+  final bool highConfidenceEnabled;
+  final double confidence9Multiplier;
+  final double confidence10Multiplier;
+
   final Map<String, Map<String, dynamic>> sportStats;
   final Map<String, Map<String, dynamic>> betTypeStats;
+  final Map<String, Map<String, dynamic>> confidenceStats;
+
+  final int highConfidenceBetCount;
+  final double highConfidenceWinRate;
+  final double highConfidenceProfit;
+  final String bestConfidenceLabel;
 
   final String bestSport;
   final String worstSport;
@@ -63,8 +73,16 @@ class StatisticsOverview {
     required this.currentBankroll,
     required this.computedMaxStake,
     required this.todayLoss,
+    required this.highConfidenceEnabled,
+    required this.confidence9Multiplier,
+    required this.confidence10Multiplier,
     required this.sportStats,
     required this.betTypeStats,
+    required this.confidenceStats,
+    required this.highConfidenceBetCount,
+    required this.highConfidenceWinRate,
+    required this.highConfidenceProfit,
+    required this.bestConfidenceLabel,
     required this.bestSport,
     required this.worstSport,
     required this.mostPlayedSport,
@@ -143,9 +161,18 @@ class StatisticsCalculator {
       currentBankroll: snapshot.currentBankroll,
       computedMaxStake: snapshot.computedMaxStake,
       todayLoss: snapshot.todayLoss,
+      highConfidenceEnabled: snapshot.highConfidenceEnabled,
+      confidence9Multiplier: snapshot.confidence9Multiplier,
+      confidence10Multiplier: snapshot.confidence10Multiplier,
       sportStats: sportStats,
       betTypeStats:
       analysis['betTypeStats'] as Map<String, Map<String, dynamic>>,
+      confidenceStats:
+      analysis['confidenceStats'] as Map<String, Map<String, dynamic>>,
+      highConfidenceBetCount: analysis['highConfidenceBetCount'] as int,
+      highConfidenceWinRate: analysis['highConfidenceWinRate'] as double,
+      highConfidenceProfit: analysis['highConfidenceProfit'] as double,
+      bestConfidenceLabel: analysis['bestConfidenceLabel'] as String,
       bestSport: analysis['bestSport'] as String,
       worstSport: analysis['worstSport'] as String,
       mostPlayedSport: analysis['mostPlayedSport'] as String,
@@ -208,6 +235,11 @@ class StatisticsCalculator {
         'biggestLossLabel': '-',
         'last10Form': <Map<String, String>>[],
         'betTypeStats': <String, Map<String, dynamic>>{},
+        'confidenceStats': <String, Map<String, dynamic>>{},
+        'highConfidenceBetCount': 0,
+        'highConfidenceWinRate': 0.0,
+        'highConfidenceProfit': 0.0,
+        'bestConfidenceLabel': '-',
       };
     }
 
@@ -293,12 +325,63 @@ class StatisticsCalculator {
 
     final betTypeCounts = <String, int>{};
     final betTypeStats = <String, Map<String, dynamic>>{};
+    final confidenceStats = <String, Map<String, dynamic>>{};
+
+    int highConfidenceBetCount = 0;
+    int highConfidenceWonCount = 0;
+    int highConfidenceSettledCount = 0;
+    double highConfidenceProfit = 0.0;
+
     BetModel? biggestWin;
     BetModel? biggestLoss;
 
     for (final bet in bets) {
       betTypeCounts[bet.betType] = (betTypeCounts[bet.betType] ?? 0) + 1;
 
+      final confidenceKey = bet.confidenceScore.toString();
+
+      confidenceStats.putIfAbsent(confidenceKey, () {
+        return {
+          'count': 0,
+          'settled': 0,
+          'won': 0,
+          'profit': 0.0,
+        };
+      });
+
+      confidenceStats[confidenceKey]!['count'] =
+          (confidenceStats[confidenceKey]!['count'] as int) + 1;
+
+      confidenceStats[confidenceKey]!['profit'] =
+          (confidenceStats[confidenceKey]!['profit'] as double) + bet.netProfit;
+
+      final isSettled =
+          bet.result == 'kazandi' ||
+              bet.result == 'kaybetti' ||
+              bet.result == 'iade';
+
+      if (isSettled) {
+        confidenceStats[confidenceKey]!['settled'] =
+            (confidenceStats[confidenceKey]!['settled'] as int) + 1;
+      }
+
+      if (bet.result == 'kazandi') {
+        confidenceStats[confidenceKey]!['won'] =
+            (confidenceStats[confidenceKey]!['won'] as int) + 1;
+      }
+
+      if (bet.confidenceScore >= 9) {
+        highConfidenceBetCount++;
+        highConfidenceProfit += bet.netProfit;
+
+        if (isSettled) {
+          highConfidenceSettledCount++;
+        }
+
+        if (bet.result == 'kazandi') {
+          highConfidenceWonCount++;
+        }
+      }
       betTypeStats.putIfAbsent(bet.betType, () {
         return {
           'count': 0,
@@ -337,6 +420,24 @@ class StatisticsCalculator {
       }
     });
 
+    final highConfidenceWinRate = highConfidenceSettledCount == 0
+        ? 0.0
+        : (highConfidenceWonCount / highConfidenceSettledCount) * 100;
+
+    String bestConfidenceLabel = '-';
+    double bestConfidenceProfit = double.negativeInfinity;
+
+    confidenceStats.forEach((score, data) {
+      final count = (data['count'] as int?) ?? 0;
+      final profit = (data['profit'] as double?) ?? 0.0;
+
+      if (count == 0) return;
+
+      if (profit > bestConfidenceProfit) {
+        bestConfidenceProfit = profit;
+        bestConfidenceLabel = 'G $score (${profit.toStringAsFixed(2)} ₺)';
+      }
+    });
     final last10Sorted = [...bets]..sort((a, b) => b.date.compareTo(a.date));
     final last10Form = last10Sorted.take(10).map((bet) {
       switch (bet.result) {
@@ -369,6 +470,11 @@ class StatisticsCalculator {
           : '${biggestLoss.netProfit.toStringAsFixed(2)} ₺',
       'last10Form': last10Form,
       'betTypeStats': betTypeStats,
+      'confidenceStats': confidenceStats,
+      'highConfidenceBetCount': highConfidenceBetCount,
+      'highConfidenceWinRate': highConfidenceWinRate,
+      'highConfidenceProfit': highConfidenceProfit,
+      'bestConfidenceLabel': bestConfidenceLabel,
     };
   }
 }

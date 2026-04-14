@@ -229,6 +229,21 @@ class StatisticsPage extends StatelessWidget {
                                         'Başlangıç Kasasını Ayarla',
                                       ),
                                     ),
+                                    const SizedBox(height: 12),
+                                    Container(
+                                      width: double.infinity,
+                                      padding: const EdgeInsets.all(12),
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFF1F2937),
+                                        borderRadius: BorderRadius.circular(14),
+                                        border: Border.all(color: const Color(0xFF374151)),
+                                      ),
+                                      child: Text(
+                                        overview.highConfidenceEnabled
+                                            ? 'Yüksek güven açık • 9 = ${overview.confidence9Multiplier.toStringAsFixed(1)}x • 10 = ${overview.confidence10Multiplier.toStringAsFixed(1)}x'
+                                            : 'Yüksek güven kapalı',
+                                      ),
+                                    ),
                                   ],
                                 ),
                               ),
@@ -341,14 +356,13 @@ class StatisticsPage extends StatelessWidget {
                                         _showDisciplineDialog(
                                           context,
                                           maxStakeMode: overview.maxStakeMode,
-                                          maxStakeValue:
-                                          overview.maxStakeValue,
-                                          dailyLossLimit:
-                                          overview.dailyLossLimit,
-                                          targetBankroll:
-                                          overview.targetBankroll,
-                                          disciplineMode:
-                                          overview.disciplineMode,
+                                          maxStakeValue: overview.maxStakeValue,
+                                          dailyLossLimit: overview.dailyLossLimit,
+                                          targetBankroll: overview.targetBankroll,
+                                          disciplineMode: overview.disciplineMode,
+                                          highConfidenceEnabled: overview.highConfidenceEnabled,
+                                          confidence9Multiplier: overview.confidence9Multiplier,
+                                          confidence10Multiplier: overview.confidence10Multiplier,
                                         );
                                       },
                                       icon: const Icon(Icons.tune),
@@ -529,6 +543,129 @@ class StatisticsPage extends StatelessWidget {
                                 ),
                               ],
                             ),
+                            const SizedBox(height: 20),
+                            const Text(
+                              'Güven Analizi',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            GridView.count(
+                              crossAxisCount: isWide ? 2 : 1,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childAspectRatio: 3.2,
+                              children: [
+                                _StatBox(
+                                  title: 'Yüksek Güven Bahis Sayısı',
+                                  value: '${overview.highConfidenceBetCount}',
+                                  icon: Icons.verified_outlined,
+                                  valueColor: overview.highConfidenceBetCount > 0
+                                      ? const Color(0xFFF59E0B)
+                                      : null,
+                                ),
+                                _StatBox(
+                                  title: 'Güven 9-10 Kazanma Oranı',
+                                  value: '%${overview.highConfidenceWinRate.toStringAsFixed(1)}',
+                                  icon: Icons.track_changes,
+                                  valueColor: overview.highConfidenceWinRate >= 50
+                                      ? const Color(0xFF22C55E)
+                                      : const Color(0xFFEF4444),
+                                ),
+                                _StatBox(
+                                  title: 'Güven 9-10 Kâr / Zarar',
+                                  value: '${overview.highConfidenceProfit.toStringAsFixed(2)} ₺',
+                                  icon: Icons.paid_outlined,
+                                  valueColor: overview.highConfidenceProfit >= 0
+                                      ? const Color(0xFF22C55E)
+                                      : const Color(0xFFEF4444),
+                                ),
+                                _StatBox(
+                                  title: 'En Kârlı Güven Seviyesi',
+                                  value: overview.bestConfidenceLabel,
+                                  icon: Icons.emoji_events_outlined,
+                                  valueColor: const Color(0xFFF59E0B),
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              'Güven Puanına Göre Özet',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            if (overview.confidenceStats.isEmpty)
+                              Card(
+                                color: const Color(0xFF161A23),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(18),
+                                ),
+                                child: const Padding(
+                                  padding: EdgeInsets.all(20),
+                                  child: Text(
+                                    'Henüz güven puanı bazlı istatistik gösterecek veri yok.',
+                                    textAlign: TextAlign.center,
+                                  ),
+                                ),
+                              )
+                            else
+                              ...(() {
+                                final entries = overview.confidenceStats.entries.toList()
+                                  ..sort((a, b) => int.parse(b.key).compareTo(int.parse(a.key)));
+
+                                return entries.map((entry) {
+                                  final score = entry.key;
+                                  final data = entry.value;
+
+                                  final count = (data['count'] as int?) ?? 0;
+                                  final settled = (data['settled'] as int?) ?? 0;
+                                  final won = (data['won'] as int?) ?? 0;
+                                  final profit = (data['profit'] as double?) ?? 0.0;
+                                  final winRate = settled == 0 ? 0.0 : (won / settled) * 100;
+
+                                  return Card(
+                                    color: const Color(0xFF161A23),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(18),
+                                    ),
+                                    margin: const EdgeInsets.only(bottom: 12),
+                                    child: ListTile(
+                                      contentPadding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
+                                      title: Text(
+                                        'Güven $score',
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      subtitle: Padding(
+                                        padding: const EdgeInsets.only(top: 6),
+                                        child: Text(
+                                          'Bahis: $count | Settled: $settled | Win Rate: %${winRate.toStringAsFixed(1)}',
+                                        ),
+                                      ),
+                                      trailing: Text(
+                                        '${profit.toStringAsFixed(2)} ₺',
+                                        style: TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: profit >= 0
+                                              ? const Color(0xFF22C55E)
+                                              : const Color(0xFFEF4444),
+                                        ),
+                                      ),
+                                    ),
+                                  );
+                                }).toList();
+                              })(),
                             const SizedBox(height: 20),
                             GridView.count(
                               crossAxisCount: isWide ? 3 : 1,
@@ -874,6 +1011,9 @@ class StatisticsPage extends StatelessWidget {
         required double dailyLossLimit,
         required double targetBankroll,
         required String disciplineMode,
+        required bool highConfidenceEnabled,
+        required double confidence9Multiplier,
+        required double confidence10Multiplier,
       }) {
     final maxStakeController = TextEditingController(
       text: maxStakeValue == 0 ? '' : maxStakeValue.toString(),
@@ -884,9 +1024,16 @@ class StatisticsPage extends StatelessWidget {
     final targetBankrollController = TextEditingController(
       text: targetBankroll == 0 ? '' : targetBankroll.toString(),
     );
+    final confidence9Controller = TextEditingController(
+      text: confidence9Multiplier.toString(),
+    );
+    final confidence10Controller = TextEditingController(
+      text: confidence10Multiplier.toString(),
+    );
 
     String selectedMode = maxStakeMode;
     String selectedDisciplineMode = disciplineMode;
+    bool selectedHighConfidenceEnabled = highConfidenceEnabled;
 
     showDialog(
       context: context,
@@ -995,6 +1142,47 @@ class StatisticsPage extends StatelessWidget {
                         });
                       },
                     ),
+                    const SizedBox(height: 12),
+                    SwitchListTile(
+                      value: selectedHighConfidenceEnabled,
+                      activeColor: const Color(0xFF16A34A),
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Yüksek Güven Limit Aşımı'),
+                      subtitle: const Text(
+                        'Açıksa güven 9 ve 10 için max bahis çarpanı uygulanır.',
+                      ),
+                      onChanged: (value) {
+                        setState(() {
+                          selectedHighConfidenceEnabled = value;
+                        });
+                      },
+                    ),
+                    if (selectedHighConfidenceEnabled) ...[
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: confidence9Controller,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Güven 9 Çarpanı',
+                          hintText: 'Örn: 2.0',
+                          prefixIcon: Icon(Icons.filter_9_plus),
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+                      TextField(
+                        controller: confidence10Controller,
+                        keyboardType: const TextInputType.numberWithOptions(
+                          decimal: true,
+                        ),
+                        decoration: const InputDecoration(
+                          labelText: 'Güven 10 Çarpanı',
+                          hintText: 'Örn: 3.0',
+                          prefixIcon: Icon(Icons.verified_outlined),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),
@@ -1012,25 +1200,51 @@ class StatisticsPage extends StatelessWidget {
                       ? null
                       : () async {
                     final maxStakeValueParsed = double.tryParse(
-                      maxStakeController.text
-                          .trim()
-                          .replaceAll(',', '.'),
+                      maxStakeController.text.trim().replaceAll(',', '.'),
                     ) ??
                         0;
 
                     final dailyLossValue = double.tryParse(
-                      dailyLossController.text
-                          .trim()
-                          .replaceAll(',', '.'),
+                      dailyLossController.text.trim().replaceAll(',', '.'),
                     ) ??
                         0;
 
                     final targetBankrollValue = double.tryParse(
-                      targetBankrollController.text
-                          .trim()
-                          .replaceAll(',', '.'),
+                      targetBankrollController.text.trim().replaceAll(',', '.'),
                     ) ??
                         0;
+
+                    final confidence9Value = double.tryParse(
+                      confidence9Controller.text.trim().replaceAll(',', '.'),
+                    ) ??
+                        2.0;
+
+                    final confidence10Value = double.tryParse(
+                      confidence10Controller.text.trim().replaceAll(',', '.'),
+                    ) ??
+                        3.0;
+
+                    if (selectedHighConfidenceEnabled &&
+                        confidence9Value < 1) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Güven 9 çarpanı en az 1.0 olmalı.'),
+                        ),
+                      );
+                      return;
+                    }
+
+                    if (selectedHighConfidenceEnabled &&
+                        confidence10Value < confidence9Value) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text(
+                            'Güven 10 çarpanı, Güven 9 çarpanından küçük olamaz.',
+                          ),
+                        ),
+                      );
+                      return;
+                    }
 
                     setState(() => isSaving = true);
 
@@ -1041,6 +1255,9 @@ class StatisticsPage extends StatelessWidget {
                       dailyLossLimit: dailyLossValue,
                       targetBankroll: targetBankrollValue,
                       disciplineMode: selectedDisciplineMode,
+                      highConfidenceEnabled: selectedHighConfidenceEnabled,
+                      confidence9Multiplier: confidence9Value,
+                      confidence10Multiplier: confidence10Value,
                     );
 
                     if (!context.mounted) return;
