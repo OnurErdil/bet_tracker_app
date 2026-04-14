@@ -606,6 +606,24 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           final pendingCount =
               filteredBets.where((bet) => bet.result == 'beklemede').length;
 
+          final highConfidenceBets =
+          filteredBets.where((bet) => bet.confidenceScore >= 9).toList();
+
+          final highConfidenceCount = highConfidenceBets.length;
+
+          final highConfidenceProfit = highConfidenceBets.fold<double>(
+            0,
+                (sum, item) => sum + item.netProfit,
+          );
+
+          final averageConfidence = filteredBets.isEmpty
+              ? 0.0
+              : filteredBets.fold<double>(
+            0,
+                (sum, item) => sum + item.confidenceScore.toDouble(),
+          ) /
+              filteredBets.length;
+
           return Center(
             child: SingleChildScrollView(
               padding: const EdgeInsets.all(24),
@@ -621,124 +639,70 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                       ),
                       child: Padding(
                         padding: const EdgeInsets.all(18),
-                        child: isWide
-                            ? Row(
+                        child: GridView.count(
+                          crossAxisCount: isWide ? 5 : 2,
+                          shrinkWrap: true,
+                          physics: const NeverScrollableScrollPhysics(),
+                          mainAxisSpacing: 14,
+                          crossAxisSpacing: 14,
+                          childAspectRatio: isWide ? 2.4 : 2.8,
                           children: [
-                            Expanded(
-                              child: _TopStat(
-                                title: 'Kayıt',
-                                value: '${filteredBets.length}',
-                              ),
+                            _TopStat(
+                              title: 'Kayıt',
+                              value: '${filteredBets.length}',
                             ),
-                            Expanded(
-                              child: _TopStat(
-                                title: 'Net',
-                                value: '${totalProfit.toStringAsFixed(2)} ₺',
-                                color: totalProfit >= 0
-                                    ? const Color(0xFF22C55E)
-                                    : const Color(0xFFEF4444),
-                              ),
+                            _TopStat(
+                              title: 'Net',
+                              value: '${totalProfit.toStringAsFixed(2)} ₺',
+                              color: totalProfit >= 0
+                                  ? const Color(0xFF22C55E)
+                                  : const Color(0xFFEF4444),
                             ),
-                            Expanded(
-                              child: _TopStat(
-                                title: 'Toplam Tutar',
-                                value: '${totalStake.toStringAsFixed(2)} ₺',
-                              ),
+                            _TopStat(
+                              title: 'Toplam Tutar',
+                              value: '${totalStake.toStringAsFixed(2)} ₺',
                             ),
-                            Expanded(
-                              child: _TopStat(
-                                title: 'Ort. Oran',
-                                value: averageOdd.toStringAsFixed(2),
-                              ),
+                            _TopStat(
+                              title: 'Ort. Oran',
+                              value: averageOdd.toStringAsFixed(2),
                             ),
-                            Expanded(
-                              child: _TopStat(
-                                title: 'Kazanan',
-                                value: '$wonCount',
-                                color: const Color(0xFF22C55E),
-                              ),
+                            _TopStat(
+                              title: 'Kazanan',
+                              value: '$wonCount',
+                              color: const Color(0xFF22C55E),
                             ),
-                            Expanded(
-                              child: _TopStat(
-                                title: 'Kaybeden',
-                                value: '$lostCount',
-                                color: const Color(0xFFEF4444),
-                              ),
+                            _TopStat(
+                              title: 'Kaybeden',
+                              value: '$lostCount',
+                              color: const Color(0xFFEF4444),
                             ),
-                            Expanded(
-                              child: _TopStat(
-                                title: 'Bekleyen',
-                                value: '$pendingCount',
-                                color: const Color(0xFF94A3B8),
-                              ),
+                            _TopStat(
+                              title: 'Bekleyen',
+                              value: '$pendingCount',
+                              color: const Color(0xFF94A3B8),
                             ),
-                          ],
-                        )
-                            : Column(
-                          children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _TopStat(
-                                    title: 'Kayıt',
-                                    value: '${filteredBets.length}',
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _TopStat(
-                                    title: 'Net',
-                                    value:
-                                    '${totalProfit.toStringAsFixed(2)} ₺',
-                                    color: totalProfit >= 0
-                                        ? const Color(0xFF22C55E)
-                                        : const Color(0xFFEF4444),
-                                  ),
-                                ),
-                              ],
+                            _TopStat(
+                              title: 'Yüksek Güven',
+                              value: '$highConfidenceCount',
+                              color: highConfidenceCount > 0
+                                  ? const Color(0xFFF59E0B)
+                                  : null,
                             ),
-                            const SizedBox(height: 14),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _TopStat(
-                                    title: 'Toplam Tutar',
-                                    value:
-                                    '${totalStake.toStringAsFixed(2)} ₺',
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _TopStat(
-                                    title: 'Ort. Oran',
-                                    value: averageOdd.toStringAsFixed(2),
-                                  ),
-                                ),
-                              ],
+                            _TopStat(
+                              title: 'Yüksek Güven Net',
+                              value: '${highConfidenceProfit.toStringAsFixed(2)} ₺',
+                              color: highConfidenceProfit >= 0
+                                  ? const Color(0xFF22C55E)
+                                  : const Color(0xFFEF4444),
                             ),
-                            const SizedBox(height: 14),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: _TopStat(
-                                    title: 'Kazanan',
-                                    value: '$wonCount',
-                                    color: const Color(0xFF22C55E),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _TopStat(
-                                    title: 'Kaybeden',
-                                    value: '$lostCount',
-                                    color: const Color(0xFFEF4444),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: _TopStat(
-                                    title: 'Bekleyen',
-                                    value: '$pendingCount',
-                                    color: const Color(0xFF94A3B8),
-                                  ),
-                                ),
-                              ],
+                            _TopStat(
+                              title: 'Ort. Güven',
+                              value: averageConfidence.toStringAsFixed(1),
+                              color: averageConfidence >= 9
+                                  ? const Color(0xFFF59E0B)
+                                  : averageConfidence >= 7
+                                  ? const Color(0xFF22C55E)
+                                  : null,
                             ),
                           ],
                         ),
