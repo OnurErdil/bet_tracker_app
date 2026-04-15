@@ -27,6 +27,7 @@ class BetService {
     }
 
     return _betsRef(user.uid)
+        .orderBy('date', descending: true)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
