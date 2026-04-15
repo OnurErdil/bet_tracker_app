@@ -1,4 +1,5 @@
 import 'package:bet_tracker_app/data/bet_form_catalog.dart';
+import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 
 class ParsedMatchName {
@@ -231,7 +232,62 @@ class BetFormHelpers {
 
     return [...startsWithMatches, ...containsMatches].take(12).toList();
   }
+  static String buildPreviewResultLabel(String result) {
+    switch (result) {
+      case 'kazandi':
+        return 'Kazanç Senaryosu';
+      case 'kaybetti':
+        return 'Kayıp Senaryosu';
+      case 'iade':
+        return 'İade Senaryosu';
+      case 'beklemede':
+      default:
+        return 'Bekleyen Senaryosu';
+    }
+  }
 
+  static String buildDisciplineModeLabel(String disciplineMode) {
+    switch (disciplineMode) {
+      case 'block_bet':
+        return '• Disiplin modu: Limit aşılırsa bahis engellenir';
+      case 'lock_day':
+        return '• Disiplin modu: Limit aşılırsa gün kilitlenir';
+      case 'warning':
+      default:
+        return '• Disiplin modu: Sadece uyarı';
+    }
+  }
+
+  static String buildMaxStakeInfoText({
+    required double currentDynamicMaxStake,
+    required String maxStakeMode,
+    required double maxStakeValue,
+    required int confidenceScore,
+    required bool highConfidenceEnabled,
+    required double confidence9Multiplier,
+    required double confidence10Multiplier,
+    required double effectiveMaxStake,
+    required bool isHighConfidenceSelected,
+  }) {
+    if (currentDynamicMaxStake <= 0) return '';
+
+    final multiplier = BankrollDisciplineCalculator.confidenceMultiplier(
+      confidenceScore,
+      highConfidenceEnabled: highConfidenceEnabled,
+      confidence9Multiplier: confidence9Multiplier,
+      confidence10Multiplier: confidence10Multiplier,
+    );
+
+    if (isHighConfidenceSelected && multiplier > 1) {
+      return '• Güven $confidenceScore/10 → Limit ${multiplier.toStringAsFixed(multiplier.truncateToDouble() == multiplier ? 0 : 1)}x = ${effectiveMaxStake.toStringAsFixed(2)} ₺';
+    }
+
+    if (maxStakeMode == 'percent') {
+      return '• Maksimum bahis: %${maxStakeValue.toStringAsFixed(1)} ≈ ${currentDynamicMaxStake.toStringAsFixed(2)} ₺';
+    }
+
+    return '• Maksimum bahis: ${currentDynamicMaxStake.toStringAsFixed(2)} ₺';
+  }
   static BetFormInitialData buildInitialDataFromBet(BetModel bet) {
     final homeTeam = bet.resolvedHomeTeam.trim();
     final awayTeam = bet.resolvedAwayTeam.trim();

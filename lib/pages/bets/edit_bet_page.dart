@@ -228,17 +228,7 @@ class _EditBetPageState extends State<EditBetPage> {
     );
   }
   String get _previewResultLabel {
-    switch (_selectedResult) {
-      case 'kazandi':
-        return 'Kazanç Senaryosu';
-      case 'kaybetti':
-        return 'Kayıp Senaryosu';
-      case 'iade':
-        return 'İade Senaryosu';
-      case 'beklemede':
-      default:
-        return 'Bekleyen Senaryosu';
-    }
+    return BetFormHelpers.buildPreviewResultLabel(_selectedResult);
   }
 
   Color get _previewNetColor {
@@ -287,37 +277,21 @@ class _EditBetPageState extends State<EditBetPage> {
   }
 
   String _maxStakeInfoText() {
-    if (_currentDynamicMaxStake <= 0) return '';
-
-    final multiplier = BankrollDisciplineCalculator.confidenceMultiplier(
-      _confidenceScore,
+    return BetFormHelpers.buildMaxStakeInfoText(
+      currentDynamicMaxStake: _currentDynamicMaxStake,
+      maxStakeMode: _maxStakeMode,
+      maxStakeValue: _maxStakeValue,
+      confidenceScore: _confidenceScore,
       highConfidenceEnabled: _highConfidenceEnabled,
       confidence9Multiplier: _confidence9Multiplier,
       confidence10Multiplier: _confidence10Multiplier,
+      effectiveMaxStake: _effectiveMaxStake,
+      isHighConfidenceSelected: _isHighConfidenceSelected,
     );
-    final effectiveLimit = _effectiveMaxStake;
-
-    if (_isHighConfidenceSelected && multiplier > 1) {
-      return '• Güven $_confidenceScore/10 → Limit ${multiplier.toStringAsFixed(multiplier.truncateToDouble() == multiplier ? 0 : 1)}x = ${effectiveLimit.toStringAsFixed(2)} ₺';
-    }
-
-    if (_maxStakeMode == 'percent') {
-      return '• Maksimum bahis: %${_maxStakeValue.toStringAsFixed(1)} ≈ ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺';
-    }
-
-    return '• Maksimum bahis: ${_currentDynamicMaxStake.toStringAsFixed(2)} ₺';
   }
 
   String _disciplineModeLabel() {
-    switch (_disciplineMode) {
-      case 'block_bet':
-        return '• Disiplin modu: Limit aşılırsa bahis engellenir';
-      case 'lock_day':
-        return '• Disiplin modu: Limit aşılırsa gün kilitlenir';
-      case 'warning':
-      default:
-        return '• Disiplin modu: Sadece uyarı';
-    }
+    return BetFormHelpers.buildDisciplineModeLabel(_disciplineMode);
   }
 
   void _showMessage(String message) {
