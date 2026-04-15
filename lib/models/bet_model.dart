@@ -36,8 +36,8 @@ class BetModel {
     required this.netProfit,
     required this.note,
     required this.createdAt,
-    this.confidenceScore = 5,
-  });
+    int confidenceScore = 5,
+  }) : confidenceScore = _normalizeConfidenceScore(confidenceScore);
 
   static Map<String, String> _parseMatchName(String matchName) {
     final parts = matchName.split(' - ');
@@ -50,6 +50,27 @@ class BetModel {
       'homeTeam': parsedHome,
       'awayTeam': parsedAway,
     };
+  }
+
+  static int _normalizeConfidenceScore(int value) {
+    if (value < 1) return 1;
+    if (value > 10) return 10;
+    return value;
+  }
+
+  static int _readConfidenceScore(dynamic rawValue) {
+    if (rawValue is num) {
+      return _normalizeConfidenceScore(rawValue.toInt());
+    }
+
+    if (rawValue is String) {
+      final parsed = int.tryParse(rawValue.trim());
+      if (parsed != null) {
+        return _normalizeConfidenceScore(parsed);
+      }
+    }
+
+    return 5;
   }
 
   String get resolvedHomeTeam {
@@ -79,7 +100,7 @@ class BetModel {
       'netProfit': netProfit,
       'note': note,
       'createdAt': Timestamp.fromDate(createdAt),
-      'confidenceScore': confidenceScore,
+      'confidenceScore': _normalizeConfidenceScore(confidenceScore),
     };
   }
 
@@ -104,7 +125,7 @@ class BetModel {
       netProfit: (map['netProfit'] ?? 0).toDouble(),
       note: map['note'] ?? '',
       createdAt: (map['createdAt'] as Timestamp).toDate(),
-      confidenceScore: ((map['confidenceScore'] ?? 5) as num).toInt(),
+      confidenceScore: _readConfidenceScore(map['confidenceScore']),
     );
   }
 }

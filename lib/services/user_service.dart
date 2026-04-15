@@ -97,6 +97,7 @@ class UserService {
       }
 
       await _userDoc(user.uid).set({
+        'email': user.email,
         'startingBankroll': 0.0,
         'maxStakeMode': 'fixed',
         'maxStakeValue': 0.0,
