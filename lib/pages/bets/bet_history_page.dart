@@ -50,6 +50,45 @@ class BetHistoryPage extends StatefulWidget {
   @override
   State<BetHistoryPage> createState() => _BetHistoryPageState();
 }
+class _BetHistorySummary {
+  final int recordCount;
+  final double totalProfit;
+  final double totalStake;
+  final double averageOdd;
+  final int wonCount;
+  final int lostCount;
+  final int pendingCount;
+  final int highConfidenceCount;
+  final double highConfidenceProfit;
+  final double averageConfidence;
+
+  const _BetHistorySummary({
+    required this.recordCount,
+    required this.totalProfit,
+    required this.totalStake,
+    required this.averageOdd,
+    required this.wonCount,
+    required this.lostCount,
+    required this.pendingCount,
+    required this.highConfidenceCount,
+    required this.highConfidenceProfit,
+    required this.averageConfidence,
+  });
+}
+
+class _BetHistoryViewData {
+  final List<String> countryOptions;
+  final List<String> leagueOptions;
+  final List<BetModel> filteredBets;
+  final _BetHistorySummary summary;
+
+  const _BetHistoryViewData({
+    required this.countryOptions,
+    required this.leagueOptions,
+    required this.filteredBets,
+    required this.summary,
+  });
+}
 
 class _BetHistoryPageState extends State<BetHistoryPage> {
   final TextEditingController _searchController = TextEditingController();
@@ -134,6 +173,70 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
     return ['Tümü', ...leagues];
   }
+  _BetHistorySummary _buildSummary(List<BetModel> filteredBets) {
+    final totalProfit =
+    filteredBets.fold<double>(0, (sum, item) => sum + item.netProfit);
+
+    final totalStake =
+    filteredBets.fold<double>(0, (sum, item) => sum + item.stake);
+
+    final averageOdd = filteredBets.isEmpty
+        ? 0.0
+        : filteredBets.fold<double>(0, (sum, item) => sum + item.odd) /
+        filteredBets.length;
+
+    final wonCount =
+        filteredBets.where((bet) => bet.result == 'kazandi').length;
+    final lostCount =
+        filteredBets.where((bet) => bet.result == 'kaybetti').length;
+    final pendingCount =
+        filteredBets.where((bet) => bet.result == 'beklemede').length;
+
+    final highConfidenceBets =
+    filteredBets.where((bet) => bet.confidenceScore >= 9).toList();
+
+    final highConfidenceCount = highConfidenceBets.length;
+
+    final highConfidenceProfit = highConfidenceBets.fold<double>(
+      0,
+          (sum, item) => sum + item.netProfit,
+    );
+
+    final averageConfidence = filteredBets.isEmpty
+        ? 0.0
+        : filteredBets.fold<double>(
+      0,
+          (sum, item) => sum + item.confidenceScore.toDouble(),
+    ) /
+        filteredBets.length;
+
+    return _BetHistorySummary(
+      recordCount: filteredBets.length,
+      totalProfit: totalProfit,
+      totalStake: totalStake,
+      averageOdd: averageOdd,
+      wonCount: wonCount,
+      lostCount: lostCount,
+      pendingCount: pendingCount,
+      highConfidenceCount: highConfidenceCount,
+      highConfidenceProfit: highConfidenceProfit,
+      averageConfidence: averageConfidence,
+    );
+  }
+
+  _BetHistoryViewData _buildViewData(List<BetModel> bets) {
+    final countryOptions = _countryOptions(bets);
+    final leagueOptions = _leagueOptions(bets);
+    final filteredBets = _filterBets(bets);
+
+    return _BetHistoryViewData(
+      countryOptions: countryOptions,
+      leagueOptions: leagueOptions,
+      filteredBets: filteredBets,
+      summary: _buildSummary(filteredBets),
+    );
+  }
+
   final List<String> _sortOptions = [
     'Tarih (Yeni → Eski)',
     'Tarih (Eski → Yeni)',
@@ -586,43 +689,12 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           }
 
           final bets = snapshot.data ?? [];
-          final countryOptions = _countryOptions(bets);
-          final leagueOptions = _leagueOptions(bets);
-          final filteredBets = _filterBets(bets);
+          final viewData = _buildViewData(bets);
 
-          final totalProfit =
-          filteredBets.fold<double>(0, (sum, item) => sum + item.netProfit);
-          final totalStake =
-          filteredBets.fold<double>(0, (sum, item) => sum + item.stake);
-          final averageOdd = filteredBets.isEmpty
-              ? 0
-              : filteredBets.fold<double>(0, (sum, item) => sum + item.odd) /
-              filteredBets.length;
-
-          final wonCount =
-              filteredBets.where((bet) => bet.result == 'kazandi').length;
-          final lostCount =
-              filteredBets.where((bet) => bet.result == 'kaybetti').length;
-          final pendingCount =
-              filteredBets.where((bet) => bet.result == 'beklemede').length;
-
-          final highConfidenceBets =
-          filteredBets.where((bet) => bet.confidenceScore >= 9).toList();
-
-          final highConfidenceCount = highConfidenceBets.length;
-
-          final highConfidenceProfit = highConfidenceBets.fold<double>(
-            0,
-                (sum, item) => sum + item.netProfit,
-          );
-
-          final averageConfidence = filteredBets.isEmpty
-              ? 0.0
-              : filteredBets.fold<double>(
-            0,
-                (sum, item) => sum + item.confidenceScore.toDouble(),
-          ) /
-              filteredBets.length;
+          final countryOptions = viewData.countryOptions;
+          final leagueOptions = viewData.leagueOptions;
+          final filteredBets = viewData.filteredBets;
+          final summary = viewData.summary;
 
           return Center(
             child: SingleChildScrollView(
@@ -649,58 +721,58 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                           children: [
                             _TopStat(
                               title: 'Kayıt',
-                              value: '${filteredBets.length}',
+                              value: '${summary.recordCount}',
                             ),
                             _TopStat(
                               title: 'Net',
-                              value: '${totalProfit.toStringAsFixed(2)} ₺',
-                              color: totalProfit >= 0
+                              value: '${summary.totalProfit.toStringAsFixed(2)} ₺',
+                              color: summary.totalProfit >= 0
                                   ? const Color(0xFF22C55E)
                                   : const Color(0xFFEF4444),
                             ),
                             _TopStat(
                               title: 'Toplam Tutar',
-                              value: '${totalStake.toStringAsFixed(2)} ₺',
+                              value: '${summary.totalStake.toStringAsFixed(2)} ₺',
                             ),
                             _TopStat(
                               title: 'Ort. Oran',
-                              value: averageOdd.toStringAsFixed(2),
+                              value: summary.averageOdd.toStringAsFixed(2),
                             ),
                             _TopStat(
                               title: 'Kazanan',
-                              value: '$wonCount',
+                              value: '${summary.wonCount}',
                               color: const Color(0xFF22C55E),
                             ),
                             _TopStat(
                               title: 'Kaybeden',
-                              value: '$lostCount',
+                              value: '${summary.lostCount}',
                               color: const Color(0xFFEF4444),
                             ),
                             _TopStat(
                               title: 'Bekleyen',
-                              value: '$pendingCount',
+                              value: '${summary.pendingCount}',
                               color: const Color(0xFF94A3B8),
                             ),
                             _TopStat(
                               title: 'Yüksek Güven',
-                              value: '$highConfidenceCount',
-                              color: highConfidenceCount > 0
+                              value: '${summary.highConfidenceCount}',
+                              color: summary.highConfidenceCount > 0
                                   ? const Color(0xFFF59E0B)
                                   : null,
                             ),
                             _TopStat(
                               title: 'Yüksek Güven Net',
-                              value: '${highConfidenceProfit.toStringAsFixed(2)} ₺',
-                              color: highConfidenceProfit >= 0
+                              value: '${summary.highConfidenceProfit.toStringAsFixed(2)} ₺',
+                              color: summary.highConfidenceProfit >= 0
                                   ? const Color(0xFF22C55E)
                                   : const Color(0xFFEF4444),
                             ),
                             _TopStat(
                               title: 'Ort. Güven',
-                              value: averageConfidence.toStringAsFixed(1),
-                              color: averageConfidence >= 9
+                              value: summary.averageConfidence.toStringAsFixed(1),
+                              color: summary.averageConfidence >= 9
                                   ? const Color(0xFFF59E0B)
-                                  : averageConfidence >= 7
+                                  : summary.averageConfidence >= 7
                                   ? const Color(0xFF22C55E)
                                   : null,
                             ),
@@ -1076,7 +1148,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                         ),
                         const Spacer(),
                         Text(
-                          '${filteredBets.length} kayıt',
+                          '${summary.recordCount} kayıt',
                           style: const TextStyle(color: Colors.white70),
                         ),
                       ],
