@@ -809,6 +809,9 @@ class _EditBetPageState extends State<EditBetPage> {
                         children: [
                           Expanded(
                             child: _buildTeamAutocompleteField(
+                              fieldKey: ValueKey(
+                                'home_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
+                              ),
                               controller: _homeTeamController,
                               label: 'Ev Sahibi',
                               hint: 'Örn: Galatasaray',
@@ -817,6 +820,9 @@ class _EditBetPageState extends State<EditBetPage> {
                           const SizedBox(width: 12),
                           Expanded(
                             child: _buildTeamAutocompleteField(
+                              fieldKey: ValueKey(
+                                'away_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
+                              ),
                               controller: _awayTeamController,
                               label: 'Deplasman',
                               hint: 'Örn: Fenerbahçe',
@@ -1050,11 +1056,13 @@ class _EditBetPageState extends State<EditBetPage> {
   }
 
   Widget _buildTeamAutocompleteField({
+    required Key fieldKey,
     required TextEditingController controller,
     required String label,
     required String hint,
   }) {
     return Autocomplete<String>(
+      key: fieldKey,
       initialValue: TextEditingValue(text: controller.text),
       optionsBuilder: (textEditingValue) {
         return _getSmartTeamSuggestions(textEditingValue.text);

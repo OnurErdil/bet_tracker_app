@@ -99,20 +99,67 @@ class BetFormHelpers {
     required String country,
     required String league,
   }) {
+    final normalizedSport = sport.trim();
+    final normalizedCountry = country.trim();
+    final normalizedLeague = league.trim();
+
     return BetFormSelectionData(
-      availableCountries: BetFormCatalog.getAvailableCountries(sport.trim()),
+      availableCountries: BetFormCatalog.getAvailableCountries(normalizedSport),
       availableLeagues: BetFormCatalog.getAvailableLeagues(
-        sport.trim(),
-        country.trim(),
+        normalizedSport,
+        normalizedCountry,
       ),
-      availableTeams: BetFormCatalog.getAvailableTeams(
-        sport.trim(),
-        country.trim(),
-        league.trim(),
+      availableTeams: _getAvailableTeamsForSelection(
+        sport: normalizedSport,
+        country: normalizedCountry,
+        league: normalizedLeague,
       ),
-      availableBetTypes: BetFormCatalog.getAvailableBetTypes(sport.trim()),
+      availableBetTypes: BetFormCatalog.getAvailableBetTypes(normalizedSport),
     );
   }
+
+  static List<String> _getAvailableTeamsForSelection({
+    required String sport,
+    required String country,
+    required String league,
+  }) {
+    if (sport.isEmpty) {
+      return [];
+    }
+
+    final sportData = BetFormCatalog.teamData[sport] ?? {};
+
+    if (country.isNotEmpty && league.isNotEmpty) {
+      return _uniqueSorted(
+        BetFormCatalog.getAvailableTeams(sport, country, league),
+      );
+    }
+
+    if (country.isNotEmpty) {
+      final countryData = sportData[country] ?? {};
+      return _uniqueSorted(
+        countryData.values.expand((teams) => teams),
+      );
+    }
+
+    return _uniqueSorted(
+      sportData.values
+          .expand((countryLeagues) => countryLeagues.values)
+          .expand((teams) => teams),
+    );
+  }
+
+  static List<String> _uniqueSorted(Iterable<String> values) {
+    final list = values
+        .map((e) => e.trim())
+        .where((e) => e.isNotEmpty)
+        .toSet()
+        .toList()
+      ..sort();
+
+    return list;
+  }
+
 
   static List<String> buildSmartTeamSuggestionsForSelection({
     required String query,
@@ -144,19 +191,10 @@ class BetFormHelpers {
   }) {
     final normalizedQuery = query.trim().toLowerCase();
 
-    final fallbackTeams = BetFormCatalog.teamData.values
-        .expand((countries) => countries.values)
-        .expand((leagues) => leagues.values)
-        .expand((teams) => teams)
-        .toSet()
-        .toList();
-
-    final sourceTeams = filteredTeams.isNotEmpty ? filteredTeams : fallbackTeams;
-
     final combined = <String>[
-      ...recentTeams.where((team) => sourceTeams.contains(team)),
-      ...frequentTeams.where((team) => sourceTeams.contains(team)),
-      ...sourceTeams,
+      ...recentTeams.where((team) => filteredTeams.contains(team)),
+      ...frequentTeams.where((team) => filteredTeams.contains(team)),
+      ...filteredTeams,
     ];
 
     final uniqueOrdered = <String>[];
@@ -170,11 +208,20 @@ class BetFormHelpers {
       return uniqueOrdered.take(12).toList();
     }
 
-    final startsWithMatches = uniqueOrdered
+    final searchableTeams = uniqueOrdered.isNotEmpty
+        ? uniqueOrdered
+        : _uniqueSorted(
+      BetFormCatalog.teamData.values
+          .expand((countries) => countries.values)
+          .expand((leagues) => leagues.values)
+          .expand((teams) => teams),
+    );
+
+    final startsWithMatches = searchableTeams
         .where((team) => team.toLowerCase().startsWith(normalizedQuery))
         .toList();
 
-    final containsMatches = uniqueOrdered
+    final containsMatches = searchableTeams
         .where(
           (team) =>
       !startsWithMatches.contains(team) &&
