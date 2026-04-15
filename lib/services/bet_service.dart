@@ -70,20 +70,32 @@ class BetService {
       }
 
       final snapshot = await _betsRef(user.uid).get();
+      final docs = snapshot.docs;
 
-      final batch = _firestore.batch();
-
-      for (final doc in snapshot.docs) {
-        batch.delete(doc.reference);
+      if (docs.isEmpty) {
+        return null;
       }
 
-      await batch.commit();
+      const deleteBatchSize = 400;
+
+      for (int i = 0; i < docs.length; i += deleteBatchSize) {
+        final batch = _firestore.batch();
+        final end = (i + deleteBatchSize > docs.length)
+            ? docs.length
+            : i + deleteBatchSize;
+
+        for (final doc in docs.sublist(i, end)) {
+          batch.delete(doc.reference);
+        }
+
+        await batch.commit();
+      }
+
       return null;
     } catch (e) {
       return 'Tüm bahisler silinirken hata oluştu: $e';
     }
   }
-
   static Future<double> getDailyLossForDate(DateTime date) async {
     final user = FirebaseAuth.instance.currentUser;
     if (user == null) return 0;
