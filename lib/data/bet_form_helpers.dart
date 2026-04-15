@@ -37,6 +37,19 @@ class BetFormInitialData {
   });
 }
 
+class BetFormSelectionData {
+  final List<String> availableCountries;
+  final List<String> availableLeagues;
+  final List<String> availableTeams;
+  final List<String> availableBetTypes;
+
+  const BetFormSelectionData({
+    required this.availableCountries,
+    required this.availableLeagues,
+    required this.availableTeams,
+    required this.availableBetTypes,
+  });
+}
 class BetFormHelpers {
   static ParsedMatchName parseMatchName(String matchName) {
     final parts = matchName.split(' - ');
@@ -79,6 +92,47 @@ class BetFormHelpers {
       recentTeams: recentOrdered.take(10).toList(),
       frequentTeams:
       frequentOrdered.map((entry) => entry.key).take(10).toList(),
+    );
+  }
+  static BetFormSelectionData buildSelectionData({
+    required String sport,
+    required String country,
+    required String league,
+  }) {
+    return BetFormSelectionData(
+      availableCountries: BetFormCatalog.getAvailableCountries(sport.trim()),
+      availableLeagues: BetFormCatalog.getAvailableLeagues(
+        sport.trim(),
+        country.trim(),
+      ),
+      availableTeams: BetFormCatalog.getAvailableTeams(
+        sport.trim(),
+        country.trim(),
+        league.trim(),
+      ),
+      availableBetTypes: BetFormCatalog.getAvailableBetTypes(sport.trim()),
+    );
+  }
+
+  static List<String> buildSmartTeamSuggestionsForSelection({
+    required String query,
+    required String sport,
+    required String country,
+    required String league,
+    required List<String> recentTeams,
+    required List<String> frequentTeams,
+  }) {
+    final selectionData = buildSelectionData(
+      sport: sport,
+      country: country,
+      league: league,
+    );
+
+    return buildSmartTeamSuggestions(
+      query: query,
+      filteredTeams: selectionData.availableTeams,
+      recentTeams: recentTeams,
+      frequentTeams: frequentTeams,
     );
   }
 

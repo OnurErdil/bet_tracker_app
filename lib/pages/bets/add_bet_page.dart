@@ -98,40 +98,30 @@ class _AddBetPageState extends State<AddBetPage> {
     });
   }
 
-  List<String> _getFilteredTeams() {
-    return BetFormCatalog.getAvailableTeams(
-      _sportController.text,
-      _countryController.text,
-      _leagueController.text,
+  BetFormSelectionData get _selectionData {
+    return BetFormHelpers.buildSelectionData(
+      sport: _sportController.text.trim(),
+      country: _countryController.text.trim(),
+      league: _leagueController.text.trim(),
     );
   }
 
-  List<String> get _availableCountries {
-    return BetFormCatalog.getAvailableCountries(_sportController.text);
-  }
+  List<String> get _availableCountries => _selectionData.availableCountries;
 
-  List<String> get _availableLeagues {
-    return BetFormCatalog.getAvailableLeagues(
-      _sportController.text,
-      _countryController.text,
-    );
-  }
+  List<String> get _availableLeagues => _selectionData.availableLeagues;
 
-  List<String> get _availableBetTypes {
-    return BetFormCatalog.getAvailableBetTypes(_sportController.text);
-  }
+  List<String> get _availableBetTypes => _selectionData.availableBetTypes;
 
   List<String> _getSmartTeamSuggestions(String query) {
-    return BetFormHelpers.buildSmartTeamSuggestions(
+    return BetFormHelpers.buildSmartTeamSuggestionsForSelection(
       query: query,
-      filteredTeams: _getFilteredTeams(),
+      sport: _sportController.text.trim(),
+      country: _countryController.text.trim(),
+      league: _leagueController.text.trim(),
       recentTeams: _recentTeams,
       frequentTeams: _frequentTeams,
     );
   }
-
-
-
   Future<void> _loadDisciplineSettings() async {
     final userData = await UserService.getUserProfileOnce();
     if (!mounted || userData == null) return;
