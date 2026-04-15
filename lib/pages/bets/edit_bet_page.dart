@@ -227,6 +227,25 @@ class _EditBetPageState extends State<EditBetPage> {
       result: _selectedResult,
     );
   }
+  String get _previewResultLabel {
+    switch (_selectedResult) {
+      case 'kazandi':
+        return 'Kazanç Senaryosu';
+      case 'kaybetti':
+        return 'Kayıp Senaryosu';
+      case 'iade':
+        return 'İade Senaryosu';
+      case 'beklemede':
+      default:
+        return 'Bekleyen Senaryosu';
+    }
+  }
+
+  Color get _previewNetColor {
+    if (_previewNetProfit > 0) return const Color(0xFF22C55E);
+    if (_previewNetProfit < 0) return const Color(0xFFEF4444);
+    return const Color(0xFFF59E0B);
+  }
 
   bool get _isPreviewLimitExceeded {
     final stake = _previewStake;
@@ -599,7 +618,26 @@ class _EditBetPageState extends State<EditBetPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-
+                      if (_isLockedForToday)
+                        Container(
+                          width: double.infinity,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          padding: const EdgeInsets.all(14),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFDC2626).withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(14),
+                            border: Border.all(
+                              color: const Color(0xFFDC2626).withOpacity(0.35),
+                            ),
+                          ),
+                          child: const Text(
+                            'Bugün bahis kilitli. Disiplin modu aktif.',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Color(0xFFFCA5A5),
+                            ),
+                          ),
+                        ),
                       if (_currentDynamicMaxStake > 0 ||
                           _dailyLossLimit > 0 ||
                           _targetBankroll > 0)
@@ -670,32 +708,39 @@ class _EditBetPageState extends State<EditBetPage> {
                               style: TextStyle(fontWeight: FontWeight.bold),
                             ),
                             const SizedBox(height: 10),
-                            Text(
-                              '• Net Etki: ${_previewNetProfit.toStringAsFixed(2)} ₺',
-                              style: TextStyle(
-                                color: _previewNetProfit > 0
-                                    ? const Color(0xFF22C55E)
-                                    : _previewNetProfit < 0
-                                    ? const Color(0xFFEF4444)
-                                    : const Color(0xFFF59E0B),
-                                fontWeight: FontWeight.bold,
-                              ),
+                            Wrap(
+                              spacing: 16,
+                              runSpacing: 8,
+                              children: [
+                                Text('• Senaryo: $_previewResultLabel'),
+                                Text(
+                                  '• Net Etki: ${_previewNetProfit.toStringAsFixed(2)} ₺',
+                                  style: TextStyle(
+                                    color: _previewNetColor,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                Text(
+                                  '• Toplam Ödeme: ${_previewPayout.toStringAsFixed(2)} ₺',
+                                ),
+                              ],
                             ),
-                            Text(
-                              '• Toplam Ödeme: ${_previewPayout.toStringAsFixed(2)} ₺',
-                            ),
-                            if (_effectiveMaxStake > 0)
+                            if (_effectiveMaxStake > 0) ...[
+                              const SizedBox(height: 8),
                               Text(
-                                '• Bu güven için max: ${_effectiveMaxStake.toStringAsFixed(2)} ₺',
+                                '• Bu güven için maksimum bahis: ${_effectiveMaxStake.toStringAsFixed(2)} ₺',
                               ),
-                            if (_isPreviewLimitExceeded)
+                            ],
+                            if (_isPreviewLimitExceeded) ...[
+                              const SizedBox(height: 8),
                               const Text(
-                                '• Limit aşıldı',
+                                '• Girilen tutar maksimum bahis limitini aşıyor.',
                                 style: TextStyle(
                                   color: Color(0xFFFCA5A5),
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
+                            ],
                           ],
                         ),
                       ),
