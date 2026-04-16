@@ -104,6 +104,76 @@ class StatisticsPage extends StatelessWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(20),
                                 child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    const Text(
+                                      'Genel Durum',
+                                      style: TextStyle(
+                                        fontSize: 22,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    GridView.count(
+                                      crossAxisCount: isWide ? 3 : 1,
+                                      shrinkWrap: true,
+                                      physics: const NeverScrollableScrollPhysics(),
+                                      mainAxisSpacing: 16,
+                                      crossAxisSpacing: 16,
+                                      childAspectRatio: 2.8,
+                                      children: [
+                                        _StatBox(
+                                          title: 'Toplam Bahis',
+                                          value: '${overview.totalBets}',
+                                          icon: Icons.receipt_long,
+                                        ),
+                                        _StatBox(
+                                          title: 'Toplam Oynanan',
+                                          value: '${overview.totalStake.toStringAsFixed(2)} ₺',
+                                          icon: Icons.payments_outlined,
+                                        ),
+                                        _StatBox(
+                                          title: 'Kazanma Oranı',
+                                          value: '%${overview.winRate.toStringAsFixed(1)}',
+                                          icon: Icons.bar_chart,
+                                        ),
+                                        _StatBox(
+                                          title: 'ROI',
+                                          value: '%${overview.roi.toStringAsFixed(1)}',
+                                          valueColor: overview.roi >= 0
+                                              ? const Color(0xFF22C55E)
+                                              : const Color(0xFFEF4444),
+                                          icon: Icons.trending_up,
+                                        ),
+                                        _StatBox(
+                                          title: 'Beklemede',
+                                          value: '${overview.pendingCount}',
+                                          valueColor: const Color(0xFF94A3B8),
+                                          icon: Icons.hourglass_bottom,
+                                        ),
+                                        _StatBox(
+                                          title: 'Bugünkü Kayıp',
+                                          value: '${overview.todayLoss.toStringAsFixed(2)} ₺',
+                                          valueColor: overview.todayLoss > 0
+                                              ? const Color(0xFFEF4444)
+                                              : null,
+                                          icon: Icons.today,
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                            const SizedBox(height: 20),
+                            Card(
+                              color: const Color(0xFF161A23),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(20),
+                              ),
+                              child: Padding(
+                                padding: const EdgeInsets.all(20),
+                                child: Column(
                                   crossAxisAlignment:
                                   CrossAxisAlignment.stretch,
                                   children: [
@@ -670,29 +740,11 @@ class StatisticsPage extends StatelessWidget {
                             GridView.count(
                               crossAxisCount: isWide ? 3 : 1,
                               shrinkWrap: true,
-                              physics:
-                              const NeverScrollableScrollPhysics(),
+                              physics: const NeverScrollableScrollPhysics(),
                               mainAxisSpacing: 16,
                               crossAxisSpacing: 16,
                               childAspectRatio: 2.8,
                               children: [
-                                _StatBox(
-                                  title: 'Toplam Bahis',
-                                  value: '${overview.totalBets}',
-                                  icon: Icons.receipt_long,
-                                ),
-                                _StatBox(
-                                  title: 'Toplam Oynanan',
-                                  value:
-                                  '${overview.totalStake.toStringAsFixed(2)} ₺',
-                                  icon: Icons.payments_outlined,
-                                ),
-                                _StatBox(
-                                  title: 'Kazanma Oranı',
-                                  value:
-                                  '%${overview.winRate.toStringAsFixed(1)}',
-                                  icon: Icons.bar_chart,
-                                ),
                                 _StatBox(
                                   title: 'Kazanan',
                                   value: '${overview.wonCount}',
@@ -706,34 +758,10 @@ class StatisticsPage extends StatelessWidget {
                                   icon: Icons.cancel_outlined,
                                 ),
                                 _StatBox(
-                                  title: 'Beklemede',
-                                  value: '${overview.pendingCount}',
-                                  valueColor: const Color(0xFF94A3B8),
-                                  icon: Icons.hourglass_bottom,
-                                ),
-                                _StatBox(
                                   title: 'İade',
                                   value: '${overview.refundedCount}',
                                   valueColor: const Color(0xFFF59E0B),
                                   icon: Icons.reply_all_outlined,
-                                ),
-                                _StatBox(
-                                  title: 'ROI',
-                                  value:
-                                  '%${overview.roi.toStringAsFixed(1)}',
-                                  valueColor: overview.roi >= 0
-                                      ? const Color(0xFF22C55E)
-                                      : const Color(0xFFEF4444),
-                                  icon: Icons.trending_up,
-                                ),
-                                _StatBox(
-                                  title: 'Bugünkü Kayıp',
-                                  value:
-                                  '${overview.todayLoss.toStringAsFixed(2)} ₺',
-                                  valueColor: overview.todayLoss > 0
-                                      ? const Color(0xFFEF4444)
-                                      : null,
-                                  icon: Icons.today,
                                 ),
                               ],
                             ),
