@@ -252,6 +252,14 @@ class QuickActionsSection extends StatelessWidget {
                 fontWeight: FontWeight.bold,
               ),
             ),
+            const SizedBox(height: 6),
+            const Text(
+              'En sık kullandığın ekranlara buradan hızlıca geç.',
+              style: TextStyle(
+                color: Colors.white70,
+                fontSize: 13,
+              ),
+            ),
             const SizedBox(height: 14),
             Wrap(
               spacing: 12,
