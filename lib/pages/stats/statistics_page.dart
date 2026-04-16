@@ -96,6 +96,7 @@ class StatisticsPage extends StatelessWidget {
                                 text:
                                 'Hedef kasaya ulaştın. Hedef tamam, havaya zıplamak serbest.',
                               ),
+                            const SizedBox(height: 20),
                             Card(
                               color: const Color(0xFF161A23),
                               shape: RoundedRectangleBorder(
@@ -174,8 +175,7 @@ class StatisticsPage extends StatelessWidget {
                               child: Padding(
                                 padding: const EdgeInsets.all(20),
                                 child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
                                   children: [
                                     const Text(
                                       'Kasa Özeti',
@@ -297,21 +297,6 @@ class StatisticsPage extends StatelessWidget {
                                       icon: const Icon(Icons.edit),
                                       label: const Text(
                                         'Başlangıç Kasasını Ayarla',
-                                      ),
-                                    ),
-                                    const SizedBox(height: 12),
-                                    Container(
-                                      width: double.infinity,
-                                      padding: const EdgeInsets.all(12),
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFF1F2937),
-                                        borderRadius: BorderRadius.circular(14),
-                                        border: Border.all(color: const Color(0xFF374151)),
-                                      ),
-                                      child: Text(
-                                        overview.highConfidenceEnabled
-                                            ? 'Yüksek güven açık • 9 = ${overview.confidence9Multiplier.toStringAsFixed(1)}x • 10 = ${overview.confidence10Multiplier.toStringAsFixed(1)}x'
-                                            : 'Yüksek güven kapalı',
                                       ),
                                     ),
                                   ],
@@ -574,47 +559,6 @@ class StatisticsPage extends StatelessWidget {
                             ),
                             const SizedBox(height: 20),
                             const Text(
-                              'Performans Özeti',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.count(
-                              crossAxisCount: isWide ? 2 : 1,
-                              shrinkWrap: true,
-                              physics:
-                              const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 3.2,
-                              children: [
-                                _StatBox(
-                                  title: 'En Büyük Tek Kazanç',
-                                  value: overview.biggestWinLabel,
-                                  icon: Icons.arrow_upward,
-                                  valueColor: const Color(0xFF22C55E),
-                                ),
-                                _StatBox(
-                                  title: 'En Büyük Tek Kayıp',
-                                  value: overview.biggestLossLabel,
-                                  icon: Icons.arrow_downward,
-                                  valueColor: const Color(0xFFEF4444),
-                                ),
-                                _StatBox(
-                                  title: 'En Çok Oynanan Bahis Türü',
-                                  value: overview.mostPlayedBetType,
-                                  icon: Icons
-                                      .local_fire_department_outlined,
-                                ),
-                                _Last10FormStat(
-                                  formItems: overview.last10Form,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
                               'Güven Analizi',
                               style: TextStyle(
                                 fontSize: 22,
@@ -736,36 +680,6 @@ class StatisticsPage extends StatelessWidget {
                                   );
                                 }).toList();
                               })(),
-                            const SizedBox(height: 20),
-                            GridView.count(
-                              crossAxisCount: isWide ? 3 : 1,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 2.8,
-                              children: [
-                                _StatBox(
-                                  title: 'Kazanan',
-                                  value: '${overview.wonCount}',
-                                  valueColor: const Color(0xFF22C55E),
-                                  icon: Icons.check_circle_outline,
-                                ),
-                                _StatBox(
-                                  title: 'Kaybeden',
-                                  value: '${overview.lostCount}',
-                                  valueColor: const Color(0xFFEF4444),
-                                  icon: Icons.cancel_outlined,
-                                ),
-                                _StatBox(
-                                  title: 'İade',
-                                  value: '${overview.refundedCount}',
-                                  valueColor: const Color(0xFFF59E0B),
-                                  icon: Icons.reply_all_outlined,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
                             const Text(
                               'Bahis Türüne Göre Özet',
                               style: TextStyle(
@@ -915,6 +829,119 @@ class StatisticsPage extends StatelessWidget {
                                   ),
                                 );
                               }),
+                            const SizedBox(height: 20),
+                            GridView.count(
+                              crossAxisCount: isWide ? 3 : 1,
+                              shrinkWrap: true,
+                              physics:
+                              const NeverScrollableScrollPhysics(),
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childAspectRatio: 2.8,
+                              children: [
+                                _StatBox(
+                                  title: 'Toplam Bahis',
+                                  value: '${overview.totalBets}',
+                                  icon: Icons.receipt_long,
+                                ),
+                                _StatBox(
+                                  title: 'Toplam Oynanan',
+                                  value:
+                                  '${overview.totalStake.toStringAsFixed(2)} ₺',
+                                  icon: Icons.payments_outlined,
+                                ),
+                                _StatBox(
+                                  title: 'Kazanma Oranı',
+                                  value:
+                                  '%${overview.winRate.toStringAsFixed(1)}',
+                                  icon: Icons.bar_chart,
+                                ),
+                                _StatBox(
+                                  title: 'Kazanan',
+                                  value: '${overview.wonCount}',
+                                  valueColor: const Color(0xFF22C55E),
+                                  icon: Icons.check_circle_outline,
+                                ),
+                                _StatBox(
+                                  title: 'Kaybeden',
+                                  value: '${overview.lostCount}',
+                                  valueColor: const Color(0xFFEF4444),
+                                  icon: Icons.cancel_outlined,
+                                ),
+                                _StatBox(
+                                  title: 'Beklemede',
+                                  value: '${overview.pendingCount}',
+                                  valueColor: const Color(0xFF94A3B8),
+                                  icon: Icons.hourglass_bottom,
+                                ),
+                                _StatBox(
+                                  title: 'İade',
+                                  value: '${overview.refundedCount}',
+                                  valueColor: const Color(0xFFF59E0B),
+                                  icon: Icons.reply_all_outlined,
+                                ),
+                                _StatBox(
+                                  title: 'ROI',
+                                  value:
+                                  '%${overview.roi.toStringAsFixed(1)}',
+                                  valueColor: overview.roi >= 0
+                                      ? const Color(0xFF22C55E)
+                                      : const Color(0xFFEF4444),
+                                  icon: Icons.trending_up,
+                                ),
+                                _StatBox(
+                                  title: 'Bugünkü Kayıp',
+                                  value:
+                                  '${overview.todayLoss.toStringAsFixed(2)} ₺',
+                                  valueColor: overview.todayLoss > 0
+                                      ? const Color(0xFFEF4444)
+                                      : null,
+                                  icon: Icons.today,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 24),
+                            const Text(
+                              'Performans Özeti',
+                              style: TextStyle(
+                                fontSize: 22,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            const SizedBox(height: 12),
+                            GridView.count(
+                              crossAxisCount: isWide ? 2 : 1,
+                              shrinkWrap: true,
+                              physics:
+                              const NeverScrollableScrollPhysics(),
+                              mainAxisSpacing: 16,
+                              crossAxisSpacing: 16,
+                              childAspectRatio: 3.2,
+                              children: [
+                                _StatBox(
+                                  title: 'En Büyük Tek Kazanç',
+                                  value: overview.biggestWinLabel,
+                                  icon: Icons.arrow_upward,
+                                  valueColor: const Color(0xFF22C55E),
+                                ),
+                                _StatBox(
+                                  title: 'En Büyük Tek Kayıp',
+                                  value: overview.biggestLossLabel,
+                                  icon: Icons.arrow_downward,
+                                  valueColor: const Color(0xFFEF4444),
+                                ),
+                                _StatBox(
+                                  title: 'En Çok Oynanan Bahis Türü',
+                                  value: overview.mostPlayedBetType,
+                                  icon: Icons
+                                      .local_fire_department_outlined,
+                                ),
+                                _Last10FormStat(
+                                  formItems: overview.last10Form,
+                                ),
+                              ],
+                            ),
+                            const SizedBox(height: 20),
                           ],
                         ),
                       ),
@@ -1115,8 +1142,7 @@ class StatisticsPage extends StatelessWidget {
                         hintText: selectedMode == 'percent'
                             ? 'Örn: 4 veya 5'
                             : 'Örn: 250',
-                        prefixIcon:
-                        const Icon(Icons.money_off_csred_outlined),
+                        prefixIcon: const Icon(Icons.money_off_csred_outlined),
                       ),
                     ),
                     const SizedBox(height: 12),

@@ -40,23 +40,49 @@ class WelcomeHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: const Color(0xFF161A23),
+      elevation: 0,
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(
+          color: Color(0xFF242B38),
+        ),
       ),
       child: Padding(
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            const Icon(
-              Icons.verified_user,
-              size: 56,
-              color: Color(0xFF16A34A),
+            Container(
+              width: 72,
+              height: 72,
+              decoration: BoxDecoration(
+                color: const Color(0xFF16A34A).withOpacity(0.14),
+                borderRadius: BorderRadius.circular(20),
+                border: Border.all(
+                  color: const Color(0xFF16A34A).withOpacity(0.30),
+                ),
+              ),
+              child: const Icon(
+                Icons.verified_user,
+                size: 34,
+                color: Color(0xFF16A34A),
+              ),
             ),
             const SizedBox(height: 16),
             const Text(
-              'Hoş geldin',
+              'Bet Tracker',
               style: TextStyle(
-                fontSize: 26,
+                color: Colors.white70,
+                fontSize: 13,
+                fontWeight: FontWeight.w600,
+                letterSpacing: 0.4,
+              ),
+            ),
+            const SizedBox(height: 8),
+            const Text(
+              'Hoş geldin',
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 28,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -70,10 +96,27 @@ class WelcomeHeader extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 18),
-            const Text(
-              'Bugünkü tabloya bak, bekleyen bahisleri kapat, sonra keyfine bak.',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 15),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.symmetric(
+                horizontal: 14,
+                vertical: 12,
+              ),
+              decoration: BoxDecoration(
+                color: const Color(0xFF1A1F2B),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: const Color(0xFF2A3140),
+                ),
+              ),
+              child: const Text(
+                'Bugünkü tabloya bak, bekleyen bahisleri kapat, sonra keyfine bak.',
+                textAlign: TextAlign.center,
+                style: TextStyle(
+                  fontSize: 14,
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
         ),
@@ -100,16 +143,27 @@ class DashboardCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: const Color(0xFF161A23),
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(
+          color: Color(0xFF242B38),
+        ),
       ),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
         child: Row(
           children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: const Color(0xFF16A34A).withOpacity(0.15),
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: const Color(0xFF16A34A).withOpacity(0.14),
+                borderRadius: BorderRadius.circular(14),
+                border: Border.all(
+                  color: const Color(0xFF16A34A).withOpacity(0.28),
+                ),
+              ),
               child: Icon(
                 icon,
                 color: const Color(0xFF16A34A),
@@ -129,17 +183,19 @@ class DashboardCard extends StatelessWidget {
                     style: const TextStyle(
                       color: Colors.white70,
                       fontSize: 13,
+                      fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  const SizedBox(height: 8),
                   Text(
                     value,
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(
-                      fontSize: 16,
+                      fontSize: 18,
+                      height: 1.1,
                       fontWeight: FontWeight.bold,
-                      color: valueColor,
+                      color: valueColor ?? Colors.white,
                     ),
                   ),
                 ],
@@ -272,14 +328,25 @@ class QuickActionButton extends StatelessWidget {
     return OutlinedButton.icon(
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(180, 48),
+        minimumSize: const Size(190, 52),
+        backgroundColor: const Color(0xFF1A1F2B),
         side: const BorderSide(color: Color(0xFF2A3140)),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(14),
         ),
       ),
-      icon: Icon(icon),
-      label: Text(label),
+      icon: Icon(
+        icon,
+        size: 18,
+        color: const Color(0xFF16A34A),
+      ),
+      label: Text(
+        label,
+        style: const TextStyle(
+          fontWeight: FontWeight.w600,
+        ),
+      ),
     );
   }
 }

@@ -310,23 +310,28 @@ class PendingBetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: const Color(0xFF161A23),
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(
+          color: Color(0xFF242B38),
+        ),
       ),
       margin: const EdgeInsets.only(bottom: 12),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(18),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: Text(
                     bet.matchName,
                     style: const TextStyle(
                       fontWeight: FontWeight.bold,
-                      fontSize: 16,
+                      fontSize: 17,
                     ),
                   ),
                 ),
@@ -334,12 +339,30 @@ class PendingBetCard extends StatelessWidget {
                 _confidenceBadge(bet.confidenceScore),
               ],
             ),
-            const SizedBox(height: 8),
-            Text(
-              '${bet.sport} • ${bet.betType}\nOran: ${bet.odd.toStringAsFixed(2)} | Tutar: ${bet.stake.toStringAsFixed(2)} ₺',
-              style: const TextStyle(color: Colors.white70),
+            const SizedBox(height: 10),
+            Wrap(
+              spacing: 10,
+              runSpacing: 10,
+              children: [
+                _PendingInfoChip(
+                  icon: Icons.sports_soccer,
+                  text: bet.sport,
+                ),
+                _PendingInfoChip(
+                  icon: Icons.local_activity_outlined,
+                  text: bet.betType,
+                ),
+                _PendingInfoChip(
+                  icon: Icons.percent,
+                  text: 'Oran ${bet.odd.toStringAsFixed(2)}',
+                ),
+                _PendingInfoChip(
+                  icon: Icons.payments_outlined,
+                  text: 'Tutar ${bet.stake.toStringAsFixed(2)} ₺',
+                ),
+              ],
             ),
-            const SizedBox(height: 14),
+            const SizedBox(height: 16),
             Wrap(
               spacing: 8,
               runSpacing: 8,
@@ -348,6 +371,7 @@ class PendingBetCard extends StatelessWidget {
                   onPressed: () => onQuickSettle(bet, 'kazandi'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF22C55E),
+                    minimumSize: const Size(0, 44),
                   ),
                   child: const Text('Kazandı'),
                 ),
@@ -355,6 +379,7 @@ class PendingBetCard extends StatelessWidget {
                   onPressed: () => onQuickSettle(bet, 'kaybetti'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFEF4444),
+                    minimumSize: const Size(0, 44),
                   ),
                   child: const Text('Kaybetti'),
                 ),
@@ -362,11 +387,17 @@ class PendingBetCard extends StatelessWidget {
                   onPressed: () => onQuickSettle(bet, 'iade'),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFFF59E0B),
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 44),
                   ),
                   child: const Text('İade'),
                 ),
                 OutlinedButton(
                   onPressed: onDetail,
+                  style: OutlinedButton.styleFrom(
+                    minimumSize: const Size(0, 44),
+                    side: const BorderSide(color: Color(0xFF2A3140)),
+                  ),
                   child: const Text('Detay'),
                 ),
               ],
@@ -377,7 +408,48 @@ class PendingBetCard extends StatelessWidget {
     );
   }
 }
+class _PendingInfoChip extends StatelessWidget {
+  final IconData icon;
+  final String text;
 
+  const _PendingInfoChip({
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 8),
+      decoration: BoxDecoration(
+        color: const Color(0xFF1A1F2B),
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(
+          color: const Color(0xFF2A3140),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: Colors.white70,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              color: Colors.white70,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
 class RecentBetCard extends StatelessWidget {
   final BetModel bet;
   final VoidCallback onTap;
@@ -392,23 +464,29 @@ class RecentBetCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       color: const Color(0xFF161A23),
+      elevation: 0,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(20),
+        side: const BorderSide(
+          color: Color(0xFF242B38),
+        ),
       ),
       margin: const EdgeInsets.only(bottom: 12),
       child: ListTile(
         onTap: onTap,
         contentPadding: const EdgeInsets.symmetric(
-          horizontal: 16,
-          vertical: 8,
+          horizontal: 18,
+          vertical: 10,
         ),
         title: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(
               child: Text(
                 bet.matchName,
                 style: const TextStyle(
                   fontWeight: FontWeight.bold,
+                  fontSize: 16,
                 ),
               ),
             ),
@@ -417,15 +495,20 @@ class RecentBetCard extends StatelessWidget {
           ],
         ),
         subtitle: Padding(
-          padding: const EdgeInsets.only(top: 6),
+          padding: const EdgeInsets.only(top: 8),
           child: Text(
             '${bet.sport} • ${bet.betType}\nOran: ${bet.odd.toStringAsFixed(2)} | Tutar: ${bet.stake.toStringAsFixed(2)} ₺ | Sonuç: ${resultLabel(bet.result)}',
+            style: const TextStyle(
+              color: Colors.white70,
+              height: 1.35,
+            ),
           ),
         ),
         trailing: Text(
           '${bet.netProfit.toStringAsFixed(2)} ₺',
           style: TextStyle(
             fontWeight: FontWeight.bold,
+            fontSize: 15,
             color: bet.netProfit >= 0
                 ? const Color(0xFF22C55E)
                 : const Color(0xFFEF4444),
