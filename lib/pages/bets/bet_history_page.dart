@@ -1501,22 +1501,50 @@ class _TopStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Text(
-          title,
-          style: const TextStyle(color: Colors.white70),
+    final resolvedColor = color ?? AppColors.textPrimary;
+
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(
+          color: AppColors.border,
         ),
-        const SizedBox(height: 6),
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: color,
+      ),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            title,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-      ],
+          const SizedBox(height: AppSpacing.xs),
+          Text(
+            value,
+            textAlign: TextAlign.center,
+            maxLines: 2,
+            overflow: TextOverflow.ellipsis,
+            style: TextStyle(
+              fontSize: 18,
+              height: 1.1,
+              fontWeight: FontWeight.bold,
+              color: resolvedColor,
+            ),
+          ),
+        ],
+      ),
     );
   }
 }
@@ -1535,9 +1563,29 @@ class _QuickFilterChip extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ChoiceChip(
-      label: Text(label),
+      label: Text(
+        label,
+        style: TextStyle(
+          fontWeight: FontWeight.w600,
+          color: isSelected ? Colors.white : AppColors.textPrimary,
+        ),
+      ),
       selected: isSelected,
       onSelected: (_) => onTap(),
+      showCheckmark: false,
+      backgroundColor: AppColors.surfaceAlt,
+      selectedColor: AppColors.primary,
+      side: BorderSide(
+        color: isSelected ? AppColors.primary : AppColors.border,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.pill),
+      ),
+      labelPadding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.xs,
+      ),
+      materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
+      visualDensity: VisualDensity.compact,
     );
   }
 }
