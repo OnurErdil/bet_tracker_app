@@ -2,6 +2,7 @@ import 'package:bet_tracker_app/firebase_options.dart';
 import 'package:bet_tracker_app/pages/auth/login_page.dart';
 import 'package:bet_tracker_app/pages/home/home_page.dart';
 import 'package:bet_tracker_app/services/auth_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -26,44 +27,59 @@ class BetTrackerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F1115),
-        primaryColor: const Color(0xFF16A34A),
+        scaffoldBackgroundColor: AppColors.background,
+        primaryColor: AppColors.primary,
         colorScheme: ColorScheme.fromSeed(
-          seedColor: const Color(0xFF16A34A),
+          seedColor: AppColors.primary,
           brightness: Brightness.dark,
         ),
         appBarTheme: const AppBarTheme(
-          backgroundColor: Color(0xFF161A23),
+          backgroundColor: AppColors.surface,
           elevation: 0,
           centerTitle: true,
         ),
+        cardTheme: CardThemeData(
+          color: AppColors.surface,
+          elevation: 0,
+          shape: AppStyles.cardShape(),
+        ),
         inputDecorationTheme: InputDecorationTheme(
           filled: true,
-          fillColor: const Color(0xFF1A1F2B),
-          border: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: BorderSide.none,
+          fillColor: AppColors.surfaceAlt,
+          border: AppStyles.inputBorder(
+            borderColor: Colors.transparent,
+            radius: AppRadius.md,
           ),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF2A3140)),
+          enabledBorder: AppStyles.inputBorder(
+            borderColor: AppColors.border,
+            radius: AppRadius.md,
           ),
-          focusedBorder: OutlineInputBorder(
-            borderRadius: BorderRadius.circular(14),
-            borderSide: const BorderSide(color: Color(0xFF16A34A), width: 1.4),
+          focusedBorder: AppStyles.inputBorder(
+            borderColor: AppColors.primary,
+            radius: AppRadius.md,
+            width: 1.4,
           ),
           contentPadding: const EdgeInsets.symmetric(
-            horizontal: 16,
-            vertical: 14,
+            horizontal: AppSpacing.lg,
+            vertical: AppSpacing.md,
           ),
         ),
         elevatedButtonTheme: ElevatedButtonThemeData(
           style: ElevatedButton.styleFrom(
-            backgroundColor: const Color(0xFF16A34A),
+            backgroundColor: AppColors.primary,
             foregroundColor: Colors.white,
             minimumSize: const Size(double.infinity, 52),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(14),
+              borderRadius: BorderRadius.circular(AppRadius.md),
+            ),
+          ),
+        ),
+        outlinedButtonTheme: OutlinedButtonThemeData(
+          style: OutlinedButton.styleFrom(
+            foregroundColor: Colors.white,
+            side: const BorderSide(color: AppColors.border),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(AppRadius.md),
             ),
           ),
         ),

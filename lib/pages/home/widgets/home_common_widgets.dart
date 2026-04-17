@@ -1,4 +1,5 @@
 import 'package:bet_tracker_app/models/bet_model.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
 String resultLabel(String value) {
@@ -39,45 +40,40 @@ class WelcomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF161A23),
+      color: AppColors.surface,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(
-          color: Color(0xFF242B38),
-        ),
-      ),
+      shape: AppStyles.cardShape(),
       child: Padding(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xxl),
         child: Column(
           children: [
             Container(
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: const Color(0xFF16A34A).withOpacity(0.14),
-                borderRadius: BorderRadius.circular(20),
+                color: AppColors.primary.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(AppRadius.xl),
                 border: Border.all(
-                  color: const Color(0xFF16A34A).withOpacity(0.30),
+                  color: AppColors.primary.withOpacity(0.30),
                 ),
               ),
               child: const Icon(
                 Icons.verified_user,
                 size: 34,
-                color: Color(0xFF16A34A),
+                color: AppColors.primary,
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppSpacing.lg),
             const Text(
               'Bet Tracker',
               style: TextStyle(
-                color: Colors.white70,
+                color: AppColors.textSecondary,
                 fontSize: 13,
                 fontWeight: FontWeight.w600,
                 letterSpacing: 0.4,
               ),
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppSpacing.xs),
             const Text(
               'Hoş geldin',
               textAlign: TextAlign.center,
@@ -91,22 +87,22 @@ class WelcomeHeader extends StatelessWidget {
               email,
               textAlign: TextAlign.center,
               style: const TextStyle(
-                color: Colors.white70,
+                color: AppColors.textSecondary,
                 fontSize: 15,
               ),
             ),
-            const SizedBox(height: 18),
+            const SizedBox(height: AppSpacing.lg),
             Container(
               width: double.infinity,
               padding: const EdgeInsets.symmetric(
-                horizontal: 14,
-                vertical: 12,
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
               ),
               decoration: BoxDecoration(
-                color: const Color(0xFF1A1F2B),
-                borderRadius: BorderRadius.circular(14),
+                color: AppColors.surfaceAlt,
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
-                  color: const Color(0xFF2A3140),
+                  color: AppColors.border,
                 ),
               ),
               child: const Text(
@@ -114,7 +110,7 @@ class WelcomeHeader extends StatelessWidget {
                 textAlign: TextAlign.center,
                 style: TextStyle(
                   fontSize: 14,
-                  color: Colors.white,
+                  color: AppColors.textPrimary,
                 ),
               ),
             ),
@@ -142,35 +138,33 @@ class DashboardCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF161A23),
+      color: AppColors.surface,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(20),
-        side: const BorderSide(
-          color: Color(0xFF242B38),
-        ),
-      ),
+      shape: AppStyles.cardShape(),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 18, vertical: 18),
+        padding: const EdgeInsets.symmetric(
+          horizontal: 18,
+          vertical: 18,
+        ),
         child: Row(
           children: [
             Container(
               width: 44,
               height: 44,
               decoration: BoxDecoration(
-                color: const Color(0xFF16A34A).withOpacity(0.14),
-                borderRadius: BorderRadius.circular(14),
+                color: AppColors.primary.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(AppRadius.md),
                 border: Border.all(
-                  color: const Color(0xFF16A34A).withOpacity(0.28),
+                  color: AppColors.primary.withOpacity(0.28),
                 ),
               ),
               child: Icon(
                 icon,
-                color: const Color(0xFF16A34A),
+                color: AppColors.primary,
                 size: 22,
               ),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: AppSpacing.md),
             Expanded(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -181,12 +175,12 @@ class DashboardCard extends StatelessWidget {
                     maxLines: 2,
                     overflow: TextOverflow.ellipsis,
                     style: const TextStyle(
-                      color: Colors.white70,
+                      color: AppColors.textSecondary,
                       fontSize: 13,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppSpacing.xs),
                   Text(
                     value,
                     maxLines: 2,
@@ -195,7 +189,7 @@ class DashboardCard extends StatelessWidget {
                       fontSize: 18,
                       height: 1.1,
                       fontWeight: FontWeight.bold,
-                      color: valueColor ?? Colors.white,
+                      color: valueColor ?? AppColors.textPrimary,
                     ),
                   ),
                 ],
@@ -329,23 +323,36 @@ class QuickActionButton extends StatelessWidget {
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
         minimumSize: const Size(190, 52),
-        backgroundColor: const Color(0xFF1A1F2B),
-        side: const BorderSide(color: Color(0xFF2A3140)),
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        backgroundColor: AppColors.surfaceAlt,
+        side: const BorderSide(color: AppColors.border),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(14),
+          borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ),
-      icon: Icon(
-        icon,
-        size: 18,
-        color: const Color(0xFF16A34A),
+      icon: const Icon(
+        Icons.circle,
+        size: 0,
       ),
-      label: Text(
-        label,
-        style: const TextStyle(
-          fontWeight: FontWeight.w600,
-        ),
+      label: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 18,
+            color: AppColors.primary,
+          ),
+          const SizedBox(width: AppSpacing.xs),
+          Text(
+            label,
+            style: const TextStyle(
+              fontWeight: FontWeight.w600,
+            ),
+          ),
+        ],
       ),
     );
   }
