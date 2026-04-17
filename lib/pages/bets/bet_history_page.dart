@@ -1165,12 +1165,37 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                         shape: AppStyles.cardShape(radius: AppRadius.lg),
                         child: const Padding(
                           padding: EdgeInsets.all(AppSpacing.xl),
-                          child: Text(
-                            'Filtreye uygun bahis bulunamadı.',
-                            textAlign: TextAlign.center,
-                            style: TextStyle(
-                              color: AppColors.textSecondary,
-                            ),
+                          child: Column(
+                            children: [
+                              SizedBox(height: 4),
+                              CircleAvatar(
+                                radius: 28,
+                                backgroundColor: AppColors.surfaceAlt,
+                                child: Icon(
+                                  Icons.inbox_outlined,
+                                  size: 28,
+                                  color: AppColors.textSecondary,
+                                ),
+                              ),
+                              SizedBox(height: AppSpacing.md),
+                              Text(
+                                'Filtreye uygun bahis bulunamadı',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              SizedBox(height: AppSpacing.xs),
+                              Text(
+                                'Arama kelimesini daraltmış veya filtreleri fazla sıkmış olabilirsin.',
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: AppColors.textSecondary,
+                                  height: 1.4,
+                                ),
+                              ),
+                            ],
                           ),
                         ),
                       )
@@ -1370,6 +1395,39 @@ class _BetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final matchTitle =
+    bet.resolvedHomeTeam.isNotEmpty && bet.resolvedAwayTeam.isNotEmpty
+        ? '${bet.resolvedHomeTeam} - ${bet.resolvedAwayTeam}'
+        : bet.matchName;
+
+    final locationText = [bet.country.trim(), bet.league.trim()]
+        .where((item) => item.isNotEmpty)
+        .join(' • ');
+
+    final hasNote = bet.note.trim().isNotEmpty;
+
+    final Color netColor;
+    final IconData resultIcon;
+
+    switch (bet.result) {
+      case 'kazandi':
+        netColor = const Color(0xFF22C55E);
+        resultIcon = Icons.check_circle_outline;
+        break;
+      case 'kaybetti':
+        netColor = const Color(0xFFEF4444);
+        resultIcon = Icons.cancel_outlined;
+        break;
+      case 'iade':
+        netColor = const Color(0xFFF59E0B);
+        resultIcon = Icons.reply_all_outlined;
+        break;
+      default:
+        netColor = AppColors.textSecondary;
+        resultIcon = Icons.hourglass_bottom_outlined;
+        break;
+    }
+
     return Card(
       color: AppColors.surface,
       elevation: 0,
@@ -1386,99 +1444,249 @@ class _BetCard extends StatelessWidget {
           );
         },
         child: Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Icon(
-                    sportIcon,
-                    size: 18,
-                    color: const Color(0xFF16A34A),
-                  ),
-                  const SizedBox(width: 8),
-                  Expanded(
-                    child: Text(
-                      bet.resolvedHomeTeam.isNotEmpty && bet.resolvedAwayTeam.isNotEmpty
-                          ? '${bet.resolvedHomeTeam} - ${bet.resolvedAwayTeam}'
-                          : bet.matchName,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 16,
+                  Container(
+                    width: 38,
+                    height: 38,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.28),
                       ),
                     ),
+                    child: Icon(
+                      sportIcon,
+                      size: 18,
+                      color: AppColors.primary,
+                    ),
                   ),
-                  const SizedBox(width: 8),
+                  const SizedBox(width: AppSpacing.md),
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          matchTitle,
+                          style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            height: 1.25,
+                          ),
+                        ),
+                        if (locationText.isNotEmpty) ...[
+                          const SizedBox(height: 4),
+                          Text(
+                            locationText,
+                            style: const TextStyle(
+                              color: AppColors.primary,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ],
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.sm),
                   _confidenceBadge(bet.confidenceScore),
                 ],
               ),
-              const SizedBox(height: 8),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (bet.country.isNotEmpty || bet.league.isNotEmpty)
-                    Text(
-                      '${bet.country} • ${bet.league}',
-                      style: const TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                ],
-              ),
-              const SizedBox(height: 6),
-              Text(
-                'Tarih: $formattedDate',
-                style: const TextStyle(color: Colors.white70),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Oran: ${bet.odd.toStringAsFixed(2)} | Tutar: ${bet.stake.toStringAsFixed(2)} ₺',
-                style: const TextStyle(color: Colors.white70),
-              ),
-              if (bet.note.trim().isNotEmpty) ...[
-                const SizedBox(height: 6),
-                Text(
-                  'Not: ${bet.note}',
-                  style: const TextStyle(color: Colors.white70),
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ],
-              const SizedBox(height: 12),
-              Row(
+              const SizedBox(height: AppSpacing.md),
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
                 children: [
                   Container(
                     padding: const EdgeInsets.symmetric(
                       horizontal: 10,
-                      vertical: 4,
+                      vertical: 7,
                     ),
                     decoration: BoxDecoration(
-                      color: resultColor.withOpacity(0.15),
-                      borderRadius: BorderRadius.circular(999),
+                      color: AppColors.surfaceAlt,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      border: Border.all(color: AppColors.border),
                     ),
                     child: Text(
-                      resultLabel,
-                      style: TextStyle(
-                        color: resultColor,
+                      formattedDate,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const Spacer(),
-                  Text(
-                    '${bet.netProfit.toStringAsFixed(2)} ₺',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
-                      color: bet.netProfit >= 0
-                          ? const Color(0xFF22C55E)
-                          : const Color(0xFFEF4444),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceAlt,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Text(
+                      bet.betType,
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceAlt,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Text(
+                      'Oran ${bet.odd.toStringAsFixed(2)}',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 7,
+                    ),
+                    decoration: BoxDecoration(
+                      color: AppColors.surfaceAlt,
+                      borderRadius: BorderRadius.circular(AppRadius.pill),
+                      border: Border.all(color: AppColors.border),
+                    ),
+                    child: Text(
+                      'Tutar ${bet.stake.toStringAsFixed(2)} ₺',
+                      style: const TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
                 ],
+              ),
+              if (hasNote) ...[
+                const SizedBox(height: AppSpacing.md),
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  decoration: BoxDecoration(
+                    color: AppColors.surfaceAlt,
+                    borderRadius: BorderRadius.circular(AppRadius.md),
+                    border: Border.all(color: AppColors.border),
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const Text(
+                        'Not',
+                        style: TextStyle(
+                          fontSize: 12,
+                          color: AppColors.textSecondary,
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+                      Text(
+                        bet.note.trim(),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                        style: const TextStyle(
+                          height: 1.35,
+                          color: AppColors.textPrimary,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ],
+              const SizedBox(height: AppSpacing.md),
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.md,
+                ),
+                decoration: BoxDecoration(
+                  color: AppColors.surfaceAlt,
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(color: AppColors.border),
+                ),
+                child: Row(
+                  children: [
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 10,
+                        vertical: 7,
+                      ),
+                      decoration: BoxDecoration(
+                        color: resultColor.withOpacity(0.14),
+                        borderRadius: BorderRadius.circular(AppRadius.pill),
+                        border: Border.all(
+                          color: resultColor.withOpacity(0.35),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(
+                            resultIcon,
+                            size: 14,
+                            color: resultColor,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            resultLabel,
+                            style: TextStyle(
+                              color: resultColor,
+                              fontWeight: FontWeight.w700,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    const Spacer(),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        const Text(
+                          'Net Etki',
+                          style: TextStyle(
+                            fontSize: 11,
+                            color: AppColors.textSecondary,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          '${bet.netProfit.toStringAsFixed(2)} ₺',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: netColor,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
