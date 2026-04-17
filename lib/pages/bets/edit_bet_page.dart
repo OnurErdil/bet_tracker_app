@@ -1,13 +1,14 @@
 import 'package:bet_tracker_app/data/bet_form_catalog.dart';
 import 'package:bet_tracker_app/data/bet_form_helpers.dart';
 import 'package:bet_tracker_app/domain/bet_calculator.dart';
+import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/services/user_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
-import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 
 class EditBetPage extends StatefulWidget {
   final BetModel bet;
@@ -582,12 +583,11 @@ class _EditBetPageState extends State<EditBetPage> {
               maxWidth: isWide ? 700 : double.infinity,
             ),
             child: Card(
-              color: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+              color: AppColors.surface,
+              elevation: 0,
+              shape: AppStyles.cardShape(),
               child: Padding(
-                padding: const EdgeInsets.all(20),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Form(
                   key: _formKey,
                   child: Column(
@@ -595,20 +595,20 @@ class _EditBetPageState extends State<EditBetPage> {
                       if (_isLockedForToday)
                         Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(14),
+                          margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                          padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFDC2626).withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(14),
+                            color: AppColors.danger.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
                             border: Border.all(
-                              color: const Color(0xFFDC2626).withOpacity(0.35),
+                              color: AppColors.danger.withOpacity(0.35),
                             ),
                           ),
                           child: const Text(
                             'Bugün bahis kilitli. Disiplin modu aktif.',
                             style: TextStyle(
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFFFCA5A5),
+                              color: AppColors.textDangerSoft,
                             ),
                           ),
                         ),
@@ -617,13 +617,13 @@ class _EditBetPageState extends State<EditBetPage> {
                           _targetBankroll > 0)
                         Container(
                           width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: 16),
-                          padding: const EdgeInsets.all(14),
+                          margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                          padding: const EdgeInsets.all(AppSpacing.md),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF16A34A).withOpacity(0.10),
-                            borderRadius: BorderRadius.circular(14),
+                            color: AppColors.primary.withOpacity(0.10),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
                             border: Border.all(
-                              color: const Color(0xFF16A34A).withOpacity(0.35),
+                              color: AppColors.primary.withOpacity(0.35),
                             ),
                           ),
                           child: Column(
@@ -661,17 +661,17 @@ class _EditBetPageState extends State<EditBetPage> {
                         ),
                       Container(
                         width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(14),
+                        margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                        padding: const EdgeInsets.all(AppSpacing.md),
                         decoration: BoxDecoration(
                           color: _isPreviewLimitExceeded
-                              ? const Color(0xFFDC2626).withOpacity(0.12)
-                              : const Color(0xFF1F2937),
-                          borderRadius: BorderRadius.circular(14),
+                              ? AppColors.danger.withOpacity(0.12)
+                              : AppColors.surfaceAlt,
+                          borderRadius: BorderRadius.circular(AppRadius.md),
                           border: Border.all(
                             color: _isPreviewLimitExceeded
-                                ? const Color(0xFFDC2626).withOpacity(0.35)
-                                : const Color(0xFF374151),
+                                ? AppColors.danger.withOpacity(0.35)
+                                : AppColors.border,
                           ),
                         ),
                         child: Column(
