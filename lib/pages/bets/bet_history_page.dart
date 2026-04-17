@@ -1,55 +1,11 @@
 import 'dart:async';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/edit_bet_page.dart';
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-
-Color _confidenceBadgeColor(int score) {
-  if (score >= 10) return const Color(0xFFEA580C);
-  if (score >= 9) return const Color(0xFFF59E0B);
-  if (score >= 7) return const Color(0xFF16A34A);
-  if (score >= 5) return const Color(0xFF0EA5E9);
-  return const Color(0xFF64748B);
-}
-
-Widget _confidenceBadge(int score) {
-  final color = _confidenceBadgeColor(score);
-
-  return Container(
-    padding: const EdgeInsets.symmetric(
-      horizontal: 10,
-      vertical: 6,
-    ),
-    decoration: BoxDecoration(
-      color: color.withOpacity(0.14),
-      borderRadius: BorderRadius.circular(AppRadius.pill),
-      border: Border.all(
-        color: color.withOpacity(0.45),
-      ),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.verified_outlined,
-          size: 14,
-          color: color,
-        ),
-        const SizedBox(width: AppSpacing.xs / 2),
-        Text(
-          'G $score',
-          style: TextStyle(
-            color: color,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    ),
-  );
-}
 class BetHistoryPage extends StatefulWidget {
   const BetHistoryPage({super.key});
 
@@ -1495,7 +1451,7 @@ class _BetCard extends StatelessWidget {
                     ),
                   ),
                   const SizedBox(width: AppSpacing.sm),
-                  _confidenceBadge(bet.confidenceScore),
+                  ConfidenceBadge(score: bet.confidenceScore),
                 ],
               ),
               const SizedBox(height: AppSpacing.md),
@@ -1709,50 +1665,12 @@ class _TopStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resolvedColor = color ?? AppColors.textPrimary;
-
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.md,
-      ),
-      decoration: BoxDecoration(
-        color: AppColors.surfaceAlt,
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(
-          color: AppColors.border,
-        ),
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Text(
-            title,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
-              fontSize: 12,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xs),
-          Text(
-            value,
-            textAlign: TextAlign.center,
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-            style: TextStyle(
-              fontSize: 18,
-              height: 1.1,
-              fontWeight: FontWeight.bold,
-              color: resolvedColor,
-            ),
-          ),
-        ],
-      ),
+    return StatValueCard(
+      title: title,
+      value: value,
+      valueColor: color,
+      centered: true,
+      compact: true,
     );
   }
 }

@@ -1,5 +1,6 @@
 import 'package:bet_tracker_app/domain/statistics_calculator.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/services/reset_service.dart';
@@ -1599,55 +1600,12 @@ class _StatBox extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFF161A23),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: const Color(0xFF16A34A).withOpacity(0.15),
-              child: Icon(
-                icon,
-                color: const Color(0xFF16A34A),
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: const TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 6),
-                  Text(
-                    value,
-                    maxLines: 2,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(
-                      fontSize: 16,
-                      fontWeight: FontWeight.bold,
-                      color: valueColor,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return StatValueCard(
+      title: title,
+      value: value,
+      icon: icon,
+      valueColor: valueColor,
+      compact: true,
     );
   }
 }

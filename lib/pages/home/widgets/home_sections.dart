@@ -3,45 +3,6 @@ import 'package:bet_tracker_app/pages/home/home_stats.dart';
 import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:flutter/material.dart';
 
-Color _confidenceBadgeColor(int score) {
-  if (score >= 10) return const Color(0xFFEA580C);
-  if (score >= 9) return const Color(0xFFF59E0B);
-  if (score >= 7) return const Color(0xFF16A34A);
-  if (score >= 5) return const Color(0xFF0EA5E9);
-  return const Color(0xFF64748B);
-}
-
-Widget _confidenceBadge(int score) {
-  final color = _confidenceBadgeColor(score);
-
-  return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
-    decoration: BoxDecoration(
-      color: color.withOpacity(0.14),
-      borderRadius: BorderRadius.circular(999),
-      border: Border.all(color: color.withOpacity(0.45)),
-    ),
-    child: Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(
-          Icons.verified_outlined,
-          size: 14,
-          color: color,
-        ),
-        const SizedBox(width: 4),
-        Text(
-          'G $score',
-          style: TextStyle(
-            color: color,
-            fontSize: 12,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ],
-    ),
-  );
-}
 class DisciplineSection extends StatelessWidget {
   final HomeStats stats;
   final bool isWide;
@@ -336,7 +297,7 @@ class PendingBetCard extends StatelessWidget {
                   ),
                 ),
                 const SizedBox(width: 8),
-                _confidenceBadge(bet.confidenceScore),
+                ConfidenceBadge(score: bet.confidenceScore),
               ],
             ),
             const SizedBox(height: 10),
@@ -491,7 +452,7 @@ class RecentBetCard extends StatelessWidget {
               ),
             ),
             const SizedBox(width: 8),
-            _confidenceBadge(bet.confidenceScore),
+            ConfidenceBadge(score: bet.confidenceScore),
           ],
         ),
         subtitle: Padding(
