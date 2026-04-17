@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/edit_bet_page.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -17,11 +18,16 @@ Widget _confidenceBadge(int score) {
   final color = _confidenceBadgeColor(score);
 
   return Container(
-    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 5),
+    padding: const EdgeInsets.symmetric(
+      horizontal: 10,
+      vertical: 6,
+    ),
     decoration: BoxDecoration(
       color: color.withOpacity(0.14),
-      borderRadius: BorderRadius.circular(999),
-      border: Border.all(color: color.withOpacity(0.45)),
+      borderRadius: BorderRadius.circular(AppRadius.pill),
+      border: Border.all(
+        color: color.withOpacity(0.45),
+      ),
     ),
     child: Row(
       mainAxisSize: MainAxisSize.min,
@@ -31,7 +37,7 @@ Widget _confidenceBadge(int score) {
           size: 14,
           color: color,
         ),
-        const SizedBox(width: 4),
+        const SizedBox(width: AppSpacing.xs / 2),
         Text(
           'G $score',
           style: TextStyle(
@@ -705,12 +711,11 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Card(
-                      color: const Color(0xFF161A23),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      color: AppColors.surface,
+                      elevation: 0,
+                      shape: AppStyles.cardShape(),
                       child: Padding(
-                        padding: const EdgeInsets.all(18),
+                        padding: const EdgeInsets.all(AppSpacing.lg),
                         child: GridView.count(
                           crossAxisCount: isWide ? 5 : 2,
                           shrinkWrap: true,
@@ -782,12 +787,11 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                     ),
                     const SizedBox(height: 16),
                     Card(
-                      color: const Color(0xFF161A23),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(20),
-                      ),
+                      color: AppColors.surface,
+                      elevation: 0,
+                      shape: AppStyles.cardShape(),
                       child: Padding(
-                        padding: const EdgeInsets.all(20),
+                        padding: const EdgeInsets.all(AppSpacing.xl),
                         child: Column(
                           children: [
                             TextField(
@@ -1156,15 +1160,17 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                     const SizedBox(height: 12),
                     if (filteredBets.isEmpty)
                       Card(
-                        color: const Color(0xFF161A23),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(18),
-                        ),
+                        color: AppColors.surface,
+                        elevation: 0,
+                        shape: AppStyles.cardShape(radius: AppRadius.lg),
                         child: const Padding(
-                          padding: EdgeInsets.all(20),
+                          padding: EdgeInsets.all(AppSpacing.xl),
                           child: Text(
                             'Filtreye uygun bahis bulunamadı.',
                             textAlign: TextAlign.center,
+                            style: TextStyle(
+                              color: AppColors.textSecondary,
+                            ),
                           ),
                         ),
                       )
@@ -1176,13 +1182,13 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                           ),
                           direction: DismissDirection.endToStart,
                           confirmDismiss: (_) => _confirmDelete(bet),
-                          background: Container(
-                            margin: const EdgeInsets.only(bottom: 12),
-                            padding: const EdgeInsets.symmetric(horizontal: 20),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFDC2626),
-                              borderRadius: BorderRadius.circular(18),
-                            ),
+                              background: Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                decoration: BoxDecoration(
+                                  color: AppColors.danger,
+                                  borderRadius: BorderRadius.circular(AppRadius.lg),
+                                ),
                             alignment: Alignment.centerRight,
                             child: const Row(
                               mainAxisAlignment: MainAxisAlignment.end,
@@ -1365,13 +1371,12 @@ class _BetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF161A23),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      color: AppColors.surface,
+      elevation: 0,
+      shape: AppStyles.cardShape(radius: AppRadius.lg),
       margin: const EdgeInsets.only(bottom: 12),
       child: InkWell(
-        borderRadius: BorderRadius.circular(18),
+        borderRadius: BorderRadius.circular(AppRadius.lg),
         onTap: () {
           Navigator.push(
             context,
@@ -1416,7 +1421,7 @@ class _BetCard extends StatelessWidget {
                     Text(
                       '${bet.country} • ${bet.league}',
                       style: const TextStyle(
-                        color: Color(0xFF16A34A),
+                        color: AppColors.primary,
                         fontSize: 12,
                         fontWeight: FontWeight.w600,
                       ),
