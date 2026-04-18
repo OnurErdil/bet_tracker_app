@@ -521,6 +521,57 @@ class SectionHeader extends StatelessWidget {
   }
 }
 
+class SectionCardShell extends StatelessWidget {
+  final String title;
+  final String? subtitle;
+  final Widget child;
+  final EdgeInsetsGeometry padding;
+
+  const SectionCardShell({
+    super.key,
+    required this.title,
+    required this.child,
+    this.subtitle,
+    this.padding = const EdgeInsets.all(AppSpacing.xl),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppColors.surface,
+      elevation: 0,
+      shape: AppStyles.cardShape(),
+      child: Padding(
+        padding: padding,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              title,
+              style: const TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            if (subtitle != null) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                subtitle!,
+                style: const TextStyle(
+                  color: AppColors.textSecondary,
+                  fontSize: 13,
+                ),
+              ),
+            ],
+            const SizedBox(height: AppSpacing.md),
+            child,
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class InfoCard extends StatelessWidget {
   final String text;
 
@@ -532,12 +583,11 @@ class InfoCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      color: const Color(0xFF161A23),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
+      color: AppColors.surface,
+      elevation: 0,
+      shape: AppStyles.cardShape(radius: AppRadius.lg),
       child: Padding(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: Text(
           text,
           textAlign: TextAlign.center,
