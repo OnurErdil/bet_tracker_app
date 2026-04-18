@@ -1416,89 +1416,35 @@ class _Last10FormStat extends StatelessWidget {
     required this.formItems,
   });
 
+  List<FormSequenceEntry> _buildItems() {
+    return formItems.map((item) {
+      Color color;
+
+      switch (item['color']) {
+        case 'green':
+          color = const Color(0xFF22C55E);
+          break;
+        case 'red':
+          color = const Color(0xFFEF4444);
+          break;
+        case 'orange':
+          color = const Color(0xFFF59E0B);
+          break;
+        default:
+          color = const Color(0xFF94A3B8);
+      }
+
+      return FormSequenceEntry(
+        label: item['label'] ?? '-',
+        color: color,
+      );
+    }).toList();
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: const Color(0xFF161A23),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: const Color(0xFF16A34A).withOpacity(0.15),
-              child: const Icon(
-                Icons.insights_outlined,
-                color: Color(0xFF16A34A),
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Son 10 Form',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: formItems.isEmpty
-                        ? [
-                      const Text(
-                        '-',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ]
-                        : formItems.map((item) {
-                      Color color;
-                      switch (item['color']) {
-                        case 'green':
-                          color = const Color(0xFF22C55E);
-                          break;
-                        case 'red':
-                          color = const Color(0xFFEF4444);
-                          break;
-                        case 'orange':
-                          color = const Color(0xFFF59E0B);
-                          break;
-                        default:
-                          color = const Color(0xFF94A3B8);
-                      }
-
-                      return Container(
-                        width: 28,
-                        height: 28,
-                        alignment: Alignment.center,
-                        decoration: BoxDecoration(
-                          color: color.withOpacity(0.18),
-                          borderRadius: BorderRadius.circular(999),
-                        ),
-                        child: Text(
-                          item['label'] ?? '-',
-                          style: TextStyle(
-                            color: color,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      );
-                    }).toList(),
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+    return FormSequenceCard(
+      items: _buildItems(),
     );
   }
 }

@@ -337,6 +337,110 @@ class DashboardCard extends StatelessWidget {
   }
 }
 
+class FormSequenceEntry {
+  final String label;
+  final Color color;
+
+  const FormSequenceEntry({
+    required this.label,
+    required this.color,
+  });
+}
+
+class FormSequenceCard extends StatelessWidget {
+  final String title;
+  final List<FormSequenceEntry> items;
+
+  const FormSequenceCard({
+    super.key,
+    this.title = 'Son 10 Form',
+    required this.items,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Card(
+      color: AppColors.surface,
+      elevation: 0,
+      shape: AppStyles.cardShape(radius: AppRadius.lg),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.lg,
+        ),
+        child: Row(
+          children: [
+            Container(
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(
+                color: AppColors.primary.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(AppRadius.md),
+                border: Border.all(
+                  color: AppColors.primary.withOpacity(0.28),
+                ),
+              ),
+              child: const Icon(
+                Icons.insights_outlined,
+                color: AppColors.primary,
+                size: 22,
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      fontSize: 13,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.sm),
+                  Wrap(
+                    spacing: 6,
+                    runSpacing: 6,
+                    children: items.isEmpty
+                        ? const [
+                      Text(
+                        '-',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ]
+                        : items.map((item) {
+                      return Container(
+                        width: 28,
+                        height: 28,
+                        alignment: Alignment.center,
+                        decoration: BoxDecoration(
+                          color: item.color.withOpacity(0.18),
+                          borderRadius: BorderRadius.circular(AppRadius.pill),
+                        ),
+                        child: Text(
+                          item.label,
+                          style: TextStyle(
+                            color: item.color,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class Last10FormCard extends StatelessWidget {
   final List<BetModel> bets;
 
@@ -345,97 +449,37 @@ class Last10FormCard extends StatelessWidget {
     required this.bets,
   });
 
-  @override
-  Widget build(BuildContext context) {
-    final formItems = bets.map((bet) {
-      late final Color color;
-      late final String label;
-
+  List<FormSequenceEntry> _buildItems() {
+    return bets.map((bet) {
       switch (bet.result) {
         case 'kazandi':
-          color = const Color(0xFF22C55E);
-          label = 'W';
-          break;
+          return const FormSequenceEntry(
+            label: 'W',
+            color: Color(0xFF22C55E),
+          );
         case 'kaybetti':
-          color = const Color(0xFFEF4444);
-          label = 'L';
-          break;
+          return const FormSequenceEntry(
+            label: 'L',
+            color: Color(0xFFEF4444),
+          );
         case 'iade':
-          color = const Color(0xFFF59E0B);
-          label = 'I';
-          break;
+          return const FormSequenceEntry(
+            label: 'I',
+            color: Color(0xFFF59E0B),
+          );
         default:
-          color = const Color(0xFF94A3B8);
-          label = 'B';
+          return const FormSequenceEntry(
+            label: 'B',
+            color: Color(0xFF94A3B8),
+          );
       }
-
-      return Container(
-        width: 28,
-        height: 28,
-        alignment: Alignment.center,
-        decoration: BoxDecoration(
-          color: color.withOpacity(0.18),
-          borderRadius: BorderRadius.circular(999),
-        ),
-        child: Text(
-          label,
-          style: TextStyle(
-            color: color,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      );
     }).toList();
+  }
 
-    return Card(
-      color: const Color(0xFF161A23),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        child: Row(
-          children: [
-            CircleAvatar(
-              radius: 20,
-              backgroundColor: const Color(0xFF16A34A).withOpacity(0.15),
-              child: const Icon(
-                Icons.insights_outlined,
-                color: Color(0xFF16A34A),
-                size: 22,
-              ),
-            ),
-            const SizedBox(width: 14),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Son 10 Form',
-                    style: TextStyle(
-                      color: Colors.white70,
-                      fontSize: 13,
-                    ),
-                  ),
-                  const SizedBox(height: 8),
-                  Wrap(
-                    spacing: 6,
-                    runSpacing: 6,
-                    children: formItems.isEmpty
-                        ? const [
-                      Text(
-                        '-',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                    ]
-                        : formItems,
-                  ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
+  @override
+  Widget build(BuildContext context) {
+    return FormSequenceCard(
+      items: _buildItems(),
     );
   }
 }
