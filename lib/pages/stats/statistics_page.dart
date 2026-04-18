@@ -98,514 +98,394 @@ class StatisticsPage extends StatelessWidget {
                                 'Hedef kasaya ulaştın. Hedef tamam, havaya zıplamak serbest.',
                               ),
                             const SizedBox(height: 20),
-                            Card(
-                              color: const Color(0xFF161A23),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    const Text(
-                                      'Genel Durum',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    GridView.count(
-                                      crossAxisCount: isWide ? 3 : 1,
-                                      shrinkWrap: true,
-                                      physics: const NeverScrollableScrollPhysics(),
-                                      mainAxisSpacing: 16,
-                                      crossAxisSpacing: 16,
-                                      childAspectRatio: 2.8,
-                                      children: [
-                                        _StatBox(
-                                          title: 'Toplam Bahis',
-                                          value: '${overview.totalBets}',
-                                          icon: Icons.receipt_long,
-                                        ),
-                                        _StatBox(
-                                          title: 'Toplam Oynanan',
-                                          value: '${overview.totalStake.toStringAsFixed(2)} ₺',
-                                          icon: Icons.payments_outlined,
-                                        ),
-                                        _StatBox(
-                                          title: 'Kazanma Oranı',
-                                          value: '%${overview.winRate.toStringAsFixed(1)}',
-                                          icon: Icons.bar_chart,
-                                        ),
-                                        _StatBox(
-                                          title: 'ROI',
-                                          value: '%${overview.roi.toStringAsFixed(1)}',
-                                          valueColor: overview.roi >= 0
-                                              ? const Color(0xFF22C55E)
-                                              : const Color(0xFFEF4444),
-                                          icon: Icons.trending_up,
-                                        ),
-                                        _StatBox(
-                                          title: 'Beklemede',
-                                          value: '${overview.pendingCount}',
-                                          valueColor: const Color(0xFF94A3B8),
-                                          icon: Icons.hourglass_bottom,
-                                        ),
-                                        _StatBox(
-                                          title: 'Bugünkü Kayıp',
-                                          value: '${overview.todayLoss.toStringAsFixed(2)} ₺',
-                                          valueColor: overview.todayLoss > 0
-                                              ? const Color(0xFFEF4444)
-                                              : null,
-                                          icon: Icons.today,
-                                        ),
-                                      ],
-                                    ),
-                                  ],
-                                ),
+                            SectionCardShell(
+                              title: 'Genel Durum',
+                              padding: const EdgeInsets.all(20),
+                              child: GridView.count(
+                                crossAxisCount: isWide ? 3 : 1,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio: 2.8,
+                                children: [
+                                  _StatBox(
+                                    title: 'Toplam Bahis',
+                                    value: '${overview.totalBets}',
+                                    icon: Icons.receipt_long,
+                                  ),
+                                  _StatBox(
+                                    title: 'Toplam Oynanan',
+                                    value: '${overview.totalStake.toStringAsFixed(2)} ₺',
+                                    icon: Icons.payments_outlined,
+                                  ),
+                                  _StatBox(
+                                    title: 'Kazanma Oranı',
+                                    value: '%${overview.winRate.toStringAsFixed(1)}',
+                                    icon: Icons.bar_chart,
+                                  ),
+                                  _StatBox(
+                                    title: 'ROI',
+                                    value: '%${overview.roi.toStringAsFixed(1)}',
+                                    valueColor: overview.roi >= 0
+                                        ? const Color(0xFF22C55E)
+                                        : const Color(0xFFEF4444),
+                                    icon: Icons.trending_up,
+                                  ),
+                                  _StatBox(
+                                    title: 'Beklemede',
+                                    value: '${overview.pendingCount}',
+                                    valueColor: const Color(0xFF94A3B8),
+                                    icon: Icons.hourglass_bottom,
+                                  ),
+                                  _StatBox(
+                                    title: 'Bugünkü Kayıp',
+                                    value: '${overview.todayLoss.toStringAsFixed(2)} ₺',
+                                    valueColor: overview.todayLoss > 0
+                                        ? const Color(0xFFEF4444)
+                                        : null,
+                                    icon: Icons.today,
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Card(
-                              color: const Color(0xFF161A23),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                                  children: [
-                                    const Text(
-                                      'Kasa Özeti',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    if (isWide)
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Başlangıç Kasası',
-                                              value:
-                                              '${overview.startingBankroll.toStringAsFixed(2)} ₺',
-                                              icon: Icons.savings_outlined,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Net Kâr / Zarar',
-                                              value:
-                                              '${overview.totalProfit.toStringAsFixed(2)} ₺',
-                                              valueColor:
-                                              overview.totalProfit >= 0
-                                                  ? const Color(0xFF22C55E)
-                                                  : const Color(0xFFEF4444),
-                                              icon:
-                                              Icons.account_balance_wallet,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Kasa Hareketleri',
-                                              value:
-                                              '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
-                                              valueColor:
-                                              overview.bankrollMovement >= 0
-                                                  ? const Color(0xFF22C55E)
-                                                  : const Color(0xFFEF4444),
-                                              icon: Icons.swap_horiz,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Mevcut Kasa',
-                                              value:
-                                              '${overview.currentBankroll.toStringAsFixed(2)} ₺',
-                                              valueColor:
-                                              overview.currentBankroll >=
-                                                  overview
-                                                      .startingBankroll
-                                                  ? const Color(0xFF22C55E)
-                                                  : const Color(0xFFEF4444),
-                                              icon: Icons.paid_outlined,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else
-                                      Column(
-                                        children: [
-                                          _StatBox(
+                            SectionCardShell(
+                              title: 'Kasa Özeti',
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (isWide)
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Başlangıç Kasası',
-                                            value:
-                                            '${overview.startingBankroll.toStringAsFixed(2)} ₺',
+                                            value: '${overview.startingBankroll.toStringAsFixed(2)} ₺',
                                             icon: Icons.savings_outlined,
                                           ),
-                                          const SizedBox(height: 12),
-                                          _StatBox(
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Net Kâr / Zarar',
-                                            value:
-                                            '${overview.totalProfit.toStringAsFixed(2)} ₺',
-                                            valueColor:
-                                            overview.totalProfit >= 0
+                                            value: '${overview.totalProfit.toStringAsFixed(2)} ₺',
+                                            valueColor: overview.totalProfit >= 0
                                                 ? const Color(0xFF22C55E)
                                                 : const Color(0xFFEF4444),
-                                            icon:
-                                            Icons.account_balance_wallet,
+                                            icon: Icons.account_balance_wallet,
                                           ),
-                                          const SizedBox(height: 12),
-                                          _StatBox(
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Kasa Hareketleri',
-                                            value:
-                                            '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
-                                            valueColor:
-                                            overview.bankrollMovement >= 0
+                                            value: '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
+                                            valueColor: overview.bankrollMovement >= 0
                                                 ? const Color(0xFF22C55E)
                                                 : const Color(0xFFEF4444),
                                             icon: Icons.swap_horiz,
                                           ),
-                                          const SizedBox(height: 12),
-                                          _StatBox(
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Mevcut Kasa',
-                                            value:
-                                            '${overview.currentBankroll.toStringAsFixed(2)} ₺',
-                                            valueColor:
-                                            overview.currentBankroll >=
-                                                overview.startingBankroll
+                                            value: '${overview.currentBankroll.toStringAsFixed(2)} ₺',
+                                            valueColor: overview.currentBankroll >= overview.startingBankroll
                                                 ? const Color(0xFF22C55E)
                                                 : const Color(0xFFEF4444),
                                             icon: Icons.paid_outlined,
                                           ),
-                                        ],
-                                      ),
-                                    const SizedBox(height: 16),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        _showBankrollDialog(
-                                          context,
-                                          overview.startingBankroll,
-                                        );
-                                      },
-                                      icon: const Icon(Icons.edit),
-                                      label: const Text(
-                                        'Başlangıç Kasasını Ayarla',
-                                      ),
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    Column(
+                                      children: [
+                                        _StatBox(
+                                          title: 'Başlangıç Kasası',
+                                          value: '${overview.startingBankroll.toStringAsFixed(2)} ₺',
+                                          icon: Icons.savings_outlined,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _StatBox(
+                                          title: 'Net Kâr / Zarar',
+                                          value: '${overview.totalProfit.toStringAsFixed(2)} ₺',
+                                          valueColor: overview.totalProfit >= 0
+                                              ? const Color(0xFF22C55E)
+                                              : const Color(0xFFEF4444),
+                                          icon: Icons.account_balance_wallet,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _StatBox(
+                                          title: 'Kasa Hareketleri',
+                                          value: '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
+                                          valueColor: overview.bankrollMovement >= 0
+                                              ? const Color(0xFF22C55E)
+                                              : const Color(0xFFEF4444),
+                                          icon: Icons.swap_horiz,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _StatBox(
+                                          title: 'Mevcut Kasa',
+                                          value: '${overview.currentBankroll.toStringAsFixed(2)} ₺',
+                                          valueColor: overview.currentBankroll >= overview.startingBankroll
+                                              ? const Color(0xFF22C55E)
+                                              : const Color(0xFFEF4444),
+                                          icon: Icons.paid_outlined,
+                                        ),
+                                      ],
                                     ),
-                                  ],
-                                ),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _showBankrollDialog(
+                                        context,
+                                        overview.startingBankroll,
+                                      );
+                                    },
+                                    icon: const Icon(Icons.edit),
+                                    label: const Text('Başlangıç Kasasını Ayarla'),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Card(
-                              color: const Color(0xFF161A23),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment:
-                                  CrossAxisAlignment.stretch,
-                                  children: [
-                                    const Text(
-                                      'Disiplin Ayarları',
-                                      style: TextStyle(
-                                        fontSize: 22,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    if (isWide)
-                                      Row(
-                                        children: [
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Maksimum Bahis',
-                                              value: overview.maxStakeMode ==
-                                                  'percent'
-                                                  ? '%${overview.maxStakeValue.toStringAsFixed(1)} • ${overview.computedMaxStake.toStringAsFixed(2)} ₺'
-                                                  : '${overview.computedMaxStake.toStringAsFixed(2)} ₺',
-                                              icon: Icons
-                                                  .money_off_csred_outlined,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Günlük Kayıp Limiti',
-                                              value:
-                                              '${overview.dailyLossLimit.toStringAsFixed(2)} ₺',
-                                              icon: Icons
-                                                  .warning_amber_rounded,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Hedef Kasa',
-                                              value:
-                                              '${overview.targetBankroll.toStringAsFixed(2)} ₺',
-                                              icon: Icons.flag_outlined,
-                                            ),
-                                          ),
-                                          const SizedBox(width: 12),
-                                          Expanded(
-                                            child: _StatBox(
-                                              title: 'Disiplin Modu',
-                                              value: _disciplineModeText(
-                                                overview.disciplineMode,
-                                              ),
-                                              icon: Icons.shield_outlined,
-                                            ),
-                                          ),
-                                        ],
-                                      )
-                                    else
-                                      Column(
-                                        children: [
-                                          _StatBox(
+                            SectionCardShell(
+                              title: 'Disiplin Ayarları',
+                              padding: const EdgeInsets.all(20),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.stretch,
+                                children: [
+                                  if (isWide)
+                                    Row(
+                                      children: [
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Maksimum Bahis',
-                                            value: overview.maxStakeMode ==
-                                                'percent'
+                                            value: overview.maxStakeMode == 'percent'
                                                 ? '%${overview.maxStakeValue.toStringAsFixed(1)} • ${overview.computedMaxStake.toStringAsFixed(2)} ₺'
                                                 : '${overview.computedMaxStake.toStringAsFixed(2)} ₺',
-                                            icon: Icons
-                                                .money_off_csred_outlined,
+                                            icon: Icons.money_off_csred_outlined,
                                           ),
-                                          const SizedBox(height: 12),
-                                          _StatBox(
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Günlük Kayıp Limiti',
-                                            value:
-                                            '${overview.dailyLossLimit.toStringAsFixed(2)} ₺',
-                                            icon: Icons
-                                                .warning_amber_rounded,
+                                            value: '${overview.dailyLossLimit.toStringAsFixed(2)} ₺',
+                                            icon: Icons.warning_amber_rounded,
                                           ),
-                                          const SizedBox(height: 12),
-                                          _StatBox(
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Hedef Kasa',
-                                            value:
-                                            '${overview.targetBankroll.toStringAsFixed(2)} ₺',
+                                            value: '${overview.targetBankroll.toStringAsFixed(2)} ₺',
                                             icon: Icons.flag_outlined,
                                           ),
-                                          const SizedBox(height: 12),
-                                          _StatBox(
+                                        ),
+                                        const SizedBox(width: 12),
+                                        Expanded(
+                                          child: _StatBox(
                                             title: 'Disiplin Modu',
                                             value: _disciplineModeText(
                                               overview.disciplineMode,
                                             ),
                                             icon: Icons.shield_outlined,
                                           ),
-                                        ],
-                                      ),
-                                    const SizedBox(height: 16),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        _showDisciplineDialog(
-                                          context,
-                                          maxStakeMode: overview.maxStakeMode,
-                                          maxStakeValue: overview.maxStakeValue,
-                                          dailyLossLimit: overview.dailyLossLimit,
-                                          targetBankroll: overview.targetBankroll,
-                                          disciplineMode: overview.disciplineMode,
-                                          highConfidenceEnabled: overview.highConfidenceEnabled,
-                                          confidence9Multiplier: overview.confidence9Multiplier,
-                                          confidence10Multiplier: overview.confidence10Multiplier,
-                                        );
-                                      },
-                                      icon: const Icon(Icons.tune),
-                                      label: const Text(
-                                        'Disiplin Ayarlarını Düzenle',
-                                      ),
+                                        ),
+                                      ],
+                                    )
+                                  else
+                                    Column(
+                                      children: [
+                                        _StatBox(
+                                          title: 'Maksimum Bahis',
+                                          value: overview.maxStakeMode == 'percent'
+                                              ? '%${overview.maxStakeValue.toStringAsFixed(1)} • ${overview.computedMaxStake.toStringAsFixed(2)} ₺'
+                                              : '${overview.computedMaxStake.toStringAsFixed(2)} ₺',
+                                          icon: Icons.money_off_csred_outlined,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _StatBox(
+                                          title: 'Günlük Kayıp Limiti',
+                                          value: '${overview.dailyLossLimit.toStringAsFixed(2)} ₺',
+                                          icon: Icons.warning_amber_rounded,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _StatBox(
+                                          title: 'Hedef Kasa',
+                                          value: '${overview.targetBankroll.toStringAsFixed(2)} ₺',
+                                          icon: Icons.flag_outlined,
+                                        ),
+                                        const SizedBox(height: 12),
+                                        _StatBox(
+                                          title: 'Disiplin Modu',
+                                          value: _disciplineModeText(
+                                            overview.disciplineMode,
+                                          ),
+                                          icon: Icons.shield_outlined,
+                                        ),
+                                      ],
                                     ),
-                                    const SizedBox(height: 12),
-                                    ElevatedButton.icon(
-                                      onPressed: () {
-                                        _showResetDialog(context);
-                                      },
-                                      style: ElevatedButton.styleFrom(
-                                        backgroundColor:
-                                        const Color(0xFFDC2626),
-                                      ),
-                                      icon: const Icon(Icons.delete_forever),
-                                      label:
-                                      const Text('Tüm Verileri Sıfırla'),
+                                  const SizedBox(height: 16),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _showDisciplineDialog(
+                                        context,
+                                        maxStakeMode: overview.maxStakeMode,
+                                        maxStakeValue: overview.maxStakeValue,
+                                        dailyLossLimit: overview.dailyLossLimit,
+                                        targetBankroll: overview.targetBankroll,
+                                        disciplineMode: overview.disciplineMode,
+                                        highConfidenceEnabled: overview.highConfidenceEnabled,
+                                        confidence9Multiplier: overview.confidence9Multiplier,
+                                        confidence10Multiplier: overview.confidence10Multiplier,
+                                      );
+                                    },
+                                    icon: const Icon(Icons.tune),
+                                    label: const Text('Disiplin Ayarlarını Düzenle'),
+                                  ),
+                                  const SizedBox(height: 12),
+                                  ElevatedButton.icon(
+                                    onPressed: () {
+                                      _showResetDialog(context);
+                                    },
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: const Color(0xFFDC2626),
                                     ),
-                                  ],
-                                ),
+                                    icon: const Icon(Icons.delete_forever),
+                                    label: const Text('Tüm Verileri Sıfırla'),
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 20),
-                            Card(
-                              color: const Color(0xFF161A23),
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(20),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(20),
-                                child: Column(
-                                  crossAxisAlignment: CrossAxisAlignment.start,
-                                  children: [
-                                    const Text(
-                                      'Kâr / Zarar Grafiği',
-                                      style: TextStyle(
-                                        fontSize: 20,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    const SizedBox(height: 16),
-                                    ProfitChart(bets: bets),
-                                  ],
-                                ),
+                            SectionCardShell(
+                              title: 'Akıllı Analiz',
+                              padding: const EdgeInsets.all(20),
+                              child: GridView.count(
+                                crossAxisCount: isWide ? 2 : 1,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio: 3.2,
+                                children: [
+                                  _StatBox(
+                                    title: 'En Kârlı Spor',
+                                    value: overview.bestSport,
+                                    icon: Icons.emoji_events_outlined,
+                                    valueColor: const Color(0xFF22C55E),
+                                  ),
+                                  _StatBox(
+                                    title: 'En Zararlı Spor',
+                                    value: overview.worstSport,
+                                    icon: Icons.sentiment_dissatisfied_outlined,
+                                    valueColor: const Color(0xFFEF4444),
+                                  ),
+                                  _StatBox(
+                                    title: 'En Çok Oynanan Spor',
+                                    value: overview.mostPlayedSport,
+                                    icon: Icons.sports_score_outlined,
+                                  ),
+                                  _StatBox(
+                                    title: 'Beklemede Oranı',
+                                    value: '%${overview.pendingRate.toStringAsFixed(1)}',
+                                    icon: Icons.pending_actions_outlined,
+                                    valueColor: overview.pendingRate > 0
+                                        ? const Color(0xFFF59E0B)
+                                        : null,
+                                  ),
+                                ],
                               ),
                             ),
                             const SizedBox(height: 20),
-                            const Text(
-                              'Akıllı Analiz',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                            SectionCardShell(
+                              title: 'Seri ve Gün Analizi',
+                              padding: const EdgeInsets.all(20),
+                              child: GridView.count(
+                                crossAxisCount: isWide ? 2 : 1,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio: 3.2,
+                                children: [
+                                  _StatBox(
+                                    title: 'En İyi Gün',
+                                    value: overview.bestDayLabel,
+                                    icon: Icons.wb_sunny_outlined,
+                                    valueColor: const Color(0xFF22C55E),
+                                  ),
+                                  _StatBox(
+                                    title: 'En Kötü Gün',
+                                    value: overview.worstDayLabel,
+                                    icon: Icons.thunderstorm_outlined,
+                                    valueColor: const Color(0xFFEF4444),
+                                  ),
+                                  _StatBox(
+                                    title: 'En Uzun Kazanma Serisi',
+                                    value: '${overview.winStreak}',
+                                    icon: Icons.trending_up,
+                                    valueColor: const Color(0xFF22C55E),
+                                  ),
+                                  _StatBox(
+                                    title: 'En Uzun Kaybetme Serisi',
+                                    value: '${overview.lossStreak}',
+                                    icon: Icons.trending_down,
+                                    valueColor: const Color(0xFFEF4444),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.count(
-                              crossAxisCount: isWide ? 2 : 1,
-                              shrinkWrap: true,
-                              physics:
-                              const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 3.2,
-                              children: [
-                                _StatBox(
-                                  title: 'En Kârlı Spor',
-                                  value: overview.bestSport,
-                                  icon: Icons.emoji_events_outlined,
-                                  valueColor: const Color(0xFF22C55E),
-                                ),
-                                _StatBox(
-                                  title: 'En Zararlı Spor',
-                                  value: overview.worstSport,
-                                  icon: Icons
-                                      .sentiment_dissatisfied_outlined,
-                                  valueColor: const Color(0xFFEF4444),
-                                ),
-                                _StatBox(
-                                  title: 'En Çok Oynanan Spor',
-                                  value: overview.mostPlayedSport,
-                                  icon: Icons.sports_score_outlined,
-                                ),
-                                _StatBox(
-                                  title: 'Beklemede Oranı',
-                                  value:
-                                  '%${overview.pendingRate.toStringAsFixed(1)}',
-                                  icon: Icons.pending_actions_outlined,
-                                  valueColor: overview.pendingRate > 0
-                                      ? const Color(0xFFF59E0B)
-                                      : null,
-                                ),
-                              ],
                             ),
                             const SizedBox(height: 20),
-                            const Text(
-                              'Seri ve Gün Analizi',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                            SectionCardShell(
+                              title: 'Güven Analizi',
+                              padding: const EdgeInsets.all(20),
+                              child: GridView.count(
+                                crossAxisCount: isWide ? 2 : 1,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio: 3.2,
+                                children: [
+                                  _StatBox(
+                                    title: 'Yüksek Güven Bahis Sayısı',
+                                    value: '${overview.highConfidenceBetCount}',
+                                    icon: Icons.verified_outlined,
+                                    valueColor: overview.highConfidenceBetCount > 0
+                                        ? const Color(0xFFF59E0B)
+                                        : null,
+                                  ),
+                                  _StatBox(
+                                    title: 'Güven 9-10 Kazanma Oranı',
+                                    value: '%${overview.highConfidenceWinRate.toStringAsFixed(1)}',
+                                    icon: Icons.track_changes,
+                                    valueColor: overview.highConfidenceWinRate >= 50
+                                        ? const Color(0xFF22C55E)
+                                        : const Color(0xFFEF4444),
+                                  ),
+                                  _StatBox(
+                                    title: 'Güven 9-10 Kâr / Zarar',
+                                    value: '${overview.highConfidenceProfit.toStringAsFixed(2)} ₺',
+                                    icon: Icons.paid_outlined,
+                                    valueColor: overview.highConfidenceProfit >= 0
+                                        ? const Color(0xFF22C55E)
+                                        : const Color(0xFFEF4444),
+                                  ),
+                                  _StatBox(
+                                    title: 'En Kârlı Güven Seviyesi',
+                                    value: overview.bestConfidenceLabel,
+                                    icon: Icons.emoji_events_outlined,
+                                    valueColor: const Color(0xFFF59E0B),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.count(
-                              crossAxisCount: isWide ? 2 : 1,
-                              shrinkWrap: true,
-                              physics:
-                              const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 3.2,
-                              children: [
-                                _StatBox(
-                                  title: 'En İyi Gün',
-                                  value: overview.bestDayLabel,
-                                  icon: Icons.wb_sunny_outlined,
-                                  valueColor: const Color(0xFF22C55E),
-                                ),
-                                _StatBox(
-                                  title: 'En Kötü Gün',
-                                  value: overview.worstDayLabel,
-                                  icon: Icons.thunderstorm_outlined,
-                                  valueColor: const Color(0xFFEF4444),
-                                ),
-                                _StatBox(
-                                  title: 'En Uzun Kazanma Serisi',
-                                  value: '${overview.winStreak}',
-                                  icon: Icons.trending_up,
-                                  valueColor: const Color(0xFF22C55E),
-                                ),
-                                _StatBox(
-                                  title: 'En Uzun Kaybetme Serisi',
-                                  value: '${overview.lossStreak}',
-                                  icon: Icons.trending_down,
-                                  valueColor: const Color(0xFFEF4444),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 20),
-                            const Text(
-                              'Güven Analizi',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.count(
-                              crossAxisCount: isWide ? 2 : 1,
-                              shrinkWrap: true,
-                              physics: const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 3.2,
-                              children: [
-                                _StatBox(
-                                  title: 'Yüksek Güven Bahis Sayısı',
-                                  value: '${overview.highConfidenceBetCount}',
-                                  icon: Icons.verified_outlined,
-                                  valueColor: overview.highConfidenceBetCount > 0
-                                      ? const Color(0xFFF59E0B)
-                                      : null,
-                                ),
-                                _StatBox(
-                                  title: 'Güven 9-10 Kazanma Oranı',
-                                  value: '%${overview.highConfidenceWinRate.toStringAsFixed(1)}',
-                                  icon: Icons.track_changes,
-                                  valueColor: overview.highConfidenceWinRate >= 50
-                                      ? const Color(0xFF22C55E)
-                                      : const Color(0xFFEF4444),
-                                ),
-                                _StatBox(
-                                  title: 'Güven 9-10 Kâr / Zarar',
-                                  value: '${overview.highConfidenceProfit.toStringAsFixed(2)} ₺',
-                                  icon: Icons.paid_outlined,
-                                  valueColor: overview.highConfidenceProfit >= 0
-                                      ? const Color(0xFF22C55E)
-                                      : const Color(0xFFEF4444),
-                                ),
-                                _StatBox(
-                                  title: 'En Kârlı Güven Seviyesi',
-                                  value: overview.bestConfidenceLabel,
-                                  icon: Icons.emoji_events_outlined,
-                                  valueColor: const Color(0xFFF59E0B),
-                                ),
-                              ],
                             ),
                             const SizedBox(height: 24),
                             const Text(
