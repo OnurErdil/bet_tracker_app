@@ -493,6 +493,73 @@ class QuickActionButton extends StatelessWidget {
   }
 }
 
+class SummaryInsightCard extends StatelessWidget {
+  final String title;
+  final String subtitle;
+  final String value;
+  final Color? valueColor;
+
+  const SummaryInsightCard({
+    super.key,
+    required this.title,
+    required this.subtitle,
+    required this.value,
+    this.valueColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final resolvedValueColor = valueColor ?? AppColors.textPrimary;
+
+    return Card(
+      color: AppColors.surface,
+      elevation: 0,
+      shape: AppStyles.cardShape(radius: AppRadius.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.md,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    subtitle,
+                    style: const TextStyle(
+                      color: AppColors.textSecondary,
+                      height: 1.35,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Text(
+              value,
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: resolvedValueColor,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class SectionHeader extends StatelessWidget {
   final String title;
   final Widget trailing;

@@ -525,39 +525,14 @@ class StatisticsPage extends StatelessWidget {
                                   final profit = (data['profit'] as double?) ?? 0.0;
                                   final winRate = settled == 0 ? 0.0 : (won / settled) * 100;
 
-                                  return Card(
-                                    color: const Color(0xFF161A23),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(18),
-                                    ),
-                                    margin: const EdgeInsets.only(bottom: 12),
-                                    child: ListTile(
-                                      contentPadding: const EdgeInsets.symmetric(
-                                        horizontal: 16,
-                                        vertical: 8,
-                                      ),
-                                      title: Text(
-                                        'Güven $score',
-                                        style: const TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                        ),
-                                      ),
-                                      subtitle: Padding(
-                                        padding: const EdgeInsets.only(top: 6),
-                                        child: Text(
-                                          'Bahis: $count | Settled: $settled | Win Rate: %${winRate.toStringAsFixed(1)}',
-                                        ),
-                                      ),
-                                      trailing: Text(
-                                        '${profit.toStringAsFixed(2)} ₺',
-                                        style: TextStyle(
-                                          fontWeight: FontWeight.bold,
-                                          color: profit >= 0
-                                              ? const Color(0xFF22C55E)
-                                              : const Color(0xFFEF4444),
-                                        ),
-                                      ),
-                                    ),
+                                  return SummaryInsightCard(
+                                    title: 'Güven $score',
+                                    subtitle:
+                                    'Bahis: $count | Settled: $settled | Win Rate: %${winRate.toStringAsFixed(1)}',
+                                    value: '${profit.toStringAsFixed(2)} ₺',
+                                    valueColor: profit >= 0
+                                        ? const Color(0xFF22C55E)
+                                        : const Color(0xFFEF4444),
                                   );
                                 }).toList();
                               })(),
@@ -597,42 +572,14 @@ class StatisticsPage extends StatelessWidget {
                                     ? 0
                                     : (typeWon / typeCount) * 100;
 
-                                return Card(
-                                  color: const Color(0xFF161A23),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  margin:
-                                  const EdgeInsets.only(bottom: 12),
-                                  child: ListTile(
-                                    contentPadding:
-                                    const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    title: Text(
-                                      betType,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: Padding(
-                                      padding:
-                                      const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        'Bahis: $typeCount | Kazanma Oranı: %${typeWinRate.toStringAsFixed(1)}',
-                                      ),
-                                    ),
-                                    trailing: Text(
-                                      '${typeProfit.toStringAsFixed(2)} ₺',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: typeProfit >= 0
-                                            ? const Color(0xFF22C55E)
-                                            : const Color(0xFFEF4444),
-                                      ),
-                                    ),
-                                  ),
+                                return SummaryInsightCard(
+                                  title: betType,
+                                  subtitle:
+                                  'Bahis: $typeCount | Kazanma Oranı: %${typeWinRate.toStringAsFixed(1)}',
+                                  value: '${typeProfit.toStringAsFixed(2)} ₺',
+                                  valueColor: typeProfit >= 0
+                                      ? const Color(0xFF22C55E)
+                                      : const Color(0xFFEF4444),
                                 );
                               }),
                             const SizedBox(height: 24),
@@ -672,42 +619,14 @@ class StatisticsPage extends StatelessWidget {
                                     ? 0
                                     : (sportWon / sportCount) * 100;
 
-                                return Card(
-                                  color: const Color(0xFF161A23),
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(18),
-                                  ),
-                                  margin:
-                                  const EdgeInsets.only(bottom: 12),
-                                  child: ListTile(
-                                    contentPadding:
-                                    const EdgeInsets.symmetric(
-                                      horizontal: 16,
-                                      vertical: 8,
-                                    ),
-                                    title: Text(
-                                      sport,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                    subtitle: Padding(
-                                      padding:
-                                      const EdgeInsets.only(top: 6),
-                                      child: Text(
-                                        'Bahis: $sportCount | Kazanma Oranı: %${sportWinRate.toStringAsFixed(1)}',
-                                      ),
-                                    ),
-                                    trailing: Text(
-                                      '${sportProfit.toStringAsFixed(2)} ₺',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: sportProfit >= 0
-                                            ? const Color(0xFF22C55E)
-                                            : const Color(0xFFEF4444),
-                                      ),
-                                    ),
-                                  ),
+                                return SummaryInsightCard(
+                                  title: sport,
+                                  subtitle:
+                                  'Bahis: $sportCount | Kazanma Oranı: %${sportWinRate.toStringAsFixed(1)}',
+                                  value: '${sportProfit.toStringAsFixed(2)} ₺',
+                                  valueColor: sportProfit >= 0
+                                      ? const Color(0xFF22C55E)
+                                      : const Color(0xFFEF4444),
                                 );
                               }),
                             const SizedBox(height: 20),
