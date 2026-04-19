@@ -610,25 +610,7 @@ class _EditBetPageState extends State<EditBetPage> {
                   child: Column(
                     children: [
                       if (_isLockedForToday)
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: AppColors.danger.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                            border: Border.all(
-                              color: AppColors.danger.withOpacity(0.35),
-                            ),
-                          ),
-                          child: const Text(
-                            'Bugün bahis kilitli. Disiplin modu aktif.',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textDangerSoft,
-                            ),
-                          ),
-                        ),
+                        const BetLockedWarningCard(),
                       if (_currentDynamicMaxStake > 0 ||
                           _dailyLossLimit > 0 ||
                           _targetBankroll > 0)
@@ -649,7 +631,7 @@ class _EditBetPageState extends State<EditBetPage> {
                         payout: _previewPayout,
                         effectiveMaxStake: _effectiveMaxStake,
                         isPreviewLimitExceeded: _isPreviewLimitExceeded,
-                        payoutLabel: 'Toplam Ödeme',
+                        payoutLabel: 'Toplam Geri Ödeme',
                       ),
                       DropdownButtonFormField<String>(
                         value: _sportController.text.isEmpty ||

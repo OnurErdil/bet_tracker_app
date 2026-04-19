@@ -491,36 +491,16 @@ class _AddBetPageState extends State<AddBetPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      if (_isLockedForToday)
+                      if (_isLockedForToday)                      if (_isLockedForToday)
                         const BetLockedWarningCard(),
                       if (_currentDynamicMaxStake > 0 ||
                           _dailyLossLimit > 0 ||
                           _targetBankroll > 0)
                         BetDisciplineInfoCard(
                           maxStakeInfoText:
-                          _currentDynamicMaxStake > 0 ? _maxStakeInfoText() : '',
-                          confidenceScore: _confidenceScore,
-                          isHighConfidenceSelected: _isHighConfidenceSelected,
-                          effectiveMaxStake: _effectiveMaxStake,
-                          dailyLossLimit: _dailyLossLimit,
-                          targetBankroll: _targetBankroll,
-                          todayLoss: _todayLoss,
-                          disciplineModeLabel: _disciplineModeLabel(),
-                        ),
-                      BetLivePreviewCard(
-                        previewResultLabel: _previewResultLabel,
-                        netProfit: previewNetProfit,
-                        netColor: previewNetColor,
-                        payout: previewPayout,
-                        effectiveMaxStake: _effectiveMaxStake,
-                        isPreviewLimitExceeded: _isPreviewLimitExceeded,
-                        payoutLabel: 'Toplam Geri Ödeme',
-                      ),
-                      if (_currentDynamicMaxStake > 0 ||
-                          _dailyLossLimit > 0 ||
-                          _targetBankroll > 0)
-                        BetDisciplineInfoCard(
-                          maxStakeInfoText: _currentDynamicMaxStake > 0 ? _maxStakeInfoText() : '',
+                          _currentDynamicMaxStake > 0
+                              ? _maxStakeInfoText()
+                              : '',
                           confidenceScore: _confidenceScore,
                           isHighConfidenceSelected: _isHighConfidenceSelected,
                           effectiveMaxStake: _effectiveMaxStake,
