@@ -1,5 +1,6 @@
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -25,11 +26,53 @@ class BankrollPage extends StatelessWidget {
 
           if (snapshot.hasError) {
             return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'Kasa hareketleri yüklenirken hata oluştu:\n${snapshot.error}',
-                  textAlign: TextAlign.center,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Card(
+                  color: AppColors.surface,
+                  elevation: 0,
+                  shape: AppStyles.cardShape(radius: AppRadius.lg),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: AppColors.danger.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            border: Border.all(
+                              color: AppColors.danger.withOpacity(0.30),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.error_outline,
+                            color: AppColors.danger,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        const Text(
+                          'Kasa hareketleri yüklenemedi',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          '${snapshot.error}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             );
@@ -38,8 +81,50 @@ class BankrollPage extends StatelessWidget {
           final list = snapshot.data ?? [];
 
           if (list.isEmpty) {
-            return const Center(
-              child: Text('Henüz işlem yok'),
+            return Center(
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 520),
+                child: Card(
+                  color: AppColors.surface,
+                  elevation: 0,
+                  shape: AppStyles.cardShape(radius: AppRadius.lg),
+                  child: const Padding(
+                    padding: EdgeInsets.all(AppSpacing.xl),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        CircleAvatar(
+                          radius: 28,
+                          backgroundColor: AppColors.surfaceAlt,
+                          child: Icon(
+                            Icons.account_balance_wallet_outlined,
+                            color: AppColors.textSecondary,
+                            size: 28,
+                          ),
+                        ),
+                        SizedBox(height: AppSpacing.md),
+                        Text(
+                          'Henüz işlem yok',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: AppSpacing.xs),
+                        Text(
+                          'İlk kasa hareketini eklediğinde burada listelenecek.',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            color: AppColors.textSecondary,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
             );
           }
 
@@ -49,52 +134,70 @@ class BankrollPage extends StatelessWidget {
             itemBuilder: (_, i) {
               final tx = list[i];
 
+              final isDeposit = tx.type == 'deposit';
+              final accentColor =
+              isDeposit ? const Color(0xFF22C55E) : const Color(0xFFEF4444);
+
               return Card(
-                color: const Color(0xFF161A23),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
+                color: AppColors.surface,
+                elevation: 0,
+                shape: AppStyles.cardShape(radius: AppRadius.lg),
                 margin: const EdgeInsets.only(bottom: 12),
-                child: ListTile(
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(AppRadius.lg),
                   onTap: () => _showEditDialog(context, tx),
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 8,
-                  ),
-                  leading: CircleAvatar(
-                    backgroundColor: (tx.type == 'deposit'
-                        ? const Color(0xFF22C55E)
-                        : const Color(0xFFEF4444))
-                        .withOpacity(0.15),
-                    child: Icon(
-                      tx.type == 'deposit'
-                          ? Icons.arrow_downward
-                          : Icons.arrow_upward,
-                      color: tx.type == 'deposit'
-                          ? const Color(0xFF22C55E)
-                          : const Color(0xFFEF4444),
-                    ),
-                  ),
-                  title: Text(
-                    tx.note.trim().isEmpty ? 'İşlem' : tx.note,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                  subtitle: Padding(
-                    padding: const EdgeInsets.only(top: 6),
-                    child: Text(
-                      '${tx.type == 'deposit' ? 'Para Eklendi' : 'Para Çekildi'}\n${_formatDate(tx.createdAt)}',
-                    ),
-                  ),
-                  trailing: Text(
-                    '${tx.type == 'deposit' ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺',
-                    style: TextStyle(
-                      color: tx.type == 'deposit'
-                          ? const Color(0xFF22C55E)
-                          : const Color(0xFFEF4444),
-                      fontWeight: FontWeight.bold,
-                      fontSize: 15,
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.lg),
+                    child: Row(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Container(
+                          width: 44,
+                          height: 44,
+                          decoration: BoxDecoration(
+                            color: accentColor.withOpacity(0.14),
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                            border: Border.all(
+                              color: accentColor.withOpacity(0.32),
+                            ),
+                          ),
+                          child: Icon(
+                            isDeposit ? Icons.arrow_downward : Icons.arrow_upward,
+                            color: accentColor,
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                tx.note.trim().isEmpty ? 'İşlem' : tx.note,
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                              const SizedBox(height: 6),
+                              Text(
+                                '${isDeposit ? 'Para Eklendi' : 'Para Çekildi'}\n${_formatDate(tx.createdAt)}',
+                                style: const TextStyle(
+                                  color: AppColors.textSecondary,
+                                  height: 1.35,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                        const SizedBox(width: AppSpacing.md),
+                        Text(
+                          '${isDeposit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺',
+                          style: TextStyle(
+                            color: accentColor,
+                            fontWeight: FontWeight.bold,
+                            fontSize: 15,
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ),
@@ -128,9 +231,25 @@ class BankrollPage extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              backgroundColor: AppColors.surface,
+              shape: AppStyles.cardShape(radius: AppRadius.xl),
+              titlePadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.md,
+              ),
+              contentPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
               ),
               title: const Text('Yeni İşlem'),
               content: SingleChildScrollView(
@@ -288,9 +407,25 @@ class BankrollPage extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              backgroundColor: AppColors.surface,
+              shape: AppStyles.cardShape(radius: AppRadius.xl),
+              titlePadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.md,
+              ),
+              contentPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
               ),
               title: const Text('İşlemi Düzenle'),
               content: SingleChildScrollView(

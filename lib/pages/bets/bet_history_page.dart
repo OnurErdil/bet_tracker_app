@@ -587,9 +587,25 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       context: context,
       builder: (dialogContext) {
         return AlertDialog(
-          backgroundColor: const Color(0xFF161A23),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(20),
+          backgroundColor: AppColors.surface,
+          shape: AppStyles.cardShape(radius: AppRadius.xl),
+          titlePadding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            AppSpacing.xl,
+            AppSpacing.xl,
+            AppSpacing.md,
+          ),
+          contentPadding: const EdgeInsets.fromLTRB(
+            AppSpacing.xl,
+            0,
+            AppSpacing.xl,
+            AppSpacing.lg,
+          ),
+          actionsPadding: const EdgeInsets.fromLTRB(
+            AppSpacing.lg,
+            0,
+            AppSpacing.lg,
+            AppSpacing.lg,
           ),
           title: const Text('Bahsi Sil'),
           content: Text(
