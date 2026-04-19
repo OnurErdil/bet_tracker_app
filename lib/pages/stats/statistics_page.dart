@@ -658,7 +658,7 @@ class StatisticsPage extends StatelessWidget {
                                 }).toList(),
                               ),
                             ),
-                            const SizedBox(height: 24),const SizedBox(height: 24),
+                            const SizedBox(height: 24),
                             SectionCardShell(
                               title: 'Spor Dalına Göre Özet',
                               padding: const EdgeInsets.all(20),
