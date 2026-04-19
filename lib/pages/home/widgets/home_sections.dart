@@ -300,32 +300,54 @@ class RecentBetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final netColor = bet.netProfit >= 0
+        ? const Color(0xFF22C55E)
+        : const Color(0xFFEF4444);
+
     return BetCardShell(
       title: bet.matchName,
       confidenceScore: bet.confidenceScore,
       onTap: onTap,
       titleFontSize: 16,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Expanded(
-            child: Text(
-              '${bet.sport} • ${bet.betType}\nOran: ${bet.odd.toStringAsFixed(2)} | Tutar: ${bet.stake.toStringAsFixed(2)} ₺ | Sonuç: ${resultLabel(bet.result)}',
-              style: const TextStyle(
-                color: AppColors.textSecondary,
-                height: 1.35,
+          Wrap(
+            spacing: 8,
+            runSpacing: 8,
+            children: [
+              BetInfoChip(
+                icon: Icons.sports_soccer,
+                text: bet.sport,
               ),
-            ),
+              BetInfoChip(
+                icon: Icons.local_activity_outlined,
+                text: bet.betType,
+              ),
+              BetInfoChip(
+                icon: Icons.percent,
+                text: 'Oran ${bet.odd.toStringAsFixed(2)}',
+              ),
+              BetInfoChip(
+                icon: Icons.payments_outlined,
+                text: 'Tutar ${bet.stake.toStringAsFixed(2)} ₺',
+              ),
+              BetInfoChip(
+                icon: Icons.flag_outlined,
+                text: resultLabel(bet.result),
+              ),
+            ],
           ),
-          const SizedBox(width: AppSpacing.md),
-          Text(
-            '${bet.netProfit.toStringAsFixed(2)} ₺',
-            style: TextStyle(
-              fontWeight: FontWeight.bold,
-              fontSize: 15,
-              color: bet.netProfit >= 0
-                  ? const Color(0xFF22C55E)
-                  : const Color(0xFFEF4444),
+          const SizedBox(height: AppSpacing.md),
+          Align(
+            alignment: Alignment.centerRight,
+            child: Text(
+              '${bet.netProfit.toStringAsFixed(2)} ₺',
+              style: TextStyle(
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+                color: netColor,
+              ),
             ),
           ),
         ],

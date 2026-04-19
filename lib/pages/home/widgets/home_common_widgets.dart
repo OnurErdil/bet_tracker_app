@@ -816,6 +816,38 @@ class InfoCard extends StatelessWidget {
   }
 }
 
+class WarningCard extends StatelessWidget {
+  final String message;
+
+  const WarningCard({
+    super.key,
+    required this.message,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.danger.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(
+          color: AppColors.danger.withOpacity(0.35),
+        ),
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(
+          color: AppColors.textDangerSoft,
+          fontWeight: FontWeight.bold,
+          height: 1.35,
+        ),
+      ),
+    );
+  }
+}
+
 class ErrorStateCard extends StatelessWidget {
   final String message;
 

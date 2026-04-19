@@ -1107,63 +1107,18 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    Row(
-                      children: [
-                        const Text(
-                          'Kayıtlar',
-                          style: TextStyle(
-                            fontSize: 22,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const Spacer(),
-                        Text(
-                          '${summary.recordCount} kayıt',
-                          style: const TextStyle(color: Colors.white70),
-                        ),
-                      ],
+                    SectionHeader(
+                      title: 'Kayıtlar',
+                      trailing: BetInfoChip(
+                        icon: Icons.inventory_2_outlined,
+                        text: '${summary.recordCount} kayıt',
+                      ),
                     ),
                     const SizedBox(height: 12),
                     if (filteredBets.isEmpty)
-                      Card(
-                        color: AppColors.surface,
-                        elevation: 0,
-                        shape: AppStyles.cardShape(radius: AppRadius.lg),
-                        child: const Padding(
-                          padding: EdgeInsets.all(AppSpacing.xl),
-                          child: Column(
-                            children: [
-                              SizedBox(height: 4),
-                              CircleAvatar(
-                                radius: 28,
-                                backgroundColor: AppColors.surfaceAlt,
-                                child: Icon(
-                                  Icons.inbox_outlined,
-                                  size: 28,
-                                  color: AppColors.textSecondary,
-                                ),
-                              ),
-                              SizedBox(height: AppSpacing.md),
-                              Text(
-                                'Filtreye uygun bahis bulunamadı',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              SizedBox(height: AppSpacing.xs),
-                              Text(
-                                'Arama kelimesini daraltmış veya filtreleri fazla sıkmış olabilirsin.',
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  color: AppColors.textSecondary,
-                                  height: 1.4,
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
+                      const InfoCard(
+                        text:
+                        'Filtreye uygun bahis bulunamadı.\nArama kelimesini daraltmış veya filtreleri fazla sıkmış olabilirsin.',
                       )
                     else
                       ...filteredBets.map(

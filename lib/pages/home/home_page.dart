@@ -321,9 +321,9 @@ class HomeContent extends StatelessWidget {
               const SizedBox(height: 24),
               SectionHeader(
                 title: 'Bekleyen Bahisler',
-                trailing: Text(
-                  '${stats.pendingBets.length} adet',
-                  style: const TextStyle(color: Colors.white70),
+                trailing: BetInfoChip(
+                  icon: Icons.hourglass_bottom,
+                  text: '${stats.pendingBets.length} adet',
                 ),
               ),
               const SizedBox(height: 12),
