@@ -156,3 +156,81 @@ class BetLivePreviewCard extends StatelessWidget {
     );
   }
 }
+
+class BetConfidenceScoreCard extends StatelessWidget {
+  final int confidenceScore;
+  final bool isHighConfidenceSelected;
+  final double effectiveMaxStake;
+  final ValueChanged<double> onChanged;
+
+  const BetConfidenceScoreCard({
+    super.key,
+    required this.confidenceScore,
+    required this.isHighConfidenceSelected,
+    required this.effectiveMaxStake,
+    required this.onChanged,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: 16),
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(14),
+        border: Border.all(
+          color: AppColors.border,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            children: [
+              const Icon(Icons.verified_outlined, size: 20),
+              const SizedBox(width: 8),
+              const Text(
+                'Güven Puanı',
+                style: TextStyle(fontWeight: FontWeight.bold),
+              ),
+              const Spacer(),
+              Text(
+                '$confidenceScore / 10',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  color: isHighConfidenceSelected
+                      ? const Color(0xFFF59E0B)
+                      : Colors.white,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+          Slider(
+            value: confidenceScore.toDouble(),
+            min: 1,
+            max: 10,
+            divisions: 9,
+            label: '$confidenceScore',
+            onChanged: onChanged,
+          ),
+          Text(
+            isHighConfidenceSelected
+                ? 'Yüksek güven aktif • Bu seçim için max: ${effectiveMaxStake.toStringAsFixed(2)} ₺'
+                : 'Normal güven • Standart max limit geçerli',
+            style: TextStyle(
+              color: isHighConfidenceSelected
+                  ? const Color(0xFFF59E0B)
+                  : Colors.white70,
+              fontWeight: isHighConfidenceSelected
+                  ? FontWeight.bold
+                  : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}

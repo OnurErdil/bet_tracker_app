@@ -812,68 +812,15 @@ class _EditBetPageState extends State<EditBetPage> {
                         },
                       ),
                       const SizedBox(height: 14),
-                      Container(
-                        width: double.infinity,
-                        margin: const EdgeInsets.only(bottom: 16),
-                        padding: const EdgeInsets.all(14),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF1F2937),
-                          borderRadius: BorderRadius.circular(14),
-                          border: Border.all(
-                            color: const Color(0xFF374151),
-                          ),
-                        ),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Row(
-                              children: [
-                                const Icon(Icons.verified_outlined, size: 20),
-                                const SizedBox(width: 8),
-                                const Text(
-                                  'Güven Puanı',
-                                  style: TextStyle(fontWeight: FontWeight.bold),
-                                ),
-                                const Spacer(),
-                                Text(
-                                  '$_confidenceScore / 10',
-                                  style: TextStyle(
-                                    fontWeight: FontWeight.bold,
-                                    color: _isHighConfidenceSelected
-                                        ? const Color(0xFFF59E0B)
-                                        : Colors.white,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            Slider(
-                              value: _confidenceScore.toDouble(),
-                              min: 1,
-                              max: 10,
-                              divisions: 9,
-                              label: '$_confidenceScore',
-                              onChanged: (value) {
-                                setState(() {
-                                  _confidenceScore = value.round();
-                                });
-                              },
-                            ),
-                            Text(
-                              _isHighConfidenceSelected
-                                  ? 'Yüksek güven aktif • Bu seçim için max: ${_effectiveMaxStake.toStringAsFixed(2)} ₺'
-                                  : 'Normal güven • Standart max limit geçerli',
-                              style: TextStyle(
-                                color: _isHighConfidenceSelected
-                                    ? const Color(0xFFF59E0B)
-                                    : Colors.white70,
-                                fontWeight: _isHighConfidenceSelected
-                                    ? FontWeight.bold
-                                    : FontWeight.normal,
-                              ),
-                            ),
-                          ],
-                        ),
+                      BetConfidenceScoreCard(
+                        confidenceScore: _confidenceScore,
+                        isHighConfidenceSelected: _isHighConfidenceSelected,
+                        effectiveMaxStake: _effectiveMaxStake,
+                        onChanged: (value) {
+                          setState(() {
+                            _confidenceScore = value.round();
+                          });
+                        },
                       ),
                       Row(
                         children: [
