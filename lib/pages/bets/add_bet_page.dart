@@ -491,7 +491,7 @@ class _AddBetPageState extends State<AddBetPage> {
                   key: _formKey,
                   child: Column(
                     children: [
-                      if (_isLockedForToday)                      if (_isLockedForToday)
+                      if (_isLockedForToday)
                         const BetLockedWarningCard(),
                       if (_currentDynamicMaxStake > 0 ||
                           _dailyLossLimit > 0 ||
