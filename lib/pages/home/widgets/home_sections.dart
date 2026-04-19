@@ -237,17 +237,41 @@ class PendingBetCard extends StatelessWidget {
                 onPressed: () => onQuickSettle(bet, 'kazandi'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF22C55E),
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(0, 44),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
                 ),
-                child: const Text('Kazandı'),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.check_circle_outline, size: 18),
+                    SizedBox(width: 6),
+                    Text('Kazandı'),
+                  ],
+                ),
               ),
               ElevatedButton(
                 onPressed: () => onQuickSettle(bet, 'kaybetti'),
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFFEF4444),
+                  foregroundColor: Colors.white,
                   minimumSize: const Size(0, 44),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
                 ),
-                child: const Text('Kaybetti'),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.cancel_outlined, size: 18),
+                    SizedBox(width: 6),
+                    Text('Kaybetti'),
+                  ],
+                ),
               ),
               ElevatedButton(
                 onPressed: () => onQuickSettle(bet, 'iade'),
@@ -255,16 +279,38 @@ class PendingBetCard extends StatelessWidget {
                   backgroundColor: const Color(0xFFF59E0B),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(0, 44),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
                 ),
-                child: const Text('İade'),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.reply_all_outlined, size: 18),
+                    SizedBox(width: 6),
+                    Text('İade'),
+                  ],
+                ),
               ),
               OutlinedButton(
                 onPressed: onDetail,
                 style: OutlinedButton.styleFrom(
                   minimumSize: const Size(0, 44),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
                   side: const BorderSide(color: AppColors.border),
                 ),
-                child: const Text('Detay'),
+                child: const Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Icon(Icons.open_in_new_outlined, size: 18),
+                    SizedBox(width: 6),
+                    Text('Detay'),
+                  ],
+                ),
               ),
             ],
           ),
