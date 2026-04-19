@@ -27,11 +27,53 @@ class StatisticsPage extends StatelessWidget {
 
           if (betSnapshot.hasError) {
             return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'İstatistikler yüklenirken hata oluştu:\n${betSnapshot.error}',
-                  textAlign: TextAlign.center,
+              child: ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: 560),
+                child: Card(
+                  color: AppColors.surface,
+                  elevation: 0,
+                  shape: AppStyles.cardShape(radius: AppRadius.lg),
+                  child: Padding(
+                    padding: const EdgeInsets.all(AppSpacing.xl),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Container(
+                          width: 56,
+                          height: 56,
+                          decoration: BoxDecoration(
+                            color: AppColors.danger.withOpacity(0.12),
+                            borderRadius: BorderRadius.circular(AppRadius.lg),
+                            border: Border.all(
+                              color: AppColors.danger.withOpacity(0.30),
+                            ),
+                          ),
+                          child: const Icon(
+                            Icons.error_outline,
+                            color: AppColors.danger,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.md),
+                        const Text(
+                          'İstatistikler yüklenemedi',
+                          textAlign: TextAlign.center,
+                          style: TextStyle(
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        const SizedBox(height: AppSpacing.xs),
+                        Text(
+                          '${betSnapshot.error}',
+                          textAlign: TextAlign.center,
+                          style: const TextStyle(
+                            color: AppColors.textSecondary,
+                            height: 1.4,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
               ),
             );
@@ -57,11 +99,53 @@ class StatisticsPage extends StatelessWidget {
 
                   if (txSnapshot.hasError) {
                     return Center(
-                      child: Padding(
-                        padding: const EdgeInsets.all(24),
-                        child: Text(
-                          'Kasa hareketleri yüklenirken hata oluştu:\n${txSnapshot.error}',
-                          textAlign: TextAlign.center,
+                      child: ConstrainedBox(
+                        constraints: const BoxConstraints(maxWidth: 560),
+                        child: Card(
+                          color: AppColors.surface,
+                          elevation: 0,
+                          shape: AppStyles.cardShape(radius: AppRadius.lg),
+                          child: Padding(
+                            padding: const EdgeInsets.all(AppSpacing.xl),
+                            child: Column(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Container(
+                                  width: 56,
+                                  height: 56,
+                                  decoration: BoxDecoration(
+                                    color: AppColors.danger.withOpacity(0.12),
+                                    borderRadius: BorderRadius.circular(AppRadius.lg),
+                                    border: Border.all(
+                                      color: AppColors.danger.withOpacity(0.30),
+                                    ),
+                                  ),
+                                  child: const Icon(
+                                    Icons.error_outline,
+                                    color: AppColors.danger,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.md),
+                                const Text(
+                                  'Kasa hareketleri yüklenemedi',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: AppSpacing.xs),
+                                Text(
+                                  '${txSnapshot.error}',
+                                  textAlign: TextAlign.center,
+                                  style: const TextStyle(
+                                    color: AppColors.textSecondary,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
                         ),
                       ),
                     );
@@ -489,258 +573,164 @@ class StatisticsPage extends StatelessWidget {
                               ),
                             ),
                             const SizedBox(height: 24),
-                            const Text(
-                              'Güven Puanına Göre Özet',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                            const SizedBox(height: 12),
-                            if (overview.confidenceStats.isEmpty)
-                              Card(
-                                color: const Color(0xFF161A23),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(20),
-                                  child: Text(
-                                    'Henüz güven puanı bazlı istatistik gösterecek veri yok.',
-                                    textAlign: TextAlign.center,
+                            SectionCardShell(
+                              title: 'Güven Puanına Göre Özet',
+                              padding: const EdgeInsets.all(20),
+                              child: overview.confidenceStats.isEmpty
+                                  ? const Padding(
+                                padding: EdgeInsets.all(AppSpacing.md),
+                                child: Text(
+                                  'Henüz güven puanı bazlı istatistik gösterecek veri yok.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    height: 1.4,
                                   ),
                                 ),
                               )
-                            else
-                              ...(() {
-                                final entries = overview.confidenceStats.entries.toList()
-                                  ..sort((a, b) => int.parse(b.key).compareTo(int.parse(a.key)));
+                                  : Column(
+                                children: (() {
+                                  final entries = overview.confidenceStats.entries.toList()
+                                    ..sort((a, b) => int.parse(b.key).compareTo(int.parse(a.key)));
 
-                                return entries.map((entry) {
-                                  final score = entry.key;
+                                  return entries.map((entry) {
+                                    final score = entry.key;
+                                    final data = entry.value;
+
+                                    final count = (data['count'] as int?) ?? 0;
+                                    final settled = (data['settled'] as int?) ?? 0;
+                                    final won = (data['won'] as int?) ?? 0;
+                                    final profit = (data['profit'] as double?) ?? 0.0;
+                                    final winRate = settled == 0 ? 0.0 : (won / settled) * 100;
+
+                                    return SummaryInsightCard(
+                                      title: 'Güven $score',
+                                      subtitle:
+                                      'Bahis: $count | Settled: $settled | Win Rate: %${winRate.toStringAsFixed(1)}',
+                                      value: '${profit.toStringAsFixed(2)} ₺',
+                                      valueColor: profit >= 0
+                                          ? const Color(0xFF22C55E)
+                                          : const Color(0xFFEF4444),
+                                    );
+                                  }).toList();
+                                })(),
+                              ),
+                            ),
+                            const SizedBox(height: 24),
+                            SectionCardShell(
+                              title: 'Bahis Türüne Göre Özet',
+                              padding: const EdgeInsets.all(20),
+                              child: overview.betTypeStats.isEmpty
+                                  ? const Padding(
+                                padding: EdgeInsets.all(AppSpacing.md),
+                                child: Text(
+                                  'Henüz bahis türü bazlı istatistik gösterecek veri yok.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    height: 1.4,
+                                  ),
+                                ),
+                              )
+                                  : Column(
+                                children: overview.betTypeStats.entries.map((entry) {
+                                  final betType = entry.key;
                                   final data = entry.value;
-
-                                  final count = (data['count'] as int?) ?? 0;
-                                  final settled = (data['settled'] as int?) ?? 0;
-                                  final won = (data['won'] as int?) ?? 0;
-                                  final profit = (data['profit'] as double?) ?? 0.0;
-                                  final winRate = settled == 0 ? 0.0 : (won / settled) * 100;
+                                  final typeProfit =
+                                      (data['profit'] as double?) ?? 0;
+                                  final typeCount =
+                                      (data['count'] as int?) ?? 0;
+                                  final typeWon =
+                                      (data['won'] as int?) ?? 0;
+                                  final typeWinRate = typeCount == 0
+                                      ? 0
+                                      : (typeWon / typeCount) * 100;
 
                                   return SummaryInsightCard(
-                                    title: 'Güven $score',
+                                    title: betType,
                                     subtitle:
-                                    'Bahis: $count | Settled: $settled | Win Rate: %${winRate.toStringAsFixed(1)}',
-                                    value: '${profit.toStringAsFixed(2)} ₺',
-                                    valueColor: profit >= 0
+                                    'Bahis: $typeCount | Kazanma Oranı: %${typeWinRate.toStringAsFixed(1)}',
+                                    value: '${typeProfit.toStringAsFixed(2)} ₺',
+                                    valueColor: typeProfit >= 0
                                         ? const Color(0xFF22C55E)
                                         : const Color(0xFFEF4444),
                                   );
-                                }).toList();
-                              })(),
-                            const Text(
-                              'Bahis Türüne Göre Özet',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                                }).toList(),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            if (overview.betTypeStats.isEmpty)
-                              Card(
-                                color: const Color(0xFF161A23),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(20),
-                                  child: Text(
-                                    'Henüz bahis türü bazlı istatistik gösterecek veri yok.',
-                                    textAlign: TextAlign.center,
+                            const SizedBox(height: 24),const SizedBox(height: 24),
+                            SectionCardShell(
+                              title: 'Spor Dalına Göre Özet',
+                              padding: const EdgeInsets.all(20),
+                              child: overview.sportStats.isEmpty
+                                  ? const Padding(
+                                padding: EdgeInsets.all(AppSpacing.md),
+                                child: Text(
+                                  'Henüz spor bazlı istatistik gösterecek veri yok.',
+                                  textAlign: TextAlign.center,
+                                  style: TextStyle(
+                                    color: AppColors.textSecondary,
+                                    height: 1.4,
                                   ),
                                 ),
                               )
-                            else
-                              ...overview.betTypeStats.entries.map((entry) {
-                                final betType = entry.key;
-                                final data = entry.value;
-                                final typeProfit =
-                                    (data['profit'] as double?) ?? 0;
-                                final typeCount =
-                                    (data['count'] as int?) ?? 0;
-                                final typeWon =
-                                    (data['won'] as int?) ?? 0;
-                                final typeWinRate = typeCount == 0
-                                    ? 0
-                                    : (typeWon / typeCount) * 100;
+                                  : Column(
+                                children: overview.sportStats.entries.map((entry) {
+                                  final sport = entry.key;
+                                  final data = entry.value;
+                                  final sportProfit = (data['profit'] as double?) ?? 0;
+                                  final sportCount = (data['count'] as int?) ?? 0;
+                                  final sportWon = (data['won'] as int?) ?? 0;
+                                  final sportWinRate = sportCount == 0
+                                      ? 0
+                                      : (sportWon / sportCount) * 100;
 
-                                return SummaryInsightCard(
-                                  title: betType,
-                                  subtitle:
-                                  'Bahis: $typeCount | Kazanma Oranı: %${typeWinRate.toStringAsFixed(1)}',
-                                  value: '${typeProfit.toStringAsFixed(2)} ₺',
-                                  valueColor: typeProfit >= 0
-                                      ? const Color(0xFF22C55E)
-                                      : const Color(0xFFEF4444),
-                                );
-                              }),
-                            const SizedBox(height: 24),
-                            const Text(
-                              'Spor Dalına Göre Özet',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                                  return SummaryInsightCard(
+                                    title: sport,
+                                    subtitle:
+                                    'Bahis: $sportCount | Kazanma Oranı: %${sportWinRate.toStringAsFixed(1)}',
+                                    value: '${sportProfit.toStringAsFixed(2)} ₺',
+                                    valueColor: sportProfit >= 0
+                                        ? const Color(0xFF22C55E)
+                                        : const Color(0xFFEF4444),
+                                  );
+                                }).toList(),
                               ),
                             ),
-                            const SizedBox(height: 12),
-                            if (overview.sportStats.isEmpty)
-                              Card(
-                                color: const Color(0xFF161A23),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(18),
-                                ),
-                                child: const Padding(
-                                  padding: EdgeInsets.all(20),
-                                  child: Text(
-                                    'Henüz spor bazlı istatistik gösterecek veri yok.',
-                                    textAlign: TextAlign.center,
+                            const SizedBox(height: 24),
+                            SectionCardShell(
+                              title: 'Performans Özeti',
+                              padding: const EdgeInsets.all(20),
+                              child: GridView.count(
+                                crossAxisCount: isWide ? 2 : 1,
+                                shrinkWrap: true,
+                                physics: const NeverScrollableScrollPhysics(),
+                                mainAxisSpacing: 16,
+                                crossAxisSpacing: 16,
+                                childAspectRatio: 3.2,
+                                children: [
+                                  _StatBox(
+                                    title: 'En Büyük Tek Kazanç',
+                                    value: overview.biggestWinLabel,
+                                    icon: Icons.arrow_upward,
+                                    valueColor: const Color(0xFF22C55E),
                                   ),
-                                ),
-                              )
-                            else
-                              ...overview.sportStats.entries.map((entry) {
-                                final sport = entry.key;
-                                final data = entry.value;
-                                final sportProfit =
-                                    (data['profit'] as double?) ?? 0;
-                                final sportCount =
-                                    (data['count'] as int?) ?? 0;
-                                final sportWon =
-                                    (data['won'] as int?) ?? 0;
-                                final sportWinRate = sportCount == 0
-                                    ? 0
-                                    : (sportWon / sportCount) * 100;
-
-                                return SummaryInsightCard(
-                                  title: sport,
-                                  subtitle:
-                                  'Bahis: $sportCount | Kazanma Oranı: %${sportWinRate.toStringAsFixed(1)}',
-                                  value: '${sportProfit.toStringAsFixed(2)} ₺',
-                                  valueColor: sportProfit >= 0
-                                      ? const Color(0xFF22C55E)
-                                      : const Color(0xFFEF4444),
-                                );
-                              }),
-                            const SizedBox(height: 20),
-                            GridView.count(
-                              crossAxisCount: isWide ? 3 : 1,
-                              shrinkWrap: true,
-                              physics:
-                              const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 2.8,
-                              children: [
-                                _StatBox(
-                                  title: 'Toplam Bahis',
-                                  value: '${overview.totalBets}',
-                                  icon: Icons.receipt_long,
-                                ),
-                                _StatBox(
-                                  title: 'Toplam Oynanan',
-                                  value:
-                                  '${overview.totalStake.toStringAsFixed(2)} ₺',
-                                  icon: Icons.payments_outlined,
-                                ),
-                                _StatBox(
-                                  title: 'Kazanma Oranı',
-                                  value:
-                                  '%${overview.winRate.toStringAsFixed(1)}',
-                                  icon: Icons.bar_chart,
-                                ),
-                                _StatBox(
-                                  title: 'Kazanan',
-                                  value: '${overview.wonCount}',
-                                  valueColor: const Color(0xFF22C55E),
-                                  icon: Icons.check_circle_outline,
-                                ),
-                                _StatBox(
-                                  title: 'Kaybeden',
-                                  value: '${overview.lostCount}',
-                                  valueColor: const Color(0xFFEF4444),
-                                  icon: Icons.cancel_outlined,
-                                ),
-                                _StatBox(
-                                  title: 'Beklemede',
-                                  value: '${overview.pendingCount}',
-                                  valueColor: const Color(0xFF94A3B8),
-                                  icon: Icons.hourglass_bottom,
-                                ),
-                                _StatBox(
-                                  title: 'İade',
-                                  value: '${overview.refundedCount}',
-                                  valueColor: const Color(0xFFF59E0B),
-                                  icon: Icons.reply_all_outlined,
-                                ),
-                                _StatBox(
-                                  title: 'ROI',
-                                  value:
-                                  '%${overview.roi.toStringAsFixed(1)}',
-                                  valueColor: overview.roi >= 0
-                                      ? const Color(0xFF22C55E)
-                                      : const Color(0xFFEF4444),
-                                  icon: Icons.trending_up,
-                                ),
-                                _StatBox(
-                                  title: 'Bugünkü Kayıp',
-                                  value:
-                                  '${overview.todayLoss.toStringAsFixed(2)} ₺',
-                                  valueColor: overview.todayLoss > 0
-                                      ? const Color(0xFFEF4444)
-                                      : null,
-                                  icon: Icons.today,
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 24),
-                            const Text(
-                              'Performans Özeti',
-                              style: TextStyle(
-                                fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                                  _StatBox(
+                                    title: 'En Büyük Tek Kayıp',
+                                    value: overview.biggestLossLabel,
+                                    icon: Icons.arrow_downward,
+                                    valueColor: const Color(0xFFEF4444),
+                                  ),
+                                  _StatBox(
+                                    title: 'En Çok Oynanan Bahis Türü',
+                                    value: overview.mostPlayedBetType,
+                                    icon: Icons.local_fire_department_outlined,
+                                  ),
+                                  _Last10FormStat(
+                                    formItems: overview.last10Form,
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 12),
-                            GridView.count(
-                              crossAxisCount: isWide ? 2 : 1,
-                              shrinkWrap: true,
-                              physics:
-                              const NeverScrollableScrollPhysics(),
-                              mainAxisSpacing: 16,
-                              crossAxisSpacing: 16,
-                              childAspectRatio: 3.2,
-                              children: [
-                                _StatBox(
-                                  title: 'En Büyük Tek Kazanç',
-                                  value: overview.biggestWinLabel,
-                                  icon: Icons.arrow_upward,
-                                  valueColor: const Color(0xFF22C55E),
-                                ),
-                                _StatBox(
-                                  title: 'En Büyük Tek Kayıp',
-                                  value: overview.biggestLossLabel,
-                                  icon: Icons.arrow_downward,
-                                  valueColor: const Color(0xFFEF4444),
-                                ),
-                                _StatBox(
-                                  title: 'En Çok Oynanan Bahis Türü',
-                                  value: overview.mostPlayedBetType,
-                                  icon: Icons
-                                      .local_fire_department_outlined,
-                                ),
-                                _Last10FormStat(
-                                  formItems: overview.last10Form,
-                                ),
-                              ],
                             ),
                             const SizedBox(height: 20),
                           ],

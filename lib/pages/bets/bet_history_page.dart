@@ -655,14 +655,8 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: Padding(
-                padding: const EdgeInsets.all(24),
-                child: Text(
-                  'Bahisler yüklenirken hata oluştu:\n${snapshot.error}',
-                  textAlign: TextAlign.center,
-                ),
-              ),
+            return ErrorStateCard(
+              message: 'Bahisler yüklenirken hata oluştu:\n${snapshot.error}',
             );
           }
 
