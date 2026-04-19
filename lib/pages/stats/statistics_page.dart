@@ -5,6 +5,7 @@ import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/services/reset_service.dart';
 import 'package:bet_tracker_app/services/user_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:fl_chart/fl_chart.dart';
 import 'package:flutter/material.dart';
 
@@ -772,9 +773,25 @@ class StatisticsPage extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              backgroundColor: AppColors.surface,
+              shape: AppStyles.cardShape(radius: AppRadius.xl),
+              titlePadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.md,
+              ),
+              contentPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
               ),
               title: const Text('Başlangıç Kasası'),
               content: TextField(
@@ -898,9 +915,25 @@ class StatisticsPage extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              backgroundColor: AppColors.surface,
+              shape: AppStyles.cardShape(radius: AppRadius.xl),
+              titlePadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.md,
+              ),
+              contentPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
               ),
               title: const Text('Disiplin Ayarları'),
               content: SingleChildScrollView(
@@ -1173,9 +1206,25 @@ class StatisticsPage extends StatelessWidget {
         return StatefulBuilder(
           builder: (context, setState) {
             return AlertDialog(
-              backgroundColor: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
+              backgroundColor: AppColors.surface,
+              shape: AppStyles.cardShape(radius: AppRadius.xl),
+              titlePadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.xl,
+                AppSpacing.md,
+              ),
+              contentPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.xl,
+                0,
+                AppSpacing.xl,
+                AppSpacing.lg,
+              ),
+              actionsPadding: const EdgeInsets.fromLTRB(
+                AppSpacing.lg,
+                0,
+                AppSpacing.lg,
+                AppSpacing.lg,
               ),
               title: const Text('Tüm Verileri Sıfırla'),
               content: const Text(
