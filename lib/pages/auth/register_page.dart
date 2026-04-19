@@ -1,4 +1,5 @@
 import 'package:bet_tracker_app/services/auth_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class RegisterPage extends StatefulWidget {
@@ -84,15 +85,31 @@ class _RegisterPageState extends State<RegisterPage> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 430),
             child: Card(
-              color: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+              color: AppColors.surface,
+              elevation: 0,
+              shape: AppStyles.cardShape(radius: AppRadius.xl),
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.14),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        border: Border.all(
+                          color: AppColors.primary.withOpacity(0.28),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.person_add_alt_1_outlined,
+                        size: 30,
+                        color: AppColors.primary,
+                      ),
+                    ),
                     const Text(
                       'Yeni Hesap Oluştur',
                       style: TextStyle(
@@ -101,7 +118,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.sm),
+                    const Text(
+                      'E-posta ve şifreni gir, hesabını oluşturalım.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
+                    ),
+                    const SizedBox(height: AppSpacing.xl),
                     TextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -110,7 +136,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppSpacing.md),
                     TextField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -131,7 +157,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: AppSpacing.md),
                     TextField(
                       controller: _confirmPasswordController,
                       obscureText: _obscureConfirmPassword,
@@ -141,8 +167,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         suffixIcon: IconButton(
                           onPressed: () {
                             setState(() {
-                              _obscureConfirmPassword =
-                              !_obscureConfirmPassword;
+                              _obscureConfirmPassword = !_obscureConfirmPassword;
                             });
                           },
                           icon: Icon(
@@ -153,7 +178,7 @@ class _RegisterPageState extends State<RegisterPage> {
                         ),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSpacing.lg),
                     ElevatedButton(
                       onPressed: _isLoading ? null : _register,
                       child: _isLoading

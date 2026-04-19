@@ -1,4 +1,5 @@
 import 'package:bet_tracker_app/services/auth_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -59,15 +60,31 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
           child: ConstrainedBox(
             constraints: const BoxConstraints(maxWidth: 430),
             child: Card(
-              color: const Color(0xFF161A23),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(20),
-              ),
+              color: AppColors.surface,
+              elevation: 0,
+              shape: AppStyles.cardShape(radius: AppRadius.xl),
               child: Padding(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(AppSpacing.xl),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
+                    Container(
+                      width: 64,
+                      height: 64,
+                      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+                      decoration: BoxDecoration(
+                        color: AppColors.primary.withOpacity(0.14),
+                        borderRadius: BorderRadius.circular(AppRadius.lg),
+                        border: Border.all(
+                          color: AppColors.primary.withOpacity(0.28),
+                        ),
+                      ),
+                      child: const Icon(
+                        Icons.lock_reset,
+                        size: 30,
+                        color: AppColors.primary,
+                      ),
+                    ),
                     const Text(
                       'Şifremi Unuttum',
                       style: TextStyle(
@@ -76,13 +93,16 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: AppSpacing.sm),
                     const Text(
                       'E-posta adresini gir, sana sıfırlama bağlantısı gönderelim.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Colors.white70),
+                      style: TextStyle(
+                        color: AppColors.textSecondary,
+                        height: 1.4,
+                      ),
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: AppSpacing.xl),
                     TextField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -91,7 +111,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         prefixIcon: Icon(Icons.email_outlined),
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: AppSpacing.lg),
                     ElevatedButton(
                       onPressed: _isLoading ? null : _resetPassword,
                       child: _isLoading
