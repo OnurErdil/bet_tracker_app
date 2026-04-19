@@ -683,6 +683,114 @@ class SectionCardShell extends StatelessWidget {
   }
 }
 
+class BetCardShell extends StatelessWidget {
+  final String title;
+  final int confidenceScore;
+  final Widget child;
+  final VoidCallback? onTap;
+  final double titleFontSize;
+  final EdgeInsetsGeometry padding;
+
+  const BetCardShell({
+    super.key,
+    required this.title,
+    required this.confidenceScore,
+    required this.child,
+    this.onTap,
+    this.titleFontSize = 16,
+    this.padding = const EdgeInsets.all(AppSpacing.lg),
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final content = Padding(
+      padding: padding,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                child: Text(
+                  title,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: titleFontSize,
+                  ),
+                ),
+              ),
+              const SizedBox(width: AppSpacing.sm),
+              ConfidenceBadge(score: confidenceScore),
+            ],
+          ),
+          const SizedBox(height: AppSpacing.md),
+          child,
+        ],
+      ),
+    );
+
+    return Card(
+      color: AppColors.surface,
+      elevation: 0,
+      shape: AppStyles.cardShape(radius: AppRadius.lg),
+      margin: const EdgeInsets.only(bottom: 12),
+      child: onTap == null
+          ? content
+          : InkWell(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        onTap: onTap,
+        child: content,
+      ),
+    );
+  }
+}
+
+class BetInfoChip extends StatelessWidget {
+  final IconData icon;
+  final String text;
+
+  const BetInfoChip({
+    super.key,
+    required this.icon,
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: 10,
+        vertical: 8,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 14,
+            color: AppColors.textSecondary,
+          ),
+          const SizedBox(width: 6),
+          Text(
+            text,
+            style: const TextStyle(
+              color: AppColors.textSecondary,
+              fontSize: 12,
+              fontWeight: FontWeight.w500,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
 class InfoCard extends StatelessWidget {
   final String text;
 
