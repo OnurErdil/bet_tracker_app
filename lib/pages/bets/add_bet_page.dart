@@ -492,25 +492,30 @@ class _AddBetPageState extends State<AddBetPage> {
                   child: Column(
                     children: [
                       if (_isLockedForToday)
-                        Container(
-                          width: double.infinity,
-                          margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-                          padding: const EdgeInsets.all(AppSpacing.md),
-                          decoration: BoxDecoration(
-                            color: AppColors.danger.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                            border: Border.all(
-                              color: AppColors.danger.withOpacity(0.35),
-                            ),
-                          ),
-                          child: const Text(
-                            'Bugün bahis kilitli. Disiplin modu aktif.',
-                            style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.textDangerSoft,
-                            ),
-                          ),
+                        const BetLockedWarningCard(),
+                      if (_currentDynamicMaxStake > 0 ||
+                          _dailyLossLimit > 0 ||
+                          _targetBankroll > 0)
+                        BetDisciplineInfoCard(
+                          maxStakeInfoText:
+                          _currentDynamicMaxStake > 0 ? _maxStakeInfoText() : '',
+                          confidenceScore: _confidenceScore,
+                          isHighConfidenceSelected: _isHighConfidenceSelected,
+                          effectiveMaxStake: _effectiveMaxStake,
+                          dailyLossLimit: _dailyLossLimit,
+                          targetBankroll: _targetBankroll,
+                          todayLoss: _todayLoss,
+                          disciplineModeLabel: _disciplineModeLabel(),
                         ),
+                      BetLivePreviewCard(
+                        previewResultLabel: _previewResultLabel,
+                        netProfit: previewNetProfit,
+                        netColor: previewNetColor,
+                        payout: previewPayout,
+                        effectiveMaxStake: _effectiveMaxStake,
+                        isPreviewLimitExceeded: _isPreviewLimitExceeded,
+                        payoutLabel: 'Toplam Geri Ödeme',
+                      ),
                       if (_currentDynamicMaxStake > 0 ||
                           _dailyLossLimit > 0 ||
                           _targetBankroll > 0)

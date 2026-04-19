@@ -157,6 +157,38 @@ class BetLivePreviewCard extends StatelessWidget {
   }
 }
 
+class BetLockedWarningCard extends StatelessWidget {
+  final String message;
+
+  const BetLockedWarningCard({
+    super.key,
+    this.message = 'Bugün bahis kilitli. Disiplin modu aktif.',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.danger.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(
+          color: AppColors.danger.withOpacity(0.35),
+        ),
+      ),
+      child: Text(
+        message,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: AppColors.textDangerSoft,
+        ),
+      ),
+    );
+  }
+}
+
 class BetConfidenceScoreCard extends StatelessWidget {
   final int confidenceScore;
   final bool isHighConfidenceSelected;
