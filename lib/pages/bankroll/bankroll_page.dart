@@ -270,7 +270,9 @@ class BankrollPage extends StatelessWidget {
                         ),
                       ],
                       onChanged: (val) {
-                        type = val ?? 'deposit';
+                        setState(() {
+                          type = val ?? 'deposit';
+                        });
                       },
                     ),
                     const SizedBox(height: 12),
@@ -352,6 +354,18 @@ class BankrollPage extends StatelessWidget {
                       ),
                     );
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 46),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ),
                   child: isSaving
                       ? const SizedBox(
                     height: 18,
@@ -361,7 +375,14 @@ class BankrollPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                      : const Text('Kaydet'),
+                      : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.save_outlined, size: 18),
+                      SizedBox(width: 6),
+                      Text('Kaydet'),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -488,7 +509,9 @@ class BankrollPage extends StatelessWidget {
                         ),
                       ],
                       onChanged: (val) {
-                        type = val ?? 'deposit';
+                        setState(() {
+                          type = val ?? 'deposit';
+                        });
                       },
                     ),
                     const SizedBox(height: 12),
@@ -561,6 +584,18 @@ class BankrollPage extends StatelessWidget {
                       ),
                     );
                   },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppColors.primary,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 46),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
+                  ),
                   child: isSaving
                       ? const SizedBox(
                     height: 18,
@@ -570,7 +605,14 @@ class BankrollPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                      : const Text('Güncelle'),
+                      : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.edit_outlined, size: 18),
+                      SizedBox(width: 6),
+                      Text('Güncelle'),
+                    ],
+                  ),
                 ),
                 ElevatedButton(
                   onPressed: (isSaving || isDeleting)
