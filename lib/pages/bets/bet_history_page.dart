@@ -1522,81 +1522,108 @@ class _BetCard extends StatelessWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: AppSpacing.md),
-              Container(
-                width: double.infinity,
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.md,
-                ),
-                decoration: BoxDecoration(
-                  color: AppColors.surfaceAlt,
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(color: AppColors.border),
-                ),
-                child: Row(
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                        horizontal: 10,
-                        vertical: 7,
-                      ),
-                      decoration: BoxDecoration(
-                        color: resultColor.withOpacity(0.14),
-                        borderRadius: BorderRadius.circular(AppRadius.pill),
-                        border: Border.all(
-                          color: resultColor.withOpacity(0.35),
-                        ),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(
-                            resultIcon,
-                            size: 14,
-                            color: resultColor,
-                          ),
-                          const SizedBox(width: 6),
-                          Text(
-                            resultLabel,
-                            style: TextStyle(
-                              color: resultColor,
-                              fontWeight: FontWeight.w700,
-                              fontSize: 12,
-                            ),
-                          ),
-                        ],
-                      ),
-                    ),
-                    const Spacer(),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        const Text(
-                          'Net Etki',
-                          style: TextStyle(
-                            fontSize: 11,
-                            color: AppColors.textSecondary,
-                            fontWeight: FontWeight.w600,
-                          ),
-                        ),
-                        const SizedBox(height: 2),
-                        Text(
-                          '${bet.netProfit.toStringAsFixed(2)} ₺',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16,
-                            color: netColor,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
+              const SizedBox(height: AppSpacing.md),const SizedBox(height: AppSpacing.md),
+              _BetOutcomeBar(
+                resultLabel: resultLabel,
+                resultColor: resultColor,
+                resultIcon: resultIcon,
+                netProfit: bet.netProfit,
+                netColor: netColor,
               ),
             ],
           ),
         ),
+      ),
+    );
+  }
+}
+
+class _BetOutcomeBar extends StatelessWidget {
+  final String resultLabel;
+  final Color resultColor;
+  final IconData resultIcon;
+  final double netProfit;
+  final Color netColor;
+
+  const _BetOutcomeBar({
+    required this.resultLabel,
+    required this.resultColor,
+    required this.resultIcon,
+    required this.netProfit,
+    required this.netColor,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.md,
+      ),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: Row(
+        children: [
+          Container(
+            padding: const EdgeInsets.symmetric(
+              horizontal: 10,
+              vertical: 7,
+            ),
+            decoration: BoxDecoration(
+              color: resultColor.withOpacity(0.14),
+              borderRadius: BorderRadius.circular(AppRadius.pill),
+              border: Border.all(
+                color: resultColor.withOpacity(0.35),
+              ),
+            ),
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(
+                  resultIcon,
+                  size: 14,
+                  color: resultColor,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  resultLabel,
+                  style: TextStyle(
+                    color: resultColor,
+                    fontWeight: FontWeight.w700,
+                    fontSize: 12,
+                  ),
+                ),
+              ],
+            ),
+          ),
+          const Spacer(),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              const Text(
+                'Net Etki',
+                style: TextStyle(
+                  fontSize: 11,
+                  color: AppColors.textSecondary,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+              const SizedBox(height: 2),
+              Text(
+                '${netProfit.toStringAsFixed(2)} ₺',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                  color: netColor,
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
