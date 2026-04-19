@@ -285,29 +285,36 @@ class HomeContent extends StatelessWidget {
               ),
 
               const SizedBox(height: 20),
-              Card(
-                color: const Color(0xFF161A23),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
-                ),
-                child: Padding(
-                  padding: const EdgeInsets.all(18),
-                  child: Wrap(
-                    spacing: 16,
-                    runSpacing: 10,
-                    children: [
-                      Text(
-                        'Bekleyen bahis: ${stats.pendingBets.length}',
-                        style: const TextStyle(
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      Text(
-                        'Toplam bekleyen tutar: ${pendingStakeTotal.toStringAsFixed(2)} ₺',
-                        style: const TextStyle(color: Colors.white70),
-                      ),
-                    ],
-                  ),
+              SectionCardShell(
+                title: 'Bekleyen Özet',
+                padding: const EdgeInsets.all(18),
+                child: GridView.count(
+                  crossAxisCount: isWide ? 2 : 1,
+                  shrinkWrap: true,
+                  physics: const NeverScrollableScrollPhysics(),
+                  mainAxisSpacing: 12,
+                  crossAxisSpacing: 12,
+                  childAspectRatio: isWide ? 3.2 : 3.0,
+                  children: [
+                    StatValueCard(
+                      title: 'Bekleyen Bahis',
+                      value: '${stats.pendingBets.length}',
+                      icon: Icons.hourglass_bottom,
+                      valueColor: stats.pendingBets.isNotEmpty
+                          ? const Color(0xFFF59E0B)
+                          : null,
+                      compact: true,
+                    ),
+                    StatValueCard(
+                      title: 'Toplam Bekleyen Tutar',
+                      value: '${pendingStakeTotal.toStringAsFixed(2)} ₺',
+                      icon: Icons.payments_outlined,
+                      valueColor: pendingStakeTotal > 0
+                          ? const Color(0xFFF59E0B)
+                          : null,
+                      compact: true,
+                    ),
+                  ],
                 ),
               ),
 
@@ -335,54 +342,6 @@ class HomeContent extends StatelessWidget {
                     ),
                   ),
                 ),
-              const SizedBox(height: 20),
-              GridView.count(
-                crossAxisCount: isWide ? 2 : 1,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: isWide ? 3.0 : 3.2,
-                children: [
-                  DashboardCard(
-                    title: 'Toplam Bahis',
-                    value: '${stats.totalBets}',
-                    icon: Icons.receipt_long,
-                  ),
-                  DashboardCard(
-                    title: 'Kazanma Oranı',
-                    value: '%${stats.winRate.toStringAsFixed(1)}',
-                    icon: Icons.bar_chart,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-              MiniAnalysisSection(stats: stats, isWide: isWide),
-              const SizedBox(height: 20),
-              GridView.count(
-                crossAxisCount: isWide ? 2 : 1,
-                shrinkWrap: true,
-                physics: const NeverScrollableScrollPhysics(),
-                mainAxisSpacing: 16,
-                crossAxisSpacing: 16,
-                childAspectRatio: isWide ? 3.0 : 3.2,
-                children: [
-                  DashboardCard(
-                    title: 'Toplam Bahis',
-                    value: '${stats.totalBets}',
-                    icon: Icons.receipt_long,
-                  ),
-                  DashboardCard(
-                    title: 'Kazanma Oranı',
-                    value: '%${stats.winRate.toStringAsFixed(1)}',
-                    icon: Icons.bar_chart,
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 20),
-              MiniAnalysisSection(stats: stats, isWide: isWide),
               const SizedBox(height: 24),
               SectionHeader(
                 title: 'Son Bahisler',
