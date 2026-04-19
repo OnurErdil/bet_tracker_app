@@ -1,0 +1,158 @@
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
+import 'package:flutter/material.dart';
+
+class BetDisciplineInfoCard extends StatelessWidget {
+  final String maxStakeInfoText;
+  final int confidenceScore;
+  final bool isHighConfidenceSelected;
+  final double effectiveMaxStake;
+  final double dailyLossLimit;
+  final double targetBankroll;
+  final double todayLoss;
+  final String disciplineModeLabel;
+
+  const BetDisciplineInfoCard({
+    super.key,
+    required this.maxStakeInfoText,
+    required this.confidenceScore,
+    required this.isHighConfidenceSelected,
+    required this.effectiveMaxStake,
+    required this.dailyLossLimit,
+    required this.targetBankroll,
+    required this.todayLoss,
+    required this.disciplineModeLabel,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.primary.withOpacity(0.10),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(
+          color: AppColors.primary.withOpacity(0.35),
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Aktif Disiplin Kuralları',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 8),
+          if (maxStakeInfoText.isNotEmpty) Text(maxStakeInfoText),
+          Text('• Güven puanı: $confidenceScore / 10'),
+          if (isHighConfidenceSelected && effectiveMaxStake > 0)
+            Text(
+              '• Bu güven için izin verilen üst limit: ${effectiveMaxStake.toStringAsFixed(2)} ₺',
+            ),
+          if (dailyLossLimit > 0)
+            Text(
+              '• Günlük kayıp limiti: ${dailyLossLimit.toStringAsFixed(2)} ₺',
+            ),
+          if (targetBankroll > 0)
+            Text(
+              '• Hedef kasa: ${targetBankroll.toStringAsFixed(2)} ₺',
+            ),
+          if (dailyLossLimit > 0)
+            Text(
+              '• Bugünkü gerçekleşmiş kayıp: ${todayLoss.toStringAsFixed(2)} ₺',
+            ),
+          Text(disciplineModeLabel),
+        ],
+      ),
+    );
+  }
+}
+
+class BetLivePreviewCard extends StatelessWidget {
+  final String previewResultLabel;
+  final double netProfit;
+  final Color netColor;
+  final double payout;
+  final double effectiveMaxStake;
+  final bool isPreviewLimitExceeded;
+  final String payoutLabel;
+
+  const BetLivePreviewCard({
+    super.key,
+    required this.previewResultLabel,
+    required this.netProfit,
+    required this.netColor,
+    required this.payout,
+    required this.effectiveMaxStake,
+    required this.isPreviewLimitExceeded,
+    this.payoutLabel = 'Toplam Geri Ödeme',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: isPreviewLimitExceeded
+            ? AppColors.danger.withOpacity(0.12)
+            : AppColors.surfaceAlt,
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(
+          color: isPreviewLimitExceeded
+              ? AppColors.danger.withOpacity(0.35)
+              : AppColors.border,
+        ),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const Text(
+            'Canlı Hesap',
+            style: TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+          const SizedBox(height: 10),
+          Wrap(
+            spacing: 16,
+            runSpacing: 8,
+            children: [
+              Text('• Senaryo: $previewResultLabel'),
+              Text(
+                '• Net Etki: ${netProfit.toStringAsFixed(2)} ₺',
+                style: TextStyle(
+                  color: netColor,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              Text(
+                '• $payoutLabel: ${payout.toStringAsFixed(2)} ₺',
+              ),
+            ],
+          ),
+          if (effectiveMaxStake > 0) ...[
+            const SizedBox(height: 8),
+            Text(
+              '• Bu güven için maksimum bahis: ${effectiveMaxStake.toStringAsFixed(2)} ₺',
+            ),
+          ],
+          if (isPreviewLimitExceeded) ...[
+            const SizedBox(height: 8),
+            const Text(
+              '• Girilen tutar maksimum bahis limitini aşıyor.',
+              style: TextStyle(
+                color: Color(0xFFFCA5A5),
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ],
+        ],
+      ),
+    );
+  }
+}
