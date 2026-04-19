@@ -118,12 +118,25 @@ class BankrollPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),
-                        Text(
-                          '${isDeposit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺',
-                          style: TextStyle(
-                            color: accentColor,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 15,
+                        Container(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: AppSpacing.md,
+                            vertical: AppSpacing.sm,
+                          ),
+                          decoration: BoxDecoration(
+                            color: accentColor.withOpacity(0.14),
+                            borderRadius: BorderRadius.circular(AppRadius.pill),
+                            border: Border.all(
+                              color: accentColor.withOpacity(0.32),
+                            ),
+                          ),
+                          child: Text(
+                            '${isDeposit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺',
+                            style: TextStyle(
+                              color: accentColor,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 14,
+                            ),
                           ),
                         ),
                       ],
@@ -180,7 +193,50 @@ class BankrollPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: const Text('Yeni İşlem'),
+              title: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.28),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.account_balance_wallet_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Yeni İşlem',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Kasaya para ekle veya çekme işlemi oluştur.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -356,7 +412,50 @@ class BankrollPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: const Text('İşlemi Düzenle'),
+              title: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.28),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.edit_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'İşlemi Düzenle',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Kasa hareketini güncelle veya sil.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -514,7 +613,16 @@ class BankrollPage extends StatelessWidget {
                     );
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFDC2626),
+                    backgroundColor: AppColors.danger,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(0, 46),
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppSpacing.md,
+                      vertical: AppSpacing.sm,
+                    ),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                    ),
                   ),
                   child: isDeleting
                       ? const SizedBox(
@@ -525,7 +633,14 @@ class BankrollPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                      : const Text('Sil'),
+                      : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.delete_outline, size: 18),
+                      SizedBox(width: 6),
+                      Text('Sil'),
+                    ],
+                  ),
                 ),
               ],
             );
