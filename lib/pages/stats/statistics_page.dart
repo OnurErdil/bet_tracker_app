@@ -88,6 +88,13 @@ class StatisticsPage extends StatelessWidget {
                 return const Center(child: CircularProgressIndicator());
               }
 
+              if (userSnapshot.hasError) {
+                return ErrorStateCard(
+                  message:
+                  'Kullanıcı verileri yüklenirken hata oluştu:\n${userSnapshot.error}',
+                );
+              }
+
               final userData = userSnapshot.data ?? {};
 
               return StreamBuilder<List<dynamic>>(

@@ -1522,7 +1522,7 @@ class _BetCard extends StatelessWidget {
                   ),
                 ),
               ],
-              const SizedBox(height: AppSpacing.md),const SizedBox(height: AppSpacing.md),
+              const SizedBox(height: AppSpacing.md),
               _BetOutcomeBar(
                 resultLabel: resultLabel,
                 resultColor: resultColor,
