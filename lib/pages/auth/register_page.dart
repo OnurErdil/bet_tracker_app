@@ -190,7 +190,14 @@ class _RegisterPageState extends State<RegisterPage> {
                           color: Colors.white,
                         ),
                       )
-                          : const Text('Kayıt Ol'),
+                          : const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.person_add_alt_1_outlined, size: 18),
+                          SizedBox(width: 6),
+                          Text('Kayıt Ol'),
+                        ],
+                      ),
                     ),
                   ],
                 ),

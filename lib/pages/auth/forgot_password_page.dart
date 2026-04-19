@@ -123,7 +123,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                           color: Colors.white,
                         ),
                       )
-                          : const Text('Bağlantı Gönder'),
+                          : const Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Icon(Icons.send_outlined, size: 18),
+                          SizedBox(width: 6),
+                          Text('Bağlantı Gönder'),
+                        ],
+                      ),
                     ),
                   ],
                 ),
