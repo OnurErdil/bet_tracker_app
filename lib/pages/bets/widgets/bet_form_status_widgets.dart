@@ -1,6 +1,38 @@
 import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
+class BetLockedWarningCard extends StatelessWidget {
+  final String text;
+
+  const BetLockedWarningCard({
+    super.key,
+    this.text = 'Bugün bahis kilitli. Disiplin modu aktif.',
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: double.infinity,
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
+      decoration: BoxDecoration(
+        color: AppColors.danger.withOpacity(0.12),
+        borderRadius: BorderRadius.circular(AppRadius.md),
+        border: Border.all(
+          color: AppColors.danger.withOpacity(0.35),
+        ),
+      ),
+      child: Text(
+        text,
+        style: const TextStyle(
+          fontWeight: FontWeight.bold,
+          color: AppColors.textDangerSoft,
+        ),
+      ),
+    );
+  }
+}
+
 class BetDisciplineInfoCard extends StatelessWidget {
   final String maxStakeInfoText;
   final int confidenceScore;
@@ -157,38 +189,6 @@ class BetLivePreviewCard extends StatelessWidget {
   }
 }
 
-class BetLockedWarningCard extends StatelessWidget {
-  final String message;
-
-  const BetLockedWarningCard({
-    super.key,
-    this.message = 'Bugün bahis kilitli. Disiplin modu aktif.',
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.danger.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(
-          color: AppColors.danger.withOpacity(0.35),
-        ),
-      ),
-      child: Text(
-        message,
-        style: const TextStyle(
-          fontWeight: FontWeight.bold,
-          color: AppColors.textDangerSoft,
-        ),
-      ),
-    );
-  }
-}
-
 class BetConfidenceScoreCard extends StatelessWidget {
   final int confidenceScore;
   final bool isHighConfidenceSelected;
@@ -205,15 +205,23 @@ class BetConfidenceScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accentColor = isHighConfidenceSelected
+        ? const Color(0xFFF59E0B)
+        : AppColors.primary;
+
+    final helperText = isHighConfidenceSelected && effectiveMaxStake > 0
+        ? 'Yüksek güven aktif • Bu seçim için max: ${effectiveMaxStake.toStringAsFixed(2)} ₺'
+        : 'Normal güven • Standart maksimum limit geçerli';
+
     return Container(
       width: double.infinity,
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
+      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+      padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: AppColors.surfaceAlt,
-        borderRadius: BorderRadius.circular(14),
+        borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: AppColors.border,
+          color: accentColor.withOpacity(0.30),
         ),
       ),
       child: Column(
@@ -221,43 +229,62 @@ class BetConfidenceScoreCard extends StatelessWidget {
         children: [
           Row(
             children: [
-              const Icon(Icons.verified_outlined, size: 20),
-              const SizedBox(width: 8),
-              const Text(
-                'Güven Puanı',
-                style: TextStyle(fontWeight: FontWeight.bold),
+              const Expanded(
+                child: Text(
+                  'Güven Puanı',
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              const Spacer(),
-              Text(
-                '$confidenceScore / 10',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  color: isHighConfidenceSelected
-                      ? const Color(0xFFF59E0B)
-                      : Colors.white,
+              Container(
+                padding: const EdgeInsets.symmetric(
+                  horizontal: 10,
+                  vertical: 6,
+                ),
+                decoration: BoxDecoration(
+                  color: accentColor.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(AppRadius.pill),
+                  border: Border.all(
+                    color: accentColor.withOpacity(0.35),
+                  ),
+                ),
+                child: Text(
+                  '$confidenceScore / 10',
+                  style: TextStyle(
+                    color: accentColor,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
           const SizedBox(height: 10),
-          Slider(
-            value: confidenceScore.toDouble(),
-            min: 1,
-            max: 10,
-            divisions: 9,
-            label: '$confidenceScore',
-            onChanged: onChanged,
+          SliderTheme(
+            data: SliderTheme.of(context).copyWith(
+              activeTrackColor: accentColor,
+              inactiveTrackColor: AppColors.border,
+              thumbColor: accentColor,
+              overlayColor: accentColor.withOpacity(0.12),
+              valueIndicatorColor: accentColor,
+            ),
+            child: Slider(
+              value: confidenceScore.toDouble(),
+              min: 1,
+              max: 10,
+              divisions: 9,
+              label: confidenceScore.toString(),
+              onChanged: onChanged,
+            ),
           ),
           Text(
-            isHighConfidenceSelected
-                ? 'Yüksek güven aktif • Bu seçim için max: ${effectiveMaxStake.toStringAsFixed(2)} ₺'
-                : 'Normal güven • Standart max limit geçerli',
+            helperText,
             style: TextStyle(
               color: isHighConfidenceSelected
-                  ? const Color(0xFFF59E0B)
-                  : Colors.white70,
+                  ? accentColor
+                  : AppColors.textSecondary,
               fontWeight: isHighConfidenceSelected
-                  ? FontWeight.bold
+                  ? FontWeight.w600
                   : FontWeight.normal,
             ),
           ),
