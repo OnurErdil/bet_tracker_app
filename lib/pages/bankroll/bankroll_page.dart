@@ -1,4 +1,5 @@
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -25,56 +26,9 @@ class BankrollPage extends StatelessWidget {
           }
 
           if (snapshot.hasError) {
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 520),
-                child: Card(
-                  color: AppColors.surface,
-                  elevation: 0,
-                  shape: AppStyles.cardShape(radius: AppRadius.lg),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: AppColors.danger.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            border: Border.all(
-                              color: AppColors.danger.withOpacity(0.30),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.error_outline,
-                            color: AppColors.danger,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        const Text(
-                          'Kasa hareketleri yüklenemedi',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          '${snapshot.error}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            return ErrorStateCard(
+              message:
+              'Kasa hareketleri yüklenemedi:\n${snapshot.error}',
             );
           }
 
@@ -84,45 +38,9 @@ class BankrollPage extends StatelessWidget {
             return Center(
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 520),
-                child: Card(
-                  color: AppColors.surface,
-                  elevation: 0,
-                  shape: AppStyles.cardShape(radius: AppRadius.lg),
-                  child: const Padding(
-                    padding: EdgeInsets.all(AppSpacing.xl),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircleAvatar(
-                          radius: 28,
-                          backgroundColor: AppColors.surfaceAlt,
-                          child: Icon(
-                            Icons.account_balance_wallet_outlined,
-                            color: AppColors.textSecondary,
-                            size: 28,
-                          ),
-                        ),
-                        SizedBox(height: AppSpacing.md),
-                        Text(
-                          'Henüz işlem yok',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: AppSpacing.xs),
-                        Text(
-                          'İlk kasa hareketini eklediğinde burada listelenecek.',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            color: AppColors.textSecondary,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
+                child: const InfoCard(
+                  text:
+                  'Henüz işlem yok.\nİlk kasa hareketini eklediğinde burada listelenecek.',
                 ),
               ),
             );
@@ -177,13 +95,24 @@ class BankrollPage extends StatelessWidget {
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
-                              const SizedBox(height: 6),
-                              Text(
-                                '${isDeposit ? 'Para Eklendi' : 'Para Çekildi'}\n${_formatDate(tx.createdAt)}',
-                                style: const TextStyle(
-                                  color: AppColors.textSecondary,
-                                  height: 1.35,
-                                ),
+                              const SizedBox(height: AppSpacing.sm),
+                              Wrap(
+                                spacing: 8,
+                                runSpacing: 8,
+                                children: [
+                                  BetInfoChip(
+                                    icon: isDeposit
+                                        ? Icons.arrow_downward
+                                        : Icons.arrow_upward,
+                                    text: isDeposit
+                                        ? 'Para Eklendi'
+                                        : 'Para Çekildi',
+                                  ),
+                                  BetInfoChip(
+                                    icon: Icons.schedule_outlined,
+                                    text: _formatDate(tx.createdAt),
+                                  ),
+                                ],
                               ),
                             ],
                           ),

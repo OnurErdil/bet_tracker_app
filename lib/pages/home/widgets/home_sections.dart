@@ -63,26 +63,12 @@ class DisciplineSection extends StatelessWidget {
           ),
           if (stats.isDailyLossExceeded) ...[
             const SizedBox(height: 14),
-            Container(
-              padding: const EdgeInsets.all(14),
-              decoration: BoxDecoration(
-                color: const Color(0xFFDC2626).withOpacity(0.12),
-                borderRadius: BorderRadius.circular(14),
-                border: Border.all(
-                  color: const Color(0xFFDC2626).withOpacity(0.35),
-                ),
-              ),
-              child: Text(
-                stats.disciplineMode == 'lock_day'
-                    ? 'Günlük kayıp limiti aşıldı. Gün kilitlenmiş durumda.'
-                    : stats.disciplineMode == 'block_bet'
-                    ? 'Günlük kayıp limiti aşıldı. Yeni bahisler engellenir.'
-                    : 'Günlük kayıp limiti aşıldı. Şu an sadece uyarı modundasın.',
-                style: const TextStyle(
-                  color: Color(0xFFFCA5A5),
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
+            WarningCard(
+              message: stats.disciplineMode == 'lock_day'
+                  ? 'Günlük kayıp limiti aşıldı. Gün kilitlenmiş durumda.'
+                  : stats.disciplineMode == 'block_bet'
+                  ? 'Günlük kayıp limiti aşıldı. Yeni bahisler engellenir.'
+                  : 'Günlük kayıp limiti aşıldı. Şu an sadece uyarı modundasın.',
             ),
           ],
         ],
