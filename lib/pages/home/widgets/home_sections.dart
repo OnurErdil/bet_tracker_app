@@ -373,12 +373,25 @@ class RecentBetCard extends StatelessWidget {
           const SizedBox(height: AppSpacing.md),
           Align(
             alignment: Alignment.centerRight,
-            child: Text(
-              '${bet.netProfit.toStringAsFixed(2)} ₺',
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: netColor,
+            child: Container(
+              padding: const EdgeInsets.symmetric(
+                horizontal: AppSpacing.md,
+                vertical: AppSpacing.sm,
+              ),
+              decoration: BoxDecoration(
+                color: netColor.withOpacity(0.14),
+                borderRadius: BorderRadius.circular(AppRadius.pill),
+                border: Border.all(
+                  color: netColor.withOpacity(0.32),
+                ),
+              ),
+              child: Text(
+                '${bet.netProfit.toStringAsFixed(2)} ₺',
+                style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: netColor,
+                ),
               ),
             ),
           ),
