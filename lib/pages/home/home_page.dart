@@ -79,7 +79,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: _positiveHomeColor(),
+        backgroundColor: homeSuccessColor(),
         foregroundColor: Colors.white,
         onPressed: () => _openPage(context, const AddBetPage()),
         icon: const Icon(Icons.add),
@@ -220,14 +220,14 @@ class HomeContent extends StatelessWidget {
                     title: 'Güncel Kasa',
                     value: '${stats.currentBankroll.toStringAsFixed(2)} ₺',
                     valueColor: stats.currentBankroll >= 0
-                        ? _positiveHomeColor()
-                        : _negativeHomeColor(),
+                        ? homeSuccessColor()
+                        : homeDangerColor(),
                     icon: Icons.account_balance_wallet,
                   ),
                   DashboardCard(
                     title: 'Maksimum Oynanabilir Tutar',
                     value: '${stats.maxPlayableAmount.toStringAsFixed(2)} ₺',
-                    valueColor: _warningHomeColor(),
+                    valueColor: homeWarningColor(),
                     icon: Icons.sports_score,
                   ),
                 ],
@@ -249,15 +249,15 @@ class HomeContent extends StatelessWidget {
                     title: 'Bugünkü Sonuç',
                     value: '${stats.todayProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.todayProfit >= 0
-                        ? _positiveHomeColor()
-                        : _negativeHomeColor(),
+                        ? homeSuccessColor()
+                        : homeDangerColor(),
                     icon: Icons.today,
                   ),
                   DashboardCard(
                     title: 'Bekleyen Bahis',
                     value: '${stats.pendingBets.length}',
                     valueColor: stats.pendingBets.isNotEmpty
-                        ? _warningHomeColor()
+                        ? homeWarningColor()
                         : null,
                     icon: Icons.hourglass_bottom,
                   ),
@@ -265,16 +265,16 @@ class HomeContent extends StatelessWidget {
                     title: 'Toplam Kâr / Zarar',
                     value: '${stats.totalProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.totalProfit >= 0
-                        ? _positiveHomeColor()
-                        : _negativeHomeColor(),
+                        ? homeSuccessColor()
+                        : homeDangerColor(),
                     icon: Icons.account_balance_wallet_outlined,
                   ),
                   DashboardCard(
                     title: 'Son 7 Gün',
                     value: '${stats.last7DaysProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.last7DaysProfit >= 0
-                        ? _positiveHomeColor()
-                        : _negativeHomeColor(),
+                        ? homeSuccessColor()
+                        : homeDangerColor(),
                     icon: Icons.date_range,
                   ),
                 ],
@@ -305,7 +305,7 @@ class HomeContent extends StatelessWidget {
                       value: '${stats.pendingBets.length}',
                       icon: Icons.hourglass_bottom,
                       valueColor: stats.pendingBets.isNotEmpty
-                          ? _warningHomeColor()
+                          ? homeWarningColor()
                           : null,
                       compact: true,
                     ),
@@ -314,7 +314,7 @@ class HomeContent extends StatelessWidget {
                       value: '${pendingStakeTotal.toStringAsFixed(2)} ₺',
                       icon: Icons.payments_outlined,
                       valueColor: pendingStakeTotal > 0
-                          ? _warningHomeColor()
+                          ? homeWarningColor()
                           : null,
                       compact: true,
                     ),
