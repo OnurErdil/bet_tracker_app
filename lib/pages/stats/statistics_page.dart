@@ -26,56 +26,9 @@ class StatisticsPage extends StatelessWidget {
           }
 
           if (betSnapshot.hasError) {
-            return Center(
-              child: ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 560),
-                child: Card(
-                  color: AppColors.surface,
-                  elevation: 0,
-                  shape: AppStyles.cardShape(radius: AppRadius.lg),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.xl),
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Container(
-                          width: 56,
-                          height: 56,
-                          decoration: BoxDecoration(
-                            color: AppColors.danger.withOpacity(0.12),
-                            borderRadius: BorderRadius.circular(AppRadius.lg),
-                            border: Border.all(
-                              color: AppColors.danger.withOpacity(0.30),
-                            ),
-                          ),
-                          child: const Icon(
-                            Icons.error_outline,
-                            color: AppColors.danger,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.md),
-                        const Text(
-                          'İstatistikler yüklenemedi',
-                          textAlign: TextAlign.center,
-                          style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        const SizedBox(height: AppSpacing.xs),
-                        Text(
-                          '${betSnapshot.error}',
-                          textAlign: TextAlign.center,
-                          style: const TextStyle(
-                            color: AppColors.textSecondary,
-                            height: 1.4,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
+            return ErrorStateCard(
+              message:
+              'İstatistikler yüklenemedi:\n${betSnapshot.error}',
             );
           }
 
@@ -105,56 +58,9 @@ class StatisticsPage extends StatelessWidget {
                   }
 
                   if (txSnapshot.hasError) {
-                    return Center(
-                      child: ConstrainedBox(
-                        constraints: const BoxConstraints(maxWidth: 560),
-                        child: Card(
-                          color: AppColors.surface,
-                          elevation: 0,
-                          shape: AppStyles.cardShape(radius: AppRadius.lg),
-                          child: Padding(
-                            padding: const EdgeInsets.all(AppSpacing.xl),
-                            child: Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                Container(
-                                  width: 56,
-                                  height: 56,
-                                  decoration: BoxDecoration(
-                                    color: AppColors.danger.withOpacity(0.12),
-                                    borderRadius: BorderRadius.circular(AppRadius.lg),
-                                    border: Border.all(
-                                      color: AppColors.danger.withOpacity(0.30),
-                                    ),
-                                  ),
-                                  child: const Icon(
-                                    Icons.error_outline,
-                                    color: AppColors.danger,
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.md),
-                                const Text(
-                                  'Kasa hareketleri yüklenemedi',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                                const SizedBox(height: AppSpacing.xs),
-                                Text(
-                                  '${txSnapshot.error}',
-                                  textAlign: TextAlign.center,
-                                  style: const TextStyle(
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ),
-                      ),
+                    return ErrorStateCard(
+                      message:
+                      'Kasa hareketleri yüklenemedi:\n${txSnapshot.error}',
                     );
                   }
 
@@ -178,16 +84,22 @@ class StatisticsPage extends StatelessWidget {
                           children: [
                             if (overview.dailyLossLimit > 0 &&
                                 overview.todayLoss >= overview.dailyLossLimit)
-                              const _WarningCard(
-                                text:
-                                'Bugünkü kayıp limiti aşıldı. Bugün frene basma zamanı.',
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 16),
+                                child: WarningCard(
+                                  message:
+                                  'Bugünkü kayıp limiti aşıldı. Bugün frene basma zamanı.',
+                                ),
                               ),
                             if (overview.targetBankroll > 0 &&
                                 overview.currentBankroll >=
                                     overview.targetBankroll)
-                              const _WarningCard(
-                                text:
-                                'Hedef kasaya ulaştın. Hedef tamam, havaya zıplamak serbest.',
+                              const Padding(
+                                padding: EdgeInsets.only(bottom: 16),
+                                child: WarningCard(
+                                  message:
+                                  'Hedef kasaya ulaştın. Hedef tamam, havaya zıplamak serbest.',
+                                ),
                               ),
                             const SizedBox(height: 20),
                             SectionCardShell(
@@ -220,21 +132,21 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'ROI',
                                     value: '%${overview.roi.toStringAsFixed(1)}',
                                     valueColor: overview.roi >= 0
-                                        ? const Color(0xFF22C55E)
-                                        : const Color(0xFFEF4444),
+                                        ? _positiveStatColor()
+                                        : _negativeStatColor(),
                                     icon: Icons.trending_up,
                                   ),
                                   _StatBox(
                                     title: 'Beklemede',
                                     value: '${overview.pendingCount}',
-                                    valueColor: const Color(0xFF94A3B8),
+                                    valueColor: _mutedStatColor(),
                                     icon: Icons.hourglass_bottom,
                                   ),
                                   _StatBox(
                                     title: 'Bugünkü Kayıp',
                                     value: '${overview.todayLoss.toStringAsFixed(2)} ₺',
                                     valueColor: overview.todayLoss > 0
-                                        ? const Color(0xFFEF4444)
+                                        ? _negativeStatColor()
                                         : null,
                                     icon: Icons.today,
                                   ),
@@ -264,8 +176,8 @@ class StatisticsPage extends StatelessWidget {
                                             title: 'Net Kâr / Zarar',
                                             value: '${overview.totalProfit.toStringAsFixed(2)} ₺',
                                             valueColor: overview.totalProfit >= 0
-                                                ? const Color(0xFF22C55E)
-                                                : const Color(0xFFEF4444),
+                                                ? _positiveStatColor()
+                                                : _negativeStatColor(),
                                             icon: Icons.account_balance_wallet,
                                           ),
                                         ),
@@ -275,8 +187,8 @@ class StatisticsPage extends StatelessWidget {
                                             title: 'Kasa Hareketleri',
                                             value: '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
                                             valueColor: overview.bankrollMovement >= 0
-                                                ? const Color(0xFF22C55E)
-                                                : const Color(0xFFEF4444),
+                                                ? _positiveStatColor()
+                                                : _negativeStatColor(),
                                             icon: Icons.swap_horiz,
                                           ),
                                         ),
@@ -286,8 +198,8 @@ class StatisticsPage extends StatelessWidget {
                                             title: 'Mevcut Kasa',
                                             value: '${overview.currentBankroll.toStringAsFixed(2)} ₺',
                                             valueColor: overview.currentBankroll >= overview.startingBankroll
-                                                ? const Color(0xFF22C55E)
-                                                : const Color(0xFFEF4444),
+                                                ? _positiveStatColor()
+                                                : _negativeStatColor(),
                                             icon: Icons.paid_outlined,
                                           ),
                                         ),
@@ -306,8 +218,8 @@ class StatisticsPage extends StatelessWidget {
                                           title: 'Net Kâr / Zarar',
                                           value: '${overview.totalProfit.toStringAsFixed(2)} ₺',
                                           valueColor: overview.totalProfit >= 0
-                                              ? const Color(0xFF22C55E)
-                                              : const Color(0xFFEF4444),
+                                              ? _positiveStatColor()
+                                              : _negativeStatColor(),
                                           icon: Icons.account_balance_wallet,
                                         ),
                                         const SizedBox(height: 12),
@@ -315,8 +227,8 @@ class StatisticsPage extends StatelessWidget {
                                           title: 'Kasa Hareketleri',
                                           value: '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
                                           valueColor: overview.bankrollMovement >= 0
-                                              ? const Color(0xFF22C55E)
-                                              : const Color(0xFFEF4444),
+                                              ? _positiveStatColor()
+                                              : _negativeStatColor(),
                                           icon: Icons.swap_horiz,
                                         ),
                                         const SizedBox(height: 12),
@@ -324,8 +236,8 @@ class StatisticsPage extends StatelessWidget {
                                           title: 'Mevcut Kasa',
                                           value: '${overview.currentBankroll.toStringAsFixed(2)} ₺',
                                           valueColor: overview.currentBankroll >= overview.startingBankroll
-                                              ? const Color(0xFF22C55E)
-                                              : const Color(0xFFEF4444),
+                                              ? _positiveStatColor()
+                                              : _negativeStatColor(),
                                           icon: Icons.paid_outlined,
                                         ),
                                       ],
@@ -338,7 +250,8 @@ class StatisticsPage extends StatelessWidget {
                                         overview.startingBankroll,
                                       );
                                     },
-                                    icon: const Icon(Icons.edit),
+                                    style: _primaryActionButtonStyle(),
+                                    icon: const Icon(Icons.edit_outlined, size: 18),
                                     label: const Text('Başlangıç Kasasını Ayarla'),
                                   ),
                                 ],
@@ -438,7 +351,8 @@ class StatisticsPage extends StatelessWidget {
                                         confidence10Multiplier: overview.confidence10Multiplier,
                                       );
                                     },
-                                    icon: const Icon(Icons.tune),
+                                    style: _primaryActionButtonStyle(),
+                                    icon: const Icon(Icons.tune, size: 18),
                                     label: const Text('Disiplin Ayarlarını Düzenle'),
                                   ),
                                   const SizedBox(height: 12),
@@ -446,10 +360,11 @@ class StatisticsPage extends StatelessWidget {
                                     onPressed: () {
                                       _showResetDialog(context);
                                     },
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: const Color(0xFFDC2626),
+                                    style: _dangerActionButtonStyle(),
+                                    icon: const Icon(
+                                      Icons.delete_forever_outlined,
+                                      size: 18,
                                     ),
-                                    icon: const Icon(Icons.delete_forever),
                                     label: const Text('Tüm Verileri Sıfırla'),
                                   ),
                                 ],
@@ -471,13 +386,13 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'En Kârlı Spor',
                                     value: overview.bestSport,
                                     icon: Icons.emoji_events_outlined,
-                                    valueColor: const Color(0xFF22C55E),
+                                    valueColor: _positiveStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Zararlı Spor',
                                     value: overview.worstSport,
                                     icon: Icons.sentiment_dissatisfied_outlined,
-                                    valueColor: const Color(0xFFEF4444),
+                                    valueColor: _negativeStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Çok Oynanan Spor',
@@ -489,7 +404,7 @@ class StatisticsPage extends StatelessWidget {
                                     value: '%${overview.pendingRate.toStringAsFixed(1)}',
                                     icon: Icons.pending_actions_outlined,
                                     valueColor: overview.pendingRate > 0
-                                        ? const Color(0xFFF59E0B)
+                                        ? _warningStatColor()
                                         : null,
                                   ),
                                 ],
@@ -511,25 +426,25 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'En İyi Gün',
                                     value: overview.bestDayLabel,
                                     icon: Icons.wb_sunny_outlined,
-                                    valueColor: const Color(0xFF22C55E),
+                                    valueColor: _positiveStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Kötü Gün',
                                     value: overview.worstDayLabel,
                                     icon: Icons.thunderstorm_outlined,
-                                    valueColor: const Color(0xFFEF4444),
+                                    valueColor: _negativeStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Uzun Kazanma Serisi',
                                     value: '${overview.winStreak}',
                                     icon: Icons.trending_up,
-                                    valueColor: const Color(0xFF22C55E),
+                                    valueColor: _positiveStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Uzun Kaybetme Serisi',
                                     value: '${overview.lossStreak}',
                                     icon: Icons.trending_down,
-                                    valueColor: const Color(0xFFEF4444),
+                                    valueColor: _negativeStatColor(),
                                   ),
                                 ],
                               ),
@@ -551,7 +466,7 @@ class StatisticsPage extends StatelessWidget {
                                     value: '${overview.highConfidenceBetCount}',
                                     icon: Icons.verified_outlined,
                                     valueColor: overview.highConfidenceBetCount > 0
-                                        ? const Color(0xFFF59E0B)
+                                        ? _warningStatColor()
                                         : null,
                                   ),
                                   _StatBox(
@@ -559,22 +474,22 @@ class StatisticsPage extends StatelessWidget {
                                     value: '%${overview.highConfidenceWinRate.toStringAsFixed(1)}',
                                     icon: Icons.track_changes,
                                     valueColor: overview.highConfidenceWinRate >= 50
-                                        ? const Color(0xFF22C55E)
-                                        : const Color(0xFFEF4444),
+                                        ? _positiveStatColor()
+                                        : _negativeStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'Güven 9-10 Kâr / Zarar',
                                     value: '${overview.highConfidenceProfit.toStringAsFixed(2)} ₺',
                                     icon: Icons.paid_outlined,
                                     valueColor: overview.highConfidenceProfit >= 0
-                                        ? const Color(0xFF22C55E)
-                                        : const Color(0xFFEF4444),
+                                        ? _positiveStatColor()
+                                        : _negativeStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Kârlı Güven Seviyesi',
                                     value: overview.bestConfidenceLabel,
                                     icon: Icons.emoji_events_outlined,
-                                    valueColor: const Color(0xFFF59E0B),
+                                    valueColor: _warningStatColor(),
                                   ),
                                 ],
                               ),
@@ -584,16 +499,9 @@ class StatisticsPage extends StatelessWidget {
                               title: 'Güven Puanına Göre Özet',
                               padding: const EdgeInsets.all(20),
                               child: overview.confidenceStats.isEmpty
-                                  ? const Padding(
-                                padding: EdgeInsets.all(AppSpacing.md),
-                                child: Text(
-                                  'Henüz güven puanı bazlı istatistik gösterecek veri yok.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
-                                ),
+                                  ? const _SectionEmptyState(
+                                text:
+                                'Henüz güven puanı bazlı istatistik gösterecek veri yok.',
                               )
                                   : Column(
                                 children: (() {
@@ -616,8 +524,8 @@ class StatisticsPage extends StatelessWidget {
                                       'Bahis: $count | Settled: $settled | Win Rate: %${winRate.toStringAsFixed(1)}',
                                       value: '${profit.toStringAsFixed(2)} ₺',
                                       valueColor: profit >= 0
-                                          ? const Color(0xFF22C55E)
-                                          : const Color(0xFFEF4444),
+                                          ? _positiveStatColor()
+                                          : _negativeStatColor(),
                                     );
                                   }).toList();
                                 })(),
@@ -628,16 +536,9 @@ class StatisticsPage extends StatelessWidget {
                               title: 'Bahis Türüne Göre Özet',
                               padding: const EdgeInsets.all(20),
                               child: overview.betTypeStats.isEmpty
-                                  ? const Padding(
-                                padding: EdgeInsets.all(AppSpacing.md),
-                                child: Text(
-                                  'Henüz bahis türü bazlı istatistik gösterecek veri yok.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
-                                ),
+                                  ? const _SectionEmptyState(
+                                text:
+                                'Henüz bahis türü bazlı istatistik gösterecek veri yok.',
                               )
                                   : Column(
                                 children: overview.betTypeStats.entries.map((entry) {
@@ -659,8 +560,8 @@ class StatisticsPage extends StatelessWidget {
                                     'Bahis: $typeCount | Kazanma Oranı: %${typeWinRate.toStringAsFixed(1)}',
                                     value: '${typeProfit.toStringAsFixed(2)} ₺',
                                     valueColor: typeProfit >= 0
-                                        ? const Color(0xFF22C55E)
-                                        : const Color(0xFFEF4444),
+                                        ? _positiveStatColor()
+                                        : _negativeStatColor(),
                                   );
                                 }).toList(),
                               ),
@@ -670,16 +571,9 @@ class StatisticsPage extends StatelessWidget {
                               title: 'Spor Dalına Göre Özet',
                               padding: const EdgeInsets.all(20),
                               child: overview.sportStats.isEmpty
-                                  ? const Padding(
-                                padding: EdgeInsets.all(AppSpacing.md),
-                                child: Text(
-                                  'Henüz spor bazlı istatistik gösterecek veri yok.',
-                                  textAlign: TextAlign.center,
-                                  style: TextStyle(
-                                    color: AppColors.textSecondary,
-                                    height: 1.4,
-                                  ),
-                                ),
+                                  ? const _SectionEmptyState(
+                                text:
+                                'Henüz spor bazlı istatistik gösterecek veri yok.',
                               )
                                   : Column(
                                 children: overview.sportStats.entries.map((entry) {
@@ -698,8 +592,8 @@ class StatisticsPage extends StatelessWidget {
                                     'Bahis: $sportCount | Kazanma Oranı: %${sportWinRate.toStringAsFixed(1)}',
                                     value: '${sportProfit.toStringAsFixed(2)} ₺',
                                     valueColor: sportProfit >= 0
-                                        ? const Color(0xFF22C55E)
-                                        : const Color(0xFFEF4444),
+                                        ? _positiveStatColor()
+                                        : _negativeStatColor(),
                                   );
                                 }).toList(),
                               ),
@@ -720,13 +614,13 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'En Büyük Tek Kazanç',
                                     value: overview.biggestWinLabel,
                                     icon: Icons.arrow_upward,
-                                    valueColor: const Color(0xFF22C55E),
+                                    valueColor: _positiveStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Büyük Tek Kayıp',
                                     value: overview.biggestLossLabel,
                                     icon: Icons.arrow_downward,
-                                    valueColor: const Color(0xFFEF4444),
+                                    valueColor: _negativeStatColor(),
                                   ),
                                   _StatBox(
                                     title: 'En Çok Oynanan Bahis Türü',
@@ -790,7 +684,50 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: const Text('Başlangıç Kasası'),
+              title: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.28),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.savings_outlined,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Başlangıç Kasası',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Kasa başlangıç tutarını güncelle.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               content: TextField(
                 controller: controller,
                 keyboardType: const TextInputType.numberWithOptions(
@@ -854,6 +791,7 @@ class StatisticsPage extends StatelessWidget {
                       ),
                     );
                   },
+                  style: _primaryActionButtonStyle(),
                   child: isSaving
                       ? const SizedBox(
                     height: 18,
@@ -863,7 +801,14 @@ class StatisticsPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                      : const Text('Kaydet'),
+                      : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.save_outlined, size: 18),
+                      SizedBox(width: 6),
+                      Text('Kaydet'),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -932,7 +877,50 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: const Text('Disiplin Ayarları'),
+              title: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.primary.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: AppColors.primary.withOpacity(0.28),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.tune,
+                      color: AppColors.primary,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Disiplin Ayarları',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Maksimum bahis, günlük limit ve güven ayarlarını güncelle.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -1029,7 +1017,7 @@ class StatisticsPage extends StatelessWidget {
                     const SizedBox(height: 12),
                     SwitchListTile(
                       value: selectedHighConfidenceEnabled,
-                      activeColor: const Color(0xFF16A34A),
+                      activeColor: AppColors.primary,
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Yüksek Güven Limit Aşımı'),
                       subtitle: const Text(
@@ -1086,17 +1074,17 @@ class StatisticsPage extends StatelessWidget {
                     final maxStakeValueParsed = double.tryParse(
                       maxStakeController.text.trim().replaceAll(',', '.'),
                     ) ??
-                        0;
+                        0.0;
 
                     final dailyLossValue = double.tryParse(
                       dailyLossController.text.trim().replaceAll(',', '.'),
                     ) ??
-                        0;
+                        0.0;
 
                     final targetBankrollValue = double.tryParse(
                       targetBankrollController.text.trim().replaceAll(',', '.'),
                     ) ??
-                        0;
+                        0.0;
 
                     final confidence9Value = double.tryParse(
                       confidence9Controller.text.trim().replaceAll(',', '.'),
@@ -1163,6 +1151,7 @@ class StatisticsPage extends StatelessWidget {
                       ),
                     );
                   },
+                  style: _primaryActionButtonStyle(),
                   child: isSaving
                       ? const SizedBox(
                     height: 18,
@@ -1172,7 +1161,14 @@ class StatisticsPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                      : const Text('Kaydet'),
+                      : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.save_outlined, size: 18),
+                      SizedBox(width: 6),
+                      Text('Kaydet'),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -1223,7 +1219,50 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: const Text('Tüm Verileri Sıfırla'),
+              title: Row(
+                children: [
+                  Container(
+                    width: 42,
+                    height: 42,
+                    decoration: BoxDecoration(
+                      color: AppColors.danger.withOpacity(0.14),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: AppColors.danger.withOpacity(0.28),
+                      ),
+                    ),
+                    child: const Icon(
+                      Icons.delete_forever_outlined,
+                      color: AppColors.danger,
+                      size: 20,
+                    ),
+                  ),
+                  const SizedBox(width: AppSpacing.md),
+                  const Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        Text(
+                          'Tüm Verileri Sıfırla',
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        SizedBox(height: 4),
+                        Text(
+                          'Bu işlem tüm bahis, kasa ve disiplin verilerini temizler.',
+                          style: TextStyle(
+                            fontSize: 12,
+                            color: AppColors.textSecondary,
+                            height: 1.3,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                ],
+              ),
               content: const Text(
                 'Bu işlem tüm bahisleri, kasa hareketlerini ve başlangıç kasasını sıfırlar. Bu işlem geri alınamaz.',
               ),
@@ -1260,14 +1299,11 @@ class StatisticsPage extends StatelessWidget {
 
                     ScaffoldMessenger.of(context).showSnackBar(
                       const SnackBar(
-                        content:
-                        Text('Tüm veriler başarıyla sıfırlandı.'),
+                        content: Text('Tüm veriler başarıyla sıfırlandı.'),
                       ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFDC2626),
-                  ),
+                  style: _dangerActionButtonStyle(),
                   child: isResetting
                       ? const SizedBox(
                     height: 18,
@@ -1277,7 +1313,14 @@ class StatisticsPage extends StatelessWidget {
                       color: Colors.white,
                     ),
                   )
-                      : const Text('Sıfırla'),
+                      : const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.delete_forever_outlined, size: 18),
+                      SizedBox(width: 6),
+                      Text('Sıfırla'),
+                    ],
+                  ),
                 ),
               ],
             );
@@ -1344,7 +1387,7 @@ class ProfitChart extends StatelessWidget {
                   return Text(
                     value.toStringAsFixed(0),
                     style: const TextStyle(
-                      color: Colors.white70,
+                      color: AppColors.textSecondary,
                       fontSize: 11,
                     ),
                   );
@@ -1368,7 +1411,7 @@ class ProfitChart extends StatelessWidget {
                     child: Text(
                       '${date.day}/${date.month}',
                       style: const TextStyle(
-                        color: Colors.white70,
+                        color: AppColors.textSecondary,
                         fontSize: 10,
                       ),
                     ),
@@ -1379,51 +1422,21 @@ class ProfitChart extends StatelessWidget {
           ),
           borderData: FlBorderData(
             show: true,
-            border: Border.all(color: const Color(0xFF2A3140)),
+            border: Border.all(color: AppColors.border),
           ),
           lineBarsData: [
             LineChartBarData(
               spots: spots,
               isCurved: true,
-              color: const Color(0xFF16A34A),
+              color: AppColors.primary,
               barWidth: 3,
               dotData: const FlDotData(show: false),
               belowBarData: BarAreaData(
                 show: true,
-                color: const Color(0xFF16A34A).withOpacity(0.15),
+                color: AppColors.primary.withOpacity(0.15),
               ),
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class _WarningCard extends StatelessWidget {
-  final String text;
-
-  const _WarningCard({
-    required this.text,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(14),
-      decoration: BoxDecoration(
-        color: const Color(0xFFDC2626).withOpacity(0.12),
-        borderRadius: BorderRadius.circular(14),
-        border: Border.all(
-          color: const Color(0xFFDC2626).withOpacity(0.35),
-        ),
-      ),
-      child: Text(
-        text,
-        style: const TextStyle(
-          color: Color(0xFFFCA5A5),
-          fontWeight: FontWeight.bold,
         ),
       ),
     );
@@ -1455,6 +1468,64 @@ class _StatBox extends StatelessWidget {
   }
 }
 
+Color _positiveStatColor() => const Color(0xFF22C55E);
+Color _negativeStatColor() => const Color(0xFFEF4444);
+Color _warningStatColor() => const Color(0xFFF59E0B);
+Color _mutedStatColor() => const Color(0xFF94A3B8);
+
+ButtonStyle _primaryActionButtonStyle() {
+  return ElevatedButton.styleFrom(
+    backgroundColor: AppColors.primary,
+    foregroundColor: Colors.white,
+    minimumSize: const Size(0, 46),
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.md,
+      vertical: AppSpacing.sm,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppRadius.md),
+    ),
+  );
+}
+
+ButtonStyle _dangerActionButtonStyle() {
+  return ElevatedButton.styleFrom(
+    backgroundColor: AppColors.danger,
+    foregroundColor: Colors.white,
+    minimumSize: const Size(0, 46),
+    padding: const EdgeInsets.symmetric(
+      horizontal: AppSpacing.md,
+      vertical: AppSpacing.sm,
+    ),
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(AppRadius.md),
+    ),
+  );
+}
+
+class _SectionEmptyState extends StatelessWidget {
+  final String text;
+
+  const _SectionEmptyState({
+    required this.text,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(AppSpacing.md),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: const TextStyle(
+          color: AppColors.textSecondary,
+          height: 1.4,
+        ),
+      ),
+    );
+  }
+}
+
 class _Last10FormStat extends StatelessWidget {
   final List<Map<String, String>> formItems;
 
@@ -1468,16 +1539,16 @@ class _Last10FormStat extends StatelessWidget {
 
       switch (item['color']) {
         case 'green':
-          color = const Color(0xFF22C55E);
+          color = _positiveStatColor();
           break;
         case 'red':
-          color = const Color(0xFFEF4444);
+          color = _negativeStatColor();
           break;
         case 'orange':
-          color = const Color(0xFFF59E0B);
+          color = _warningStatColor();
           break;
         default:
-          color = const Color(0xFF94A3B8);
+          color = _mutedStatColor();
       }
 
       return FormSequenceEntry(
