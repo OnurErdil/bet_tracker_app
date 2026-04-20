@@ -46,7 +46,7 @@ class DisciplineSection extends StatelessWidget {
                 title: 'Bugünkü Kayıp',
                 value: '${stats.todayLoss.toStringAsFixed(2)} ₺',
                 valueColor:
-                stats.todayLoss > 0 ? const Color(0xFFEF4444) : null,
+                stats.todayLoss > 0 ? homeDangerColor() : null,
                 icon: Icons.trending_down,
               ),
               DashboardCard(
@@ -55,8 +55,8 @@ class DisciplineSection extends StatelessWidget {
                     ? '${stats.remainingDailyLoss > 0 ? stats.remainingDailyLoss.toStringAsFixed(2) : '0.00'} ₺'
                     : 'Sınırsız',
                 valueColor: stats.isDailyLossExceeded
-                    ? const Color(0xFFEF4444)
-                    : const Color(0xFF22C55E),
+                    ? homeDangerColor()
+                    : homeSuccessColor(),
                 icon: Icons.speed,
               ),
             ],
@@ -106,7 +106,7 @@ class MiniAnalysisSection extends StatelessWidget {
                 : '${stats.biggestWin!.netProfit.toStringAsFixed(2)} ₺',
             valueColor: stats.biggestWin != null &&
                 stats.biggestWin!.netProfit > 0
-                ? const Color(0xFF22C55E)
+                ? homeSuccessColor()
                 : null,
             icon: Icons.arrow_upward,
           ),
@@ -117,7 +117,7 @@ class MiniAnalysisSection extends StatelessWidget {
                 : '${stats.biggestLoss!.netProfit.toStringAsFixed(2)} ₺',
             valueColor: stats.biggestLoss != null &&
                 stats.biggestLoss!.netProfit < 0
-                ? const Color(0xFFEF4444)
+                ? homeDangerColor()
                 : null,
             icon: Icons.arrow_downward,
           ),
@@ -236,7 +236,7 @@ class PendingBetCard extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => onQuickSettle(bet, 'kazandi'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF22C55E),
+                  backgroundColor: homeSuccessColor(),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(0, 44),
                   padding: const EdgeInsets.symmetric(
@@ -256,7 +256,7 @@ class PendingBetCard extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => onQuickSettle(bet, 'kaybetti'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFEF4444),
+                  backgroundColor: homeDangerColor(),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(0, 44),
                   padding: const EdgeInsets.symmetric(
@@ -276,7 +276,7 @@ class PendingBetCard extends StatelessWidget {
               ElevatedButton(
                 onPressed: () => onQuickSettle(bet, 'iade'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFF59E0B),
+                  backgroundColor: homeWarningColor(),
                   foregroundColor: Colors.white,
                   minimumSize: const Size(0, 44),
                   padding: const EdgeInsets.symmetric(

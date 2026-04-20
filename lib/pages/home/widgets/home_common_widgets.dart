@@ -29,12 +29,19 @@ String disciplineModeText(String mode) {
   }
 }
 
+Color homeSuccessColor() => const Color(0xFF22C55E);
+Color homeDangerColor() => const Color(0xFFEF4444);
+Color homeWarningColor() => const Color(0xFFF59E0B);
+Color homeMutedColor() => const Color(0xFF94A3B8);
+Color homeInfoColor() => const Color(0xFF0EA5E9);
+Color homeHighConfidenceColor() => const Color(0xFFEA580C);
+
 Color confidenceBadgeColor(int score) {
-  if (score >= 10) return const Color(0xFFEA580C);
-  if (score >= 9) return const Color(0xFFF59E0B);
-  if (score >= 7) return const Color(0xFF16A34A);
-  if (score >= 5) return const Color(0xFF0EA5E9);
-  return const Color(0xFF64748B);
+  if (score >= 10) return homeHighConfidenceColor();
+  if (score >= 9) return homeWarningColor();
+  if (score >= 7) return homeSuccessColor();
+  if (score >= 5) return homeInfoColor();
+  return homeMutedColor();
 }
 
 class ConfidenceBadge extends StatelessWidget {
@@ -465,24 +472,24 @@ class Last10FormCard extends StatelessWidget {
     return bets.map((bet) {
       switch (bet.result) {
         case 'kazandi':
-          return const FormSequenceEntry(
+          return FormSequenceEntry(
             label: 'W',
-            color: Color(0xFF22C55E),
+            color: homeSuccessColor(),
           );
         case 'kaybetti':
-          return const FormSequenceEntry(
+          return FormSequenceEntry(
             label: 'L',
-            color: Color(0xFFEF4444),
+            color: homeDangerColor(),
           );
         case 'iade':
-          return const FormSequenceEntry(
+          return FormSequenceEntry(
             label: 'I',
-            color: Color(0xFFF59E0B),
+            color: homeWarningColor(),
           );
         default:
-          return const FormSequenceEntry(
+          return FormSequenceEntry(
             label: 'B',
-            color: Color(0xFF94A3B8),
+            color: homeMutedColor(),
           );
       }
     }).toList();

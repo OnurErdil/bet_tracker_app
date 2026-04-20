@@ -79,7 +79,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: const Color(0xFF16A34A),
+        backgroundColor: _positiveHomeColor(),
         foregroundColor: Colors.white,
         onPressed: () => _openPage(context, const AddBetPage()),
         icon: const Icon(Icons.add),
@@ -166,6 +166,10 @@ class HomeDataLoader extends StatelessWidget {
   }
 }
 
+Color _positiveHomeColor() => const Color(0xFF22C55E);
+Color _negativeHomeColor() => const Color(0xFFEF4444);
+Color _warningHomeColor() => const Color(0xFFF59E0B);
+
 class HomeContent extends StatelessWidget {
   final String userEmail;
   final HomeStats stats;
@@ -216,14 +220,14 @@ class HomeContent extends StatelessWidget {
                     title: 'Güncel Kasa',
                     value: '${stats.currentBankroll.toStringAsFixed(2)} ₺',
                     valueColor: stats.currentBankroll >= 0
-                        ? const Color(0xFF22C55E)
-                        : const Color(0xFFEF4444),
+                        ? _positiveHomeColor()
+                        : _negativeHomeColor(),
                     icon: Icons.account_balance_wallet,
                   ),
                   DashboardCard(
                     title: 'Maksimum Oynanabilir Tutar',
                     value: '${stats.maxPlayableAmount.toStringAsFixed(2)} ₺',
-                    valueColor: const Color(0xFFF59E0B),
+                    valueColor: _warningHomeColor(),
                     icon: Icons.sports_score,
                   ),
                 ],
@@ -245,15 +249,15 @@ class HomeContent extends StatelessWidget {
                     title: 'Bugünkü Sonuç',
                     value: '${stats.todayProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.todayProfit >= 0
-                        ? const Color(0xFF22C55E)
-                        : const Color(0xFFEF4444),
+                        ? _positiveHomeColor()
+                        : _negativeHomeColor(),
                     icon: Icons.today,
                   ),
                   DashboardCard(
                     title: 'Bekleyen Bahis',
                     value: '${stats.pendingBets.length}',
                     valueColor: stats.pendingBets.isNotEmpty
-                        ? const Color(0xFFF59E0B)
+                        ? _warningHomeColor()
                         : null,
                     icon: Icons.hourglass_bottom,
                   ),
@@ -261,16 +265,16 @@ class HomeContent extends StatelessWidget {
                     title: 'Toplam Kâr / Zarar',
                     value: '${stats.totalProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.totalProfit >= 0
-                        ? const Color(0xFF22C55E)
-                        : const Color(0xFFEF4444),
+                        ? _positiveHomeColor()
+                        : _negativeHomeColor(),
                     icon: Icons.account_balance_wallet_outlined,
                   ),
                   DashboardCard(
                     title: 'Son 7 Gün',
                     value: '${stats.last7DaysProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.last7DaysProfit >= 0
-                        ? const Color(0xFF22C55E)
-                        : const Color(0xFFEF4444),
+                        ? _positiveHomeColor()
+                        : _negativeHomeColor(),
                     icon: Icons.date_range,
                   ),
                 ],
@@ -301,7 +305,7 @@ class HomeContent extends StatelessWidget {
                       value: '${stats.pendingBets.length}',
                       icon: Icons.hourglass_bottom,
                       valueColor: stats.pendingBets.isNotEmpty
-                          ? const Color(0xFFF59E0B)
+                          ? _warningHomeColor()
                           : null,
                       compact: true,
                     ),
@@ -310,7 +314,7 @@ class HomeContent extends StatelessWidget {
                       value: '${pendingStakeTotal.toStringAsFixed(2)} ₺',
                       icon: Icons.payments_outlined,
                       valueColor: pendingStakeTotal > 0
-                          ? const Color(0xFFF59E0B)
+                          ? _warningHomeColor()
                           : null,
                       compact: true,
                     ),
