@@ -14,9 +14,12 @@ class BankrollPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Kasa Hareketleri'),
       ),
-      floatingActionButton: FloatingActionButton(
+      floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddDialog(context),
-        child: const Icon(Icons.add),
+        backgroundColor: AppColors.primary,
+        foregroundColor: Colors.white,
+        icon: const Icon(Icons.add),
+        label: const Text('İşlem Ekle'),
       ),
       body: StreamBuilder<List<BankrollTransaction>>(
         stream: BankrollService.getTransactions(),
@@ -310,7 +313,7 @@ class BankrollPage extends StatelessWidget {
                       controller: noteController,
                       decoration: const InputDecoration(
                         labelText: 'Not',
-                        hintText: 'Örn: Kasa takviyesi',
+                        hintText: 'Örn: Nakit ekleme / çekim nedeni',
                         prefixIcon: Icon(Icons.note_alt_outlined),
                       ),
                     ),
@@ -538,6 +541,7 @@ class BankrollPage extends StatelessWidget {
                       controller: noteController,
                       decoration: const InputDecoration(
                         labelText: 'Not',
+                        hintText: 'Örn: Nakit ekleme / çekim nedeni',
                         prefixIcon: Icon(Icons.note_alt_outlined),
                       ),
                     ),
