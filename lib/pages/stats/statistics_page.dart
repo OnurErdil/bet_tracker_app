@@ -131,22 +131,22 @@ class StatisticsPage extends StatelessWidget {
                                   _StatBox(
                                     title: 'ROI',
                                     value: '%${overview.roi.toStringAsFixed(1)}',
-                                    valueColor: overview.roi >= 0
-                                        ? _positiveStatColor()
-                                        : _negativeStatColor(),
+                                    tone: overview.roi >= 0
+                                        ? StatusTone.success
+                                        : StatusTone.danger,
                                     icon: Icons.trending_up,
                                   ),
                                   _StatBox(
                                     title: 'Beklemede',
                                     value: '${overview.pendingCount}',
-                                    valueColor: _mutedStatColor(),
+                                    tone: StatusTone.muted,
                                     icon: Icons.hourglass_bottom,
                                   ),
                                   _StatBox(
                                     title: 'Bugünkü Kayıp',
                                     value: '${overview.todayLoss.toStringAsFixed(2)} ₺',
-                                    valueColor: overview.todayLoss > 0
-                                        ? _negativeStatColor()
+                                    tone: overview.todayLoss > 0
+                                        ? StatusTone.danger
                                         : null,
                                     icon: Icons.today,
                                   ),
@@ -175,9 +175,9 @@ class StatisticsPage extends StatelessWidget {
                                           child: _StatBox(
                                             title: 'Net Kâr / Zarar',
                                             value: '${overview.totalProfit.toStringAsFixed(2)} ₺',
-                                            valueColor: overview.totalProfit >= 0
-                                                ? _positiveStatColor()
-                                                : _negativeStatColor(),
+                                            tone: overview.totalProfit >= 0
+                                                ? StatusTone.success
+                                                : StatusTone.danger,
                                             icon: Icons.account_balance_wallet,
                                           ),
                                         ),
@@ -186,9 +186,9 @@ class StatisticsPage extends StatelessWidget {
                                           child: _StatBox(
                                             title: 'Kasa Hareketleri',
                                             value: '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
-                                            valueColor: overview.bankrollMovement >= 0
-                                                ? _positiveStatColor()
-                                                : _negativeStatColor(),
+                                            tone: overview.bankrollMovement >= 0
+                                                ? StatusTone.success
+                                                : StatusTone.danger,
                                             icon: Icons.swap_horiz,
                                           ),
                                         ),
@@ -197,9 +197,9 @@ class StatisticsPage extends StatelessWidget {
                                           child: _StatBox(
                                             title: 'Mevcut Kasa',
                                             value: '${overview.currentBankroll.toStringAsFixed(2)} ₺',
-                                            valueColor: overview.currentBankroll >= overview.startingBankroll
-                                                ? _positiveStatColor()
-                                                : _negativeStatColor(),
+                                            tone: overview.currentBankroll >= overview.startingBankroll
+                                                ? StatusTone.success
+                                                : StatusTone.danger,
                                             icon: Icons.paid_outlined,
                                           ),
                                         ),
@@ -386,13 +386,13 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'En Kârlı Spor',
                                     value: overview.bestSport,
                                     icon: Icons.emoji_events_outlined,
-                                    valueColor: _positiveStatColor(),
+                                    tone: StatusTone.success,
                                   ),
                                   _StatBox(
                                     title: 'En Zararlı Spor',
                                     value: overview.worstSport,
                                     icon: Icons.sentiment_dissatisfied_outlined,
-                                    valueColor: _negativeStatColor(),
+                                    tone: StatusTone.danger,
                                   ),
                                   _StatBox(
                                     title: 'En Çok Oynanan Spor',
@@ -403,8 +403,8 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'Beklemede Oranı',
                                     value: '%${overview.pendingRate.toStringAsFixed(1)}',
                                     icon: Icons.pending_actions_outlined,
-                                    valueColor: overview.pendingRate > 0
-                                        ? _warningStatColor()
+                                    tone: overview.pendingRate > 0
+                                        ? StatusTone.warning
                                         : null,
                                   ),
                                 ],
@@ -426,25 +426,25 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'En İyi Gün',
                                     value: overview.bestDayLabel,
                                     icon: Icons.wb_sunny_outlined,
-                                    valueColor: _positiveStatColor(),
+                                    tone: StatusTone.success,
                                   ),
                                   _StatBox(
                                     title: 'En Kötü Gün',
                                     value: overview.worstDayLabel,
                                     icon: Icons.thunderstorm_outlined,
-                                    valueColor: _negativeStatColor(),
+                                    tone: StatusTone.danger,
                                   ),
                                   _StatBox(
                                     title: 'En Uzun Kazanma Serisi',
                                     value: '${overview.winStreak}',
                                     icon: Icons.trending_up,
-                                    valueColor: _positiveStatColor(),
+                                    tone: StatusTone.success,
                                   ),
                                   _StatBox(
                                     title: 'En Uzun Kaybetme Serisi',
                                     value: '${overview.lossStreak}',
                                     icon: Icons.trending_down,
-                                    valueColor: _negativeStatColor(),
+                                    tone: StatusTone.danger,
                                   ),
                                 ],
                               ),
@@ -465,31 +465,31 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'Yüksek Güven Bahis Sayısı',
                                     value: '${overview.highConfidenceBetCount}',
                                     icon: Icons.verified_outlined,
-                                    valueColor: overview.highConfidenceBetCount > 0
-                                        ? _warningStatColor()
+                                    tone: overview.highConfidenceBetCount > 0
+                                        ? StatusTone.warning
                                         : null,
                                   ),
                                   _StatBox(
                                     title: 'Güven 9-10 Kazanma Oranı',
                                     value: '%${overview.highConfidenceWinRate.toStringAsFixed(1)}',
                                     icon: Icons.track_changes,
-                                    valueColor: overview.highConfidenceWinRate >= 50
-                                        ? _positiveStatColor()
-                                        : _negativeStatColor(),
+                                    tone: overview.highConfidenceWinRate >= 50
+                                        ? StatusTone.success
+                                        : StatusTone.danger,
                                   ),
                                   _StatBox(
                                     title: 'Güven 9-10 Kâr / Zarar',
                                     value: '${overview.highConfidenceProfit.toStringAsFixed(2)} ₺',
                                     icon: Icons.paid_outlined,
-                                    valueColor: overview.highConfidenceProfit >= 0
-                                        ? _positiveStatColor()
-                                        : _negativeStatColor(),
+                                    tone: overview.highConfidenceProfit >= 0
+                                        ? StatusTone.success
+                                        : StatusTone.danger,
                                   ),
                                   _StatBox(
                                     title: 'En Kârlı Güven Seviyesi',
                                     value: overview.bestConfidenceLabel,
                                     icon: Icons.emoji_events_outlined,
-                                    valueColor: _warningStatColor(),
+                                    tone: StatusTone.warning,
                                   ),
                                 ],
                               ),
@@ -614,13 +614,13 @@ class StatisticsPage extends StatelessWidget {
                                     title: 'En Büyük Tek Kazanç',
                                     value: overview.biggestWinLabel,
                                     icon: Icons.arrow_upward,
-                                    valueColor: _positiveStatColor(),
+                                    tone: StatusTone.success,
                                   ),
                                   _StatBox(
                                     title: 'En Büyük Tek Kayıp',
                                     value: overview.biggestLossLabel,
                                     icon: Icons.arrow_downward,
-                                    valueColor: _negativeStatColor(),
+                                    tone: StatusTone.danger,
                                   ),
                                   _StatBox(
                                     title: 'En Çok Oynanan Bahis Türü',
@@ -1448,12 +1448,14 @@ class _StatBox extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color? valueColor;
+  final StatusTone? tone;
 
   const _StatBox({
     required this.title,
     required this.value,
     required this.icon,
     this.valueColor,
+    this.tone,
   });
 
   @override
@@ -1462,7 +1464,7 @@ class _StatBox extends StatelessWidget {
       title: title,
       value: value,
       icon: icon,
-      valueColor: valueColor,
+      valueColor: valueColor ?? (tone == null ? null : statusToneColor(tone!)),
       compact: true,
     );
   }
