@@ -3,11 +3,11 @@ import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
 class BetLockedWarningCard extends StatelessWidget {
-  final String text;
+  final String message;
 
   const BetLockedWarningCard({
     super.key,
-    this.text = 'Bugün bahis kilitli. Disiplin modu aktif.',
+    this.message = 'Bugün bahis kilitli. Disiplin modu aktif.',
   });
 
   @override
@@ -24,7 +24,7 @@ class BetLockedWarningCard extends StatelessWidget {
         ),
       ),
       child: Text(
-        text,
+        message,
         style: const TextStyle(
           fontWeight: FontWeight.bold,
           color: AppColors.textDangerSoft,
