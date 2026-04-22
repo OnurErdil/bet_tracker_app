@@ -332,9 +332,16 @@ class RecentBetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final netColor = bet.netProfit >= 0
-        ? homeSuccessColor()
-        : homeDangerColor();
+    final resultTone = bet.result == 'kazandi'
+        ? StatusTone.success
+        : bet.result == 'kaybetti'
+        ? StatusTone.danger
+        : bet.result == 'iade'
+        ? StatusTone.warning
+        : StatusTone.muted;
+
+    final netTone =
+    bet.netProfit >= 0 ? StatusTone.success : StatusTone.danger;
 
     return BetCardShell(
       title: bet.matchName,
@@ -367,32 +374,19 @@ class RecentBetCard extends StatelessWidget {
               BetInfoChip(
                 icon: Icons.flag_outlined,
                 text: resultLabel(bet.result),
+                tone: resultTone,
               ),
             ],
           ),
           const SizedBox(height: AppSpacing.md),
           Align(
             alignment: Alignment.centerRight,
-            child: Container(
-              padding: const EdgeInsets.symmetric(
-                horizontal: AppSpacing.md,
-                vertical: AppSpacing.sm,
-              ),
-              decoration: BoxDecoration(
-                color: netColor.withOpacity(0.14),
-                borderRadius: BorderRadius.circular(AppRadius.pill),
-                border: Border.all(
-                  color: netColor.withOpacity(0.32),
-                ),
-              ),
-              child: Text(
-                '${bet.netProfit.toStringAsFixed(2)} ₺',
-                style: TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                  color: netColor,
-                ),
-              ),
+            child: BetInfoChip(
+              icon: bet.netProfit >= 0
+                  ? Icons.trending_up
+                  : Icons.trending_down,
+              text: '${bet.netProfit.toStringAsFixed(2)} ₺',
+              tone: netTone,
             ),
           ),
         ],

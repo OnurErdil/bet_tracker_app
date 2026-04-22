@@ -358,6 +358,22 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     });
   }
 
+  StatusTone _quickFilterTone(String filter) {
+    switch (filter) {
+      case 'Sadece Kaybedenler':
+        return StatusTone.danger;
+      case 'Sadece Bekleyenler':
+        return StatusTone.muted;
+      case 'Yüksek Güven':
+        return StatusTone.highConfidence;
+      case 'Bugün':
+      case 'Son 7 Gün':
+      case 'Bu Ay':
+      default:
+        return StatusTone.info;
+    }
+  }
+
   void _applyQuickFilter(String filter) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
@@ -427,6 +443,19 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
         return 'Tümü';
       default:
         return 'Beklemede';
+    }
+  }
+
+  StatusTone _resultTone(String value) {
+    switch (value) {
+      case 'kazandi':
+        return StatusTone.success;
+      case 'kaybetti':
+        return StatusTone.danger;
+      case 'iade':
+        return StatusTone.warning;
+      default:
+        return StatusTone.muted;
     }
   }
 
@@ -756,9 +785,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                             _TopStat(
                               title: 'Net',
                               value: '${summary.totalProfit.toStringAsFixed(2)} ₺',
-                              color: summary.totalProfit >= 0
-                                  ? homeSuccessColor()
-                                  : homeDangerColor(),
+                              tone: summary.totalProfit >= 0
+                                  ? StatusTone.success
+                                  : StatusTone.danger,
                             ),
                             _TopStat(
                               title: 'Toplam Tutar',
@@ -771,39 +800,39 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                             _TopStat(
                               title: 'Kazanan',
                               value: '${summary.wonCount}',
-                              color: homeSuccessColor(),
+                              tone: StatusTone.success,
                             ),
                             _TopStat(
                               title: 'Kaybeden',
                               value: '${summary.lostCount}',
-                              color: homeDangerColor(),
+                              tone: StatusTone.danger,
                             ),
                             _TopStat(
                               title: 'Bekleyen',
                               value: '${summary.pendingCount}',
-                              color: homeMutedColor(),
+                              tone: StatusTone.muted,
                             ),
                             _TopStat(
                               title: 'Yüksek Güven',
                               value: '${summary.highConfidenceCount}',
-                              color: summary.highConfidenceCount > 0
-                                  ? homeWarningColor()
+                              tone: summary.highConfidenceCount > 0
+                                  ? StatusTone.warning
                                   : null,
                             ),
                             _TopStat(
                               title: 'Yüksek Güven Net',
                               value: '${summary.highConfidenceProfit.toStringAsFixed(2)} ₺',
-                              color: summary.highConfidenceProfit >= 0
-                                  ? homeSuccessColor()
-                                  : homeDangerColor(),
+                              tone: summary.highConfidenceProfit >= 0
+                                  ? StatusTone.success
+                                  : StatusTone.danger,
                             ),
                             _TopStat(
                               title: 'Ort. Güven',
                               value: summary.averageConfidence.toStringAsFixed(1),
-                              color: summary.averageConfidence >= 9
-                                  ? homeWarningColor()
+                              tone: summary.averageConfidence >= 9
+                                  ? StatusTone.warning
                                   : summary.averageConfidence >= 7
-                                  ? homeSuccessColor()
+                                  ? StatusTone.success
                                   : null,
                             ),
                           ],
@@ -835,21 +864,25 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                               children: [
                                 _QuickFilterChip(
                                   label: 'Bugün',
+                                  tone: _quickFilterTone('Bugün'),
                                   isSelected: _selectedQuickFilter == 'Bugün',
                                   onTap: () => _applyQuickFilter('Bugün'),
                                 ),
                                 _QuickFilterChip(
                                   label: 'Son 7 Gün',
+                                  tone: _quickFilterTone('Son 7 Gün'),
                                   isSelected: _selectedQuickFilter == 'Son 7 Gün',
                                   onTap: () => _applyQuickFilter('Son 7 Gün'),
                                 ),
                                 _QuickFilterChip(
                                   label: 'Bu Ay',
+                                  tone: _quickFilterTone('Bu Ay'),
                                   isSelected: _selectedQuickFilter == 'Bu Ay',
                                   onTap: () => _applyQuickFilter('Bu Ay'),
                                 ),
                                 _QuickFilterChip(
                                   label: 'Sadece Kaybedenler',
+                                  tone: _quickFilterTone('Sadece Kaybedenler'),
                                   isSelected:
                                   _selectedQuickFilter == 'Sadece Kaybedenler',
                                   onTap: () =>
@@ -857,6 +890,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                 ),
                                 _QuickFilterChip(
                                   label: 'Sadece Bekleyenler',
+                                  tone: _quickFilterTone('Sadece Bekleyenler'),
                                   isSelected:
                                   _selectedQuickFilter == 'Sadece Bekleyenler',
                                   onTap: () =>
@@ -864,7 +898,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                 ),
                                 _QuickFilterChip(
                                   label: 'Yüksek Güven',
-                                  isSelected: _selectedQuickFilter == 'Yüksek Güven',
+                                  tone: _quickFilterTone('Yüksek Güven'),
+                                  isSelected:
+                                  _selectedQuickFilter == 'Yüksek Güven',
                                   onTap: () => _applyQuickFilter('Yüksek Güven'),
                                 ),
                               ],
@@ -1171,6 +1207,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                       trailing: BetInfoChip(
                         icon: Icons.inventory_2_outlined,
                         text: '${summary.recordCount} kayıt',
+                        tone: StatusTone.info,
                       ),
                     ),
                     const SizedBox(height: 12),
@@ -1560,6 +1597,13 @@ class _BetCard extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               _BetOutcomeBar(
                 resultLabel: resultLabel,
+                resultTone: bet.result == 'kazandi'
+                    ? StatusTone.success
+                    : bet.result == 'kaybetti'
+                    ? StatusTone.danger
+                    : bet.result == 'iade'
+                    ? StatusTone.warning
+                    : StatusTone.muted,
                 resultColor: resultColor,
                 resultIcon: resultIcon,
                 netProfit: bet.netProfit,
@@ -1575,6 +1619,7 @@ class _BetCard extends StatelessWidget {
 
 class _BetOutcomeBar extends StatelessWidget {
   final String resultLabel;
+  final StatusTone resultTone;
   final Color resultColor;
   final IconData resultIcon;
   final double netProfit;
@@ -1582,6 +1627,7 @@ class _BetOutcomeBar extends StatelessWidget {
 
   const _BetOutcomeBar({
     required this.resultLabel,
+    required this.resultTone,
     required this.resultColor,
     required this.resultIcon,
     required this.netProfit,
@@ -1603,37 +1649,10 @@ class _BetOutcomeBar extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Container(
-            padding: const EdgeInsets.symmetric(
-              horizontal: 10,
-              vertical: 7,
-            ),
-            decoration: BoxDecoration(
-              color: resultColor.withOpacity(0.14),
-              borderRadius: BorderRadius.circular(AppRadius.pill),
-              border: Border.all(
-                color: resultColor.withOpacity(0.35),
-              ),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(
-                  resultIcon,
-                  size: 14,
-                  color: resultColor,
-                ),
-                const SizedBox(width: 6),
-                Text(
-                  resultLabel,
-                  style: TextStyle(
-                    color: resultColor,
-                    fontWeight: FontWeight.w700,
-                    fontSize: 12,
-                  ),
-                ),
-              ],
-            ),
+          BetInfoChip(
+            icon: resultIcon,
+            text: resultLabel,
+            tone: resultTone,
           ),
           const Spacer(),
           Column(
@@ -1667,12 +1686,12 @@ class _BetOutcomeBar extends StatelessWidget {
 class _TopStat extends StatelessWidget {
   final String title;
   final String value;
-  final Color? color;
+  final StatusTone? tone;
 
   const _TopStat({
     required this.title,
     required this.value,
-    this.color,
+    this.tone,
   });
 
   @override
@@ -1680,7 +1699,7 @@ class _TopStat extends StatelessWidget {
     return StatValueCard(
       title: title,
       value: value,
-      valueColor: color,
+      valueColor: tone == null ? null : statusToneColor(tone!),
       centered: true,
       compact: true,
     );
@@ -1689,33 +1708,37 @@ class _TopStat extends StatelessWidget {
 
 class _QuickFilterChip extends StatelessWidget {
   final String label;
+  final StatusTone tone;
   final bool isSelected;
   final VoidCallback onTap;
 
   const _QuickFilterChip({
     required this.label,
+    required this.tone,
     required this.isSelected,
     required this.onTap,
   });
 
   @override
   Widget build(BuildContext context) {
+    final activeColor = statusToneColor(tone);
+
     return ChoiceChip(
       label: Text(
         label,
         style: TextStyle(
           fontSize: 12,
           fontWeight: FontWeight.w600,
-          color: isSelected ? Colors.white : AppColors.textPrimary,
+          color: isSelected ? activeColor : AppColors.textPrimary,
         ),
       ),
       selected: isSelected,
       onSelected: (_) => onTap(),
       showCheckmark: false,
       backgroundColor: AppColors.surfaceAlt,
-      selectedColor: AppColors.primary,
+      selectedColor: statusToneFill(tone),
       side: BorderSide(
-        color: isSelected ? AppColors.primary : AppColors.border,
+        color: isSelected ? statusToneBorder(tone) : AppColors.border,
       ),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(AppRadius.pill),
