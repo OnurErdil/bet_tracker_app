@@ -531,7 +531,50 @@ class _EditBetPageState extends State<EditBetPage> {
             AppSpacing.lg,
             AppSpacing.lg,
           ),
-          title: const Text('Bahsi Sil'),
+          title: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: AppColors.danger.withOpacity(0.28),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.delete_outline,
+                  color: AppColors.danger,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Bahsi Sil',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Bu kayıt düzenleme ekranından kaldırılacak.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           content: Text(
             '"${_currentMatchNameForDialog()}" kaydını silmek istiyor musun?',
           ),
@@ -547,9 +590,25 @@ class _EditBetPageState extends State<EditBetPage> {
                 Navigator.pop(dialogContext, true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFDC2626),
+                backgroundColor: AppColors.danger,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(0, 46),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
               ),
-              child: const Text('Sil'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.delete_outline, size: 18),
+                  SizedBox(width: 6),
+                  Text('Sil'),
+                ],
+              ),
             ),
           ],
         );

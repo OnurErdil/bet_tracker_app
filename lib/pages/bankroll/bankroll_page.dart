@@ -662,7 +662,7 @@ class BankrollPage extends StatelessWidget {
                       ),
                     );
                   },
-                  style: _primaryDialogButtonStyle(),
+                  style: _dangerDialogButtonStyle(),
                   child: isDeleting
                       ? const SizedBox(
                     height: 18,
