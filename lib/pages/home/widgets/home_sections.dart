@@ -255,24 +255,10 @@ class PendingBetCard extends StatelessWidget {
                 icon: Icons.reply_all_outlined,
                 label: 'İade',
               ),
-              OutlinedButton(
+              SecondaryActionButton(
                 onPressed: onDetail,
-                style: OutlinedButton.styleFrom(
-                  minimumSize: const Size(0, 44),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                  side: const BorderSide(color: AppColors.border),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.open_in_new_outlined, size: 18),
-                    SizedBox(width: 6),
-                    Text('Detay'),
-                  ],
-                ),
+                icon: Icons.open_in_new_outlined,
+                label: 'Detay',
               ),
             ],
           ),
@@ -320,18 +306,22 @@ class RecentBetCard extends StatelessWidget {
               BetInfoChip(
                 icon: Icons.sports_soccer,
                 text: bet.sport,
+                tone: StatusTone.info,
               ),
               BetInfoChip(
                 icon: Icons.local_activity_outlined,
                 text: bet.betType,
+                tone: StatusTone.muted,
               ),
               BetInfoChip(
                 icon: Icons.percent,
                 text: 'Oran ${bet.odd.toStringAsFixed(2)}',
+                tone: StatusTone.info,
               ),
               BetInfoChip(
                 icon: Icons.payments_outlined,
                 text: 'Tutar ${bet.stake.toStringAsFixed(2)} ₺',
+                tone: StatusTone.warning,
               ),
               BetInfoChip(
                 icon: Icons.flag_outlined,
