@@ -600,6 +600,7 @@ class SummaryInsightCard extends StatelessWidget {
   final String subtitle;
   final String value;
   final Color? valueColor;
+  final StatusTone? tone;
 
   const SummaryInsightCard({
     super.key,
@@ -607,11 +608,13 @@ class SummaryInsightCard extends StatelessWidget {
     required this.subtitle,
     required this.value,
     this.valueColor,
+    this.tone,
   });
 
   @override
   Widget build(BuildContext context) {
-    final resolvedValueColor = valueColor ?? AppColors.textPrimary;
+    final resolvedValueColor = valueColor ??
+        (tone == null ? AppColors.textPrimary : statusToneColor(tone!));
 
     return Card(
       color: AppColors.surface,

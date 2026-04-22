@@ -217,27 +217,27 @@ class StatisticsPage extends StatelessWidget {
                                         _StatBox(
                                           title: 'Net Kâr / Zarar',
                                           value: '${overview.totalProfit.toStringAsFixed(2)} ₺',
-                                          valueColor: overview.totalProfit >= 0
-                                              ? _positiveStatColor()
-                                              : _negativeStatColor(),
+                                          tone: overview.totalProfit >= 0
+                                              ? StatusTone.success
+                                              : StatusTone.danger,
                                           icon: Icons.account_balance_wallet,
                                         ),
                                         const SizedBox(height: 12),
                                         _StatBox(
                                           title: 'Kasa Hareketleri',
                                           value: '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
-                                          valueColor: overview.bankrollMovement >= 0
-                                              ? _positiveStatColor()
-                                              : _negativeStatColor(),
+                                          tone: overview.bankrollMovement >= 0
+                                              ? StatusTone.success
+                                              : StatusTone.danger,
                                           icon: Icons.swap_horiz,
                                         ),
                                         const SizedBox(height: 12),
                                         _StatBox(
                                           title: 'Mevcut Kasa',
                                           value: '${overview.currentBankroll.toStringAsFixed(2)} ₺',
-                                          valueColor: overview.currentBankroll >= overview.startingBankroll
-                                              ? _positiveStatColor()
-                                              : _negativeStatColor(),
+                                          tone: overview.currentBankroll >= overview.startingBankroll
+                                              ? StatusTone.success
+                                              : StatusTone.danger,
                                           icon: Icons.paid_outlined,
                                         ),
                                       ],
@@ -523,9 +523,9 @@ class StatisticsPage extends StatelessWidget {
                                       subtitle:
                                       'Bahis: $count | Settled: $settled | Win Rate: %${winRate.toStringAsFixed(1)}',
                                       value: '${profit.toStringAsFixed(2)} ₺',
-                                      valueColor: profit >= 0
-                                          ? _positiveStatColor()
-                                          : _negativeStatColor(),
+                                      tone: profit >= 0
+                                          ? StatusTone.success
+                                          : StatusTone.danger,
                                     );
                                   }).toList();
                                 })(),
@@ -559,9 +559,9 @@ class StatisticsPage extends StatelessWidget {
                                     subtitle:
                                     'Bahis: $typeCount | Kazanma Oranı: %${typeWinRate.toStringAsFixed(1)}',
                                     value: '${typeProfit.toStringAsFixed(2)} ₺',
-                                    valueColor: typeProfit >= 0
-                                        ? _positiveStatColor()
-                                        : _negativeStatColor(),
+                                    tone: typeProfit >= 0
+                                        ? StatusTone.success
+                                        : StatusTone.danger,
                                   );
                                 }).toList(),
                               ),
@@ -591,9 +591,9 @@ class StatisticsPage extends StatelessWidget {
                                     subtitle:
                                     'Bahis: $sportCount | Kazanma Oranı: %${sportWinRate.toStringAsFixed(1)}',
                                     value: '${sportProfit.toStringAsFixed(2)} ₺',
-                                    valueColor: sportProfit >= 0
-                                        ? _positiveStatColor()
-                                        : _negativeStatColor(),
+                                    tone: sportProfit >= 0
+                                        ? StatusTone.success
+                                        : StatusTone.danger,
                                   );
                                 }).toList(),
                               ),
