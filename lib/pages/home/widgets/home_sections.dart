@@ -333,8 +333,8 @@ class RecentBetCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final netColor = bet.netProfit >= 0
-        ? const Color(0xFF22C55E)
-        : const Color(0xFFEF4444);
+        ? homeSuccessColor()
+        : homeDangerColor();
 
     return BetCardShell(
       title: bet.matchName,
