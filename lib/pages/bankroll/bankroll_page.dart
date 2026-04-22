@@ -124,26 +124,15 @@ class BankrollPage extends StatelessWidget {
                           ),
                         ),
                         const SizedBox(width: AppSpacing.md),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: AppSpacing.md,
-                            vertical: AppSpacing.sm,
-                          ),
-                          decoration: BoxDecoration(
-                            color: accentColor.withOpacity(0.14),
-                            borderRadius: BorderRadius.circular(AppRadius.pill),
-                            border: Border.all(
-                              color: accentColor.withOpacity(0.32),
-                            ),
-                          ),
-                          child: Text(
-                            '${isDeposit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺',
-                            style: TextStyle(
-                              color: accentColor,
-                              fontWeight: FontWeight.bold,
-                              fontSize: 14,
-                            ),
-                          ),
+                        BetInfoChip(
+                          icon: isDeposit
+                              ? Icons.add_circle_outline
+                              : Icons.remove_circle_outline,
+                          text:
+                          '${isDeposit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺',
+                          tone: isDeposit
+                              ? StatusTone.success
+                              : StatusTone.danger,
                         ),
                       ],
                     ),

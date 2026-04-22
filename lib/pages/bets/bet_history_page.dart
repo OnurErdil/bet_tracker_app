@@ -1544,18 +1544,22 @@ class _BetCard extends StatelessWidget {
                   BetInfoChip(
                     icon: Icons.calendar_today_outlined,
                     text: formattedDate,
+                    tone: StatusTone.muted,
                   ),
                   BetInfoChip(
                     icon: Icons.local_activity_outlined,
                     text: bet.betType,
+                    tone: StatusTone.muted,
                   ),
                   BetInfoChip(
                     icon: Icons.percent,
                     text: 'Oran ${bet.odd.toStringAsFixed(2)}',
+                    tone: StatusTone.info,
                   ),
                   BetInfoChip(
                     icon: Icons.payments_outlined,
                     text: 'Tutar ${bet.stake.toStringAsFixed(2)} ₺',
+                    tone: StatusTone.warning,
                   ),
                 ],
               ),
@@ -1604,7 +1608,6 @@ class _BetCard extends StatelessWidget {
                     : bet.result == 'iade'
                     ? StatusTone.warning
                     : StatusTone.muted,
-                resultColor: resultColor,
                 resultIcon: resultIcon,
                 netProfit: bet.netProfit,
                 netColor: netColor,
@@ -1620,7 +1623,6 @@ class _BetCard extends StatelessWidget {
 class _BetOutcomeBar extends StatelessWidget {
   final String resultLabel;
   final StatusTone resultTone;
-  final Color resultColor;
   final IconData resultIcon;
   final double netProfit;
   final Color netColor;
@@ -1628,7 +1630,6 @@ class _BetOutcomeBar extends StatelessWidget {
   const _BetOutcomeBar({
     required this.resultLabel,
     required this.resultTone,
-    required this.resultColor,
     required this.resultIcon,
     required this.netProfit,
     required this.netColor,
