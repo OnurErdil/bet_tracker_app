@@ -433,13 +433,13 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   Color _resultColor(String value) {
     switch (value) {
       case 'kazandi':
-        return const Color(0xFF22C55E);
+        return homeSuccessColor();
       case 'kaybetti':
-        return const Color(0xFFEF4444);
+        return homeDangerColor();
       case 'iade':
-        return const Color(0xFFF59E0B);
+        return homeWarningColor();
       default:
-        return const Color(0xFF94A3B8);
+        return homeMutedColor();
     }
   }
   String _displayMatchName(BetModel bet) {
@@ -623,9 +623,25 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                 Navigator.pop(dialogContext, true);
               },
               style: ElevatedButton.styleFrom(
-                backgroundColor: const Color(0xFFDC2626),
+                backgroundColor: AppColors.danger,
+                foregroundColor: Colors.white,
+                minimumSize: const Size(0, 46),
+                padding: const EdgeInsets.symmetric(
+                  horizontal: AppSpacing.md,
+                  vertical: AppSpacing.sm,
+                ),
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                ),
               ),
-              child: const Text('Sil'),
+              child: const Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Icon(Icons.delete_outline, size: 18),
+                  SizedBox(width: 6),
+                  Text('Sil'),
+                ],
+              ),
             ),
           ],
         );
@@ -698,8 +714,8 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                               title: 'Net',
                               value: '${summary.totalProfit.toStringAsFixed(2)} ₺',
                               color: summary.totalProfit >= 0
-                                  ? const Color(0xFF22C55E)
-                                  : const Color(0xFFEF4444),
+                                  ? homeSuccessColor()
+                                  : homeDangerColor(),
                             ),
                             _TopStat(
                               title: 'Toplam Tutar',
@@ -712,39 +728,39 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                             _TopStat(
                               title: 'Kazanan',
                               value: '${summary.wonCount}',
-                              color: const Color(0xFF22C55E),
+                              color: homeSuccessColor(),
                             ),
                             _TopStat(
                               title: 'Kaybeden',
                               value: '${summary.lostCount}',
-                              color: const Color(0xFFEF4444),
+                              color: homeDangerColor(),
                             ),
                             _TopStat(
                               title: 'Bekleyen',
                               value: '${summary.pendingCount}',
-                              color: const Color(0xFF94A3B8),
+                              color: homeMutedColor(),
                             ),
                             _TopStat(
                               title: 'Yüksek Güven',
                               value: '${summary.highConfidenceCount}',
                               color: summary.highConfidenceCount > 0
-                                  ? const Color(0xFFF59E0B)
+                                  ? homeWarningColor()
                                   : null,
                             ),
                             _TopStat(
                               title: 'Yüksek Güven Net',
                               value: '${summary.highConfidenceProfit.toStringAsFixed(2)} ₺',
                               color: summary.highConfidenceProfit >= 0
-                                  ? const Color(0xFF22C55E)
-                                  : const Color(0xFFEF4444),
+                                  ? homeSuccessColor()
+                                  : homeDangerColor(),
                             ),
                             _TopStat(
                               title: 'Ort. Güven',
                               value: summary.averageConfidence.toStringAsFixed(1),
                               color: summary.averageConfidence >= 9
-                                  ? const Color(0xFFF59E0B)
+                                  ? homeWarningColor()
                                   : summary.averageConfidence >= 7
-                                  ? const Color(0xFF22C55E)
+                                  ? homeSuccessColor()
                                   : null,
                             ),
                           ],
