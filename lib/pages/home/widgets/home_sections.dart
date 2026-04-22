@@ -213,18 +213,22 @@ class PendingBetCard extends StatelessWidget {
               BetInfoChip(
                 icon: Icons.sports_soccer,
                 text: bet.sport,
+                tone: StatusTone.info,
               ),
               BetInfoChip(
                 icon: Icons.local_activity_outlined,
                 text: bet.betType,
+                tone: StatusTone.muted,
               ),
               BetInfoChip(
                 icon: Icons.percent,
                 text: 'Oran ${bet.odd.toStringAsFixed(2)}',
+                tone: StatusTone.info,
               ),
               BetInfoChip(
                 icon: Icons.payments_outlined,
                 text: 'Tutar ${bet.stake.toStringAsFixed(2)} ₺',
+                tone: StatusTone.warning,
               ),
             ],
           ),
@@ -233,65 +237,23 @@ class PendingBetCard extends StatelessWidget {
             spacing: 8,
             runSpacing: 8,
             children: [
-              ElevatedButton(
+              StatusActionButton(
                 onPressed: () => onQuickSettle(bet, 'kazandi'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: homeSuccessColor(),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(0, 44),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.check_circle_outline, size: 18),
-                    SizedBox(width: 6),
-                    Text('Kazandı'),
-                  ],
-                ),
+                tone: StatusTone.success,
+                icon: Icons.check_circle_outline,
+                label: 'Kazandı',
               ),
-              ElevatedButton(
+              StatusActionButton(
                 onPressed: () => onQuickSettle(bet, 'kaybetti'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: homeDangerColor(),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(0, 44),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.cancel_outlined, size: 18),
-                    SizedBox(width: 6),
-                    Text('Kaybetti'),
-                  ],
-                ),
+                tone: StatusTone.danger,
+                icon: Icons.cancel_outlined,
+                label: 'Kaybetti',
               ),
-              ElevatedButton(
+              StatusActionButton(
                 onPressed: () => onQuickSettle(bet, 'iade'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: homeWarningColor(),
-                  foregroundColor: Colors.white,
-                  minimumSize: const Size(0, 44),
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppSpacing.md,
-                    vertical: AppSpacing.sm,
-                  ),
-                ),
-                child: const Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Icon(Icons.reply_all_outlined, size: 18),
-                    SizedBox(width: 6),
-                    Text('İade'),
-                  ],
-                ),
+                tone: StatusTone.warning,
+                icon: Icons.reply_all_outlined,
+                label: 'İade',
               ),
               OutlinedButton(
                 onPressed: onDetail,

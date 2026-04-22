@@ -856,6 +856,50 @@ class BetInfoChip extends StatelessWidget {
   }
 }
 
+class StatusActionButton extends StatelessWidget {
+  final IconData icon;
+  final String label;
+  final StatusTone tone;
+  final VoidCallback? onPressed;
+
+  const StatusActionButton({
+    super.key,
+    required this.icon,
+    required this.label,
+    required this.tone,
+    required this.onPressed,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = statusToneColor(tone);
+
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: color,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(0, 44),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(AppRadius.md),
+        ),
+      ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(icon, size: 18),
+          const SizedBox(width: 6),
+          Text(label),
+        ],
+      ),
+    );
+  }
+}
+
 class InfoCard extends StatelessWidget {
   final String text;
 
