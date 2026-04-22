@@ -36,12 +36,50 @@ Color homeMutedColor() => const Color(0xFF94A3B8);
 Color homeInfoColor() => const Color(0xFF0EA5E9);
 Color homeHighConfidenceColor() => const Color(0xFFEA580C);
 
+enum StatusTone {
+  success,
+  danger,
+  warning,
+  muted,
+  info,
+  highConfidence,
+}
+
+Color statusToneColor(StatusTone tone) {
+  switch (tone) {
+    case StatusTone.success:
+      return homeSuccessColor();
+    case StatusTone.danger:
+      return homeDangerColor();
+    case StatusTone.warning:
+      return homeWarningColor();
+    case StatusTone.muted:
+      return homeMutedColor();
+    case StatusTone.info:
+      return homeInfoColor();
+    case StatusTone.highConfidence:
+      return homeHighConfidenceColor();
+  }
+}
+
+Color statusToneFill(StatusTone tone) {
+  return statusToneColor(tone).withOpacity(0.14);
+}
+
+Color statusToneBorder(StatusTone tone) {
+  return statusToneColor(tone).withOpacity(0.35);
+}
+
+StatusTone confidenceBadgeTone(int score) {
+  if (score >= 10) return StatusTone.highConfidence;
+  if (score >= 9) return StatusTone.warning;
+  if (score >= 7) return StatusTone.success;
+  if (score >= 5) return StatusTone.info;
+  return StatusTone.muted;
+}
+
 Color confidenceBadgeColor(int score) {
-  if (score >= 10) return homeHighConfidenceColor();
-  if (score >= 9) return homeWarningColor();
-  if (score >= 7) return homeSuccessColor();
-  if (score >= 5) return homeInfoColor();
-  return homeMutedColor();
+  return statusToneColor(confidenceBadgeTone(score));
 }
 
 class ConfidenceBadge extends StatelessWidget {
@@ -54,7 +92,8 @@ class ConfidenceBadge extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = confidenceBadgeColor(score);
+    final tone = confidenceBadgeTone(score);
+    final color = statusToneColor(tone);
 
     return Container(
       padding: const EdgeInsets.symmetric(
@@ -62,10 +101,10 @@ class ConfidenceBadge extends StatelessWidget {
         vertical: 6,
       ),
       decoration: BoxDecoration(
-        color: color.withOpacity(0.14),
+        color: statusToneFill(tone),
         borderRadius: BorderRadius.circular(AppRadius.pill),
         border: Border.all(
-          color: color.withOpacity(0.45),
+          color: statusToneBorder(tone),
         ),
       ),
       child: Row(
@@ -768,24 +807,31 @@ class BetCardShell extends StatelessWidget {
 class BetInfoChip extends StatelessWidget {
   final IconData icon;
   final String text;
+  final StatusTone? tone;
 
   const BetInfoChip({
     super.key,
     required this.icon,
     required this.text,
+    this.tone,
   });
 
   @override
   Widget build(BuildContext context) {
+    final resolvedColor =
+    tone == null ? AppColors.textSecondary : statusToneColor(tone!);
+
     return Container(
       padding: const EdgeInsets.symmetric(
         horizontal: 10,
         vertical: 8,
       ),
       decoration: BoxDecoration(
-        color: AppColors.surfaceAlt,
+        color: tone == null ? AppColors.surfaceAlt : statusToneFill(tone!),
         borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(color: AppColors.border),
+        border: Border.all(
+          color: tone == null ? AppColors.border : statusToneBorder(tone!),
+        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,
@@ -793,13 +839,13 @@ class BetInfoChip extends StatelessWidget {
           Icon(
             icon,
             size: 14,
-            color: AppColors.textSecondary,
+            color: resolvedColor,
           ),
           const SizedBox(width: 6),
           Text(
             text,
-            style: const TextStyle(
-              color: AppColors.textSecondary,
+            style: TextStyle(
+              color: resolvedColor,
               fontSize: 12,
               fontWeight: FontWeight.w500,
             ),
