@@ -576,7 +576,7 @@ class _EditBetPageState extends State<EditBetPage> {
             ],
           ),
           content: Text(
-            '"${_currentMatchNameForDialog()}" kaydını silmek istiyor musun?',
+            '"${_currentMatchNameForDialog()}" kaydı silinecek. Bu işlem geri alınamaz.',
           ),
           actions: [
             TextButton(
@@ -965,14 +965,26 @@ class _EditBetPageState extends State<EditBetPage> {
                             color: Colors.white,
                           ),
                         )
-                            : const Text('Güncelle'),
+                            : const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.edit_outlined, size: 18),
+                            SizedBox(width: 6),
+                            Text('Güncelle'),
+                          ],
+                        ),
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed:
                         (_isLoading || _isDeleting) ? null : _confirmDelete,
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFDC2626),
+                          backgroundColor: AppColors.danger,
+                          foregroundColor: Colors.white,
+                          minimumSize: const Size(double.infinity, 52),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(AppRadius.md),
+                          ),
                         ),
                         child: _isDeleting
                             ? const SizedBox(
@@ -983,7 +995,14 @@ class _EditBetPageState extends State<EditBetPage> {
                             color: Colors.white,
                           ),
                         )
-                            : const Text('Sil'),
+                            : const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.delete_outline, size: 18),
+                            SizedBox(width: 6),
+                            Text('Sil'),
+                          ],
+                        ),
                       ),
                     ],
                   ),

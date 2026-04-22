@@ -790,7 +790,14 @@ class _AddBetPageState extends State<AddBetPage> {
                             color: Colors.white,
                           ),
                         )
-                            : const Text('Bahsi Kaydet'),
+                            : const Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Icon(Icons.save_outlined, size: 18),
+                            SizedBox(width: 6),
+                            Text('Bahsi Kaydet'),
+                          ],
+                        ),
                       ),
                     ],
                   ),
