@@ -110,6 +110,9 @@ class BankrollPage extends StatelessWidget {
                                     text: isDeposit
                                         ? 'Para Eklendi'
                                         : 'Para Çekildi',
+                                    tone: isDeposit
+                                        ? StatusTone.success
+                                        : StatusTone.danger,
                                   ),
                                   BetInfoChip(
                                     icon: Icons.schedule_outlined,
