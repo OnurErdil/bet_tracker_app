@@ -160,6 +160,36 @@ class BankrollPage extends StatelessWidget {
     return '$day.$month.$year  $hour:$minute';
   }
 
+  static ButtonStyle _primaryDialogButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: AppColors.primary,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(0, 46),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+    );
+  }
+
+  static ButtonStyle _dangerDialogButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: AppColors.danger,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(0, 46),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+    );
+  }
+
   static void _showAddDialog(BuildContext context) {
     final amountController = TextEditingController();
     final noteController = TextEditingController();
@@ -354,18 +384,7 @@ class BankrollPage extends StatelessWidget {
                       ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(0, 46),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                  ),
+                  style: _primaryDialogButtonStyle(),
                   child: isSaving
                       ? const SizedBox(
                     height: 18,
@@ -584,18 +603,7 @@ class BankrollPage extends StatelessWidget {
                       ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(0, 46),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                  ),
+                  style: _primaryDialogButtonStyle(),
                   child: isSaving
                       ? const SizedBox(
                     height: 18,
@@ -654,18 +662,7 @@ class BankrollPage extends StatelessWidget {
                       ),
                     );
                   },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.danger,
-                    foregroundColor: Colors.white,
-                    minimumSize: const Size(0, 46),
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppSpacing.md,
-                      vertical: AppSpacing.sm,
-                    ),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                    ),
-                  ),
+                  style: _primaryDialogButtonStyle(),
                   child: isDeleting
                       ? const SizedBox(
                     height: 18,
