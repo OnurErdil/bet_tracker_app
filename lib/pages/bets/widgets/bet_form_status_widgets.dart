@@ -1,3 +1,4 @@
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
@@ -178,7 +179,7 @@ class BetLivePreviewCard extends StatelessWidget {
             const Text(
               '• Girilen tutar maksimum bahis limitini aşıyor.',
               style: TextStyle(
-                color: Color(0xFFFCA5A5),
+                color: AppColors.textDangerSoft,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -206,7 +207,7 @@ class BetConfidenceScoreCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final accentColor = isHighConfidenceSelected
-        ? const Color(0xFFF59E0B)
+        ? homeWarningColor()
         : AppColors.primary;
 
     final helperText = isHighConfidenceSelected && effectiveMaxStake > 0

@@ -5,6 +5,7 @@ import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/widgets/bet_form_status_widgets.dart';
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/services/user_service.dart';
@@ -234,9 +235,9 @@ class _EditBetPageState extends State<EditBetPage> {
   }
 
   Color get _previewNetColor {
-    if (_previewNetProfit > 0) return const Color(0xFF22C55E);
-    if (_previewNetProfit < 0) return const Color(0xFFEF4444);
-    return const Color(0xFFF59E0B);
+    if (_previewNetProfit > 0) return homeSuccessColor();
+    if (_previewNetProfit < 0) return homeDangerColor();
+    return homeWarningColor();
   }
 
   bool get _isPreviewLimitExceeded {

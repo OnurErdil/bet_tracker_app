@@ -5,6 +5,7 @@ import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/widgets/bet_form_status_widgets.dart';
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/services/user_service.dart';
@@ -465,10 +466,10 @@ class _AddBetPageState extends State<AddBetPage> {
     final previewNetProfit = _previewNetProfit;
     final previewPayout = _previewPayout;
     final previewNetColor = previewNetProfit > 0
-        ? const Color(0xFF22C55E)
+        ? homeSuccessColor()
         : previewNetProfit < 0
-        ? const Color(0xFFEF4444)
-        : const Color(0xFFF59E0B);
+        ? homeDangerColor()
+        : homeWarningColor();
 
     return Scaffold(
       appBar: AppBar(
