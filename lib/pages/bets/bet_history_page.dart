@@ -607,7 +607,50 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
             AppSpacing.lg,
             AppSpacing.lg,
           ),
-          title: const Text('Bahsi Sil'),
+          title: Row(
+            children: [
+              Container(
+                width: 42,
+                height: 42,
+                decoration: BoxDecoration(
+                  color: AppColors.danger.withOpacity(0.14),
+                  borderRadius: BorderRadius.circular(AppRadius.md),
+                  border: Border.all(
+                    color: AppColors.danger.withOpacity(0.28),
+                  ),
+                ),
+                child: const Icon(
+                  Icons.delete_outline,
+                  color: AppColors.danger,
+                  size: 20,
+                ),
+              ),
+              const SizedBox(width: AppSpacing.md),
+              const Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Text(
+                      'Bahsi Sil',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    SizedBox(height: 4),
+                    Text(
+                      'Bu kayıt geçmişten kaldırılacak.',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: AppColors.textSecondary,
+                        height: 1.3,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
           content: Text(
             '"${_displayMatchName(bet)}" kaydını silmek istiyor musun?',
           ),
@@ -1347,22 +1390,22 @@ class _BetCard extends StatelessWidget {
     final IconData resultIcon;
 
     switch (bet.result) {
-      case 'kazandi':
-        netColor = const Color(0xFF22C55E);
-        resultIcon = Icons.check_circle_outline;
-        break;
-      case 'kaybetti':
-        netColor = const Color(0xFFEF4444);
-        resultIcon = Icons.cancel_outlined;
-        break;
-      case 'iade':
-        netColor = const Color(0xFFF59E0B);
-        resultIcon = Icons.reply_all_outlined;
-        break;
-      default:
-        netColor = AppColors.textSecondary;
-        resultIcon = Icons.hourglass_bottom_outlined;
-        break;
+    case 'kazandi':
+    netColor = homeSuccessColor();
+    resultIcon = Icons.check_circle_outline;
+    break;
+    case 'kaybetti':
+    netColor = homeDangerColor();
+    resultIcon = Icons.cancel_outlined;
+    break;
+    case 'iade':
+    netColor = homeWarningColor();
+    resultIcon = Icons.reply_all_outlined;
+    break;
+    default:
+    netColor = AppColors.textSecondary;
+    resultIcon = Icons.hourglass_bottom_outlined;
+    break;
     }
 
     return Card(

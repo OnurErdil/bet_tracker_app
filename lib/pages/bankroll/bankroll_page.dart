@@ -54,7 +54,7 @@ class BankrollPage extends StatelessWidget {
 
               final isDeposit = tx.type == 'deposit';
               final accentColor =
-              isDeposit ? const Color(0xFF22C55E) : const Color(0xFFEF4444);
+              isDeposit ? homeSuccessColor() : homeDangerColor();
 
               return Card(
                 color: AppColors.surface,
