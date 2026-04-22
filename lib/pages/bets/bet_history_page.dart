@@ -652,7 +652,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
             ],
           ),
           content: Text(
-            '"${_displayMatchName(bet)}" kaydını silmek istiyor musun?',
+            '"${_displayMatchName(bet)}" kaydı silinecek. Bu işlem geri alınamaz.',
           ),
           actions: [
             TextButton(
@@ -1189,27 +1189,48 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                           confirmDismiss: (_) => _confirmDelete(bet),
                               background: Container(
                                 margin: const EdgeInsets.only(bottom: 12),
-                                padding: const EdgeInsets.symmetric(horizontal: 20),
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: AppSpacing.lg,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppColors.danger,
                                   borderRadius: BorderRadius.circular(AppRadius.lg),
                                 ),
-                            alignment: Alignment.centerRight,
-                            child: const Row(
-                              mainAxisAlignment: MainAxisAlignment.end,
-                              children: [
-                                Icon(Icons.delete_forever, color: Colors.white),
-                                SizedBox(width: 8),
-                                Text(
-                                  'Sil',
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontWeight: FontWeight.bold,
+                                alignment: Alignment.centerRight,
+                                child: Container(
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 10,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white.withOpacity(0.10),
+                                    borderRadius: BorderRadius.circular(
+                                      AppRadius.pill,
+                                    ),
+                                    border: Border.all(
+                                      color: Colors.white.withOpacity(0.16),
+                                    ),
+                                  ),
+                                  child: const Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      Icon(
+                                        Icons.delete_outline,
+                                        color: Colors.white,
+                                        size: 18,
+                                      ),
+                                      SizedBox(width: 6),
+                                      Text(
+                                        'Sil',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.w700,
+                                        ),
+                                      ),
+                                    ],
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
+                              ),
                           child: _BetCard(
                             bet: bet,
                             resultLabel: _resultLabel(bet.result),
@@ -1683,6 +1704,7 @@ class _QuickFilterChip extends StatelessWidget {
       label: Text(
         label,
         style: TextStyle(
+          fontSize: 12,
           fontWeight: FontWeight.w600,
           color: isSelected ? Colors.white : AppColors.textPrimary,
         ),
@@ -1699,10 +1721,17 @@ class _QuickFilterChip extends StatelessWidget {
         borderRadius: BorderRadius.circular(AppRadius.pill),
       ),
       labelPadding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.xs,
+        horizontal: AppSpacing.sm,
+      ),
+      padding: const EdgeInsets.symmetric(
+        horizontal: 2,
+        vertical: 2,
       ),
       materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
-      visualDensity: VisualDensity.compact,
+      visualDensity: const VisualDensity(
+        horizontal: -1,
+        vertical: -2,
+      ),
     );
   }
 }
