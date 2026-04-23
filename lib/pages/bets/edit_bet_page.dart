@@ -318,6 +318,18 @@ class _EditBetPageState extends State<EditBetPage> {
     );
   }
 
+  ButtonStyle _dangerPrimaryButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: AppColors.danger,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(double.infinity, 52),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+    );
+  }
+
+
   Future<bool> _handleDailyLossLimitBeforeUpdate({
     required double stake,
   }) async {
@@ -982,14 +994,7 @@ class _EditBetPageState extends State<EditBetPage> {
                       ElevatedButton(
                         onPressed:
                         (_isLoading || _isDeleting) ? null : _confirmDelete,
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: AppColors.danger,
-                          foregroundColor: Colors.white,
-                          minimumSize: const Size(double.infinity, 52),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                          ),
-                        ),
+                        style: _dangerPrimaryButtonStyle(),
                         child: _isDeleting
                             ? const SizedBox(
                           height: 22,
