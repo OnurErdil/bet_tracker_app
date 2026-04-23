@@ -102,7 +102,11 @@ class HomeStats {
     final last7DaysProfit =
     last7DaysBets.fold<double>(0, (sum, item) => sum + item.netProfit);
 
-    final sortedByDate = [...bets]..sort((a, b) => b.date.compareTo(a.date));
+    final sortedByDate = [...bets]..sort((a, b) {
+      final dateCompare = b.date.compareTo(a.date);
+      if (dateCompare != 0) return dateCompare;
+      return b.createdAt.compareTo(a.createdAt);
+    });
     final last10Bets = sortedByDate.take(10).toList();
 
     BetModel? biggestWin;

@@ -303,6 +303,21 @@ class _EditBetPageState extends State<EditBetPage> {
     );
   }
 
+  ButtonStyle _dangerDialogButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: AppColors.danger,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(0, 46),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+    );
+  }
+
   Future<bool> _handleDailyLossLimitBeforeUpdate({
     required double stake,
   }) async {
@@ -589,18 +604,7 @@ class _EditBetPageState extends State<EditBetPage> {
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.danger,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(0, 46),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-              ),
+              style: _dangerDialogButtonStyle(),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [

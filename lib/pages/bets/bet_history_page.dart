@@ -311,25 +311,43 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           matchesStake;
     }).toList();
 
+    int compareNewestFirst(BetModel a, BetModel b) {
+      final dateCompare = b.date.compareTo(a.date);
+      if (dateCompare != 0) return dateCompare;
+      return b.createdAt.compareTo(a.createdAt);
+    }
+
+    int compareOldestFirst(BetModel a, BetModel b) {
+      final dateCompare = a.date.compareTo(b.date);
+      if (dateCompare != 0) return dateCompare;
+      return a.createdAt.compareTo(b.createdAt);
+    }
+
     filtered.sort((a, b) {
       switch (_sortOption) {
         case 'Tarih (Eski → Yeni)':
-          return a.date.compareTo(b.date);
+          return compareOldestFirst(a, b);
         case 'Oran (Yüksek → Düşük)':
-          return b.odd.compareTo(a.odd);
+          final oddCompare = b.odd.compareTo(a.odd);
+          return oddCompare != 0 ? oddCompare : compareNewestFirst(a, b);
         case 'Oran (Düşük → Yüksek)':
-          return a.odd.compareTo(b.odd);
+          final oddCompare = a.odd.compareTo(b.odd);
+          return oddCompare != 0 ? oddCompare : compareNewestFirst(a, b);
         case 'Tutar (Yüksek → Düşük)':
-          return b.stake.compareTo(a.stake);
+          final stakeCompare = b.stake.compareTo(a.stake);
+          return stakeCompare != 0 ? stakeCompare : compareNewestFirst(a, b);
         case 'Tutar (Düşük → Yüksek)':
-          return a.stake.compareTo(b.stake);
+          final stakeCompare = a.stake.compareTo(b.stake);
+          return stakeCompare != 0 ? stakeCompare : compareNewestFirst(a, b);
         case 'Net (Yüksek → Düşük)':
-          return b.netProfit.compareTo(a.netProfit);
+          final netCompare = b.netProfit.compareTo(a.netProfit);
+          return netCompare != 0 ? netCompare : compareNewestFirst(a, b);
         case 'Net (Düşük → Yüksek)':
-          return a.netProfit.compareTo(b.netProfit);
+          final netCompare = a.netProfit.compareTo(b.netProfit);
+          return netCompare != 0 ? netCompare : compareNewestFirst(a, b);
         case 'Tarih (Yeni → Eski)':
         default:
-          return b.date.compareTo(a.date);
+          return compareNewestFirst(a, b);
       }
     });
 
@@ -443,6 +461,22 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
         return StatusTone.muted;
     }
   }
+
+  ButtonStyle _dangerDialogButtonStyle() {
+    return ElevatedButton.styleFrom(
+      backgroundColor: AppColors.danger,
+      foregroundColor: Colors.white,
+      minimumSize: const Size(0, 46),
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppSpacing.md,
+        vertical: AppSpacing.sm,
+      ),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.md),
+      ),
+    );
+  }
+
   String _displayMatchName(BetModel bet) {
     final home = bet.resolvedHomeTeam.trim();
     final away = bet.resolvedAwayTeam.trim();
@@ -666,18 +700,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
               onPressed: () {
                 Navigator.pop(dialogContext, true);
               },
-              style: ElevatedButton.styleFrom(
-                backgroundColor: AppColors.danger,
-                foregroundColor: Colors.white,
-                minimumSize: const Size(0, 46),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: AppSpacing.md,
-                  vertical: AppSpacing.sm,
-                ),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                ),
-              ),
+              style: _dangerDialogButtonStyle(),
               child: const Row(
                 mainAxisSize: MainAxisSize.min,
                 children: [
