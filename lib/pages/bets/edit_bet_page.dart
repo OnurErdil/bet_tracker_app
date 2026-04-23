@@ -537,15 +537,15 @@ class _EditBetPageState extends State<EditBetPage> {
                 width: 42,
                 height: 42,
                 decoration: BoxDecoration(
-                  color: AppColors.danger.withOpacity(0.14),
+                  color: statusToneFill(StatusTone.danger),
                   borderRadius: BorderRadius.circular(AppRadius.md),
                   border: Border.all(
-                    color: AppColors.danger.withOpacity(0.28),
+                    color: statusToneBorder(StatusTone.danger),
                   ),
                 ),
-                child: const Icon(
+                child: Icon(
                   Icons.delete_outline,
-                  color: AppColors.danger,
+                  color: statusToneColor(StatusTone.danger),
                   size: 20,
                 ),
               ),

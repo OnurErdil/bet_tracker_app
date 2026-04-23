@@ -126,18 +126,21 @@ class BetLivePreviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final containerTone =
+    isPreviewLimitExceeded ? StatusTone.danger : StatusTone.info;
+
     return Container(
       width: double.infinity,
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
         color: isPreviewLimitExceeded
-            ? AppColors.danger.withOpacity(0.12)
+            ? statusToneFill(containerTone)
             : AppColors.surfaceAlt,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
           color: isPreviewLimitExceeded
-              ? AppColors.danger.withOpacity(0.35)
+              ? statusToneBorder(containerTone)
               : AppColors.border,
         ),
       ),
