@@ -214,6 +214,12 @@ class _AddBetPageState extends State<AddBetPage> {
     return BetFormHelpers.buildPreviewResultLabel(_selectedResult);
   }
 
+  StatusTone get _previewNetTone {
+    if (_previewNetProfit > 0) return StatusTone.success;
+    if (_previewNetProfit < 0) return StatusTone.danger;
+    return StatusTone.warning;
+  }
+
   Future<void> _pickDate() async {
     final picked = await showDatePicker(
       context: context,
@@ -465,11 +471,6 @@ class _AddBetPageState extends State<AddBetPage> {
     final isWide = MediaQuery.of(context).size.width > 700;
     final previewNetProfit = _previewNetProfit;
     final previewPayout = _previewPayout;
-    final previewNetTone = previewNetProfit > 0
-        ? StatusTone.success
-        : previewNetProfit < 0
-        ? StatusTone.danger
-        : StatusTone.warning;
 
     return Scaffold(
       appBar: AppBar(
@@ -513,7 +514,7 @@ class _AddBetPageState extends State<AddBetPage> {
                       BetLivePreviewCard(
                         previewResultLabel: _previewResultLabel,
                         netProfit: previewNetProfit,
-                        netTone: previewNetTone,
+                        netTone: _previewNetTone,
                         payout: previewPayout,
                         effectiveMaxStake: _effectiveMaxStake,
                         isPreviewLimitExceeded: _isPreviewLimitExceeded,
