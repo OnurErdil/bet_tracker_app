@@ -241,17 +241,6 @@ class _AddBetPageState extends State<AddBetPage> {
     }
   }
 
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
-  String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year.toString();
-    return '$day.$month.$year';
-  }
-
   String _maxStakeInfoText() {
     return BetFormHelpers.buildMaxStakeInfoText(
       currentDynamicMaxStake: _currentDynamicMaxStake,
@@ -282,7 +271,7 @@ class _AddBetPageState extends State<AddBetPage> {
       return true;
     }
 
-    final isTodayBet = _isSameDay(_selectedDate, DateTime.now());
+    final isTodayBet = BetFormHelpers.isSameDay(_selectedDate, DateTime.now());
     if (!isTodayBet) {
       return true;
     }
@@ -760,7 +749,9 @@ class _AddBetPageState extends State<AddBetPage> {
                             labelText: 'Tarih',
                             prefixIcon: Icon(Icons.calendar_today_outlined),
                           ),
-                          child: Text(_formatDate(_selectedDate)),
+                          child: Text(
+                            BetFormHelpers.formatShortDate(_selectedDate),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 14),

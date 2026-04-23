@@ -268,17 +268,6 @@ class _EditBetPageState extends State<EditBetPage> {
     }
   }
 
-  bool _isSameDay(DateTime a, DateTime b) {
-    return a.year == b.year && a.month == b.month && a.day == b.day;
-  }
-
-  String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year.toString();
-    return '$day.$month.$year';
-  }
-
   String _maxStakeInfoText() {
     return BetFormHelpers.buildMaxStakeInfoText(
       currentDynamicMaxStake: _currentDynamicMaxStake,
@@ -337,7 +326,10 @@ class _EditBetPageState extends State<EditBetPage> {
       return true;
     }
 
-    final isTodayBet = _isSameDay(_selectedDate, DateTime.now());
+    final isTodayBet = BetFormHelpers.isSameDay(
+      _selectedDate,
+      DateTime.now(),
+    );
     if (!isTodayBet) {
       return true;
     }
@@ -348,7 +340,7 @@ class _EditBetPageState extends State<EditBetPage> {
 
     double adjustedTodayLoss = todayLoss;
 
-    if (_isSameDay(widget.bet.date, DateTime.now()) &&
+    if (BetFormHelpers.isSameDay(widget.bet.date, DateTime.now()) &&
         widget.bet.result == 'kaybetti' &&
         widget.bet.netProfit < 0) {
       adjustedTodayLoss -= widget.bet.netProfit.abs();
@@ -949,7 +941,9 @@ class _EditBetPageState extends State<EditBetPage> {
                             labelText: 'Tarih',
                             prefixIcon: Icon(Icons.calendar_today_outlined),
                           ),
-                          child: Text(_formatDate(_selectedDate)),
+                          child: Text(
+                            BetFormHelpers.formatShortDate(_selectedDate),
+                          ),
                         ),
                       ),
                       const SizedBox(height: 14),

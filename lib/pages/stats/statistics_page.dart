@@ -296,7 +296,7 @@ class StatisticsPage extends StatelessWidget {
                                         Expanded(
                                           child: _StatBox(
                                             title: 'Disiplin Modu',
-                                            value: _disciplineModeText(
+                                            value: disciplineModeText(
                                               overview.disciplineMode,
                                             ),
                                             icon: Icons.shield_outlined,
@@ -329,7 +329,7 @@ class StatisticsPage extends StatelessWidget {
                                         const SizedBox(height: 12),
                                         _StatBox(
                                           title: 'Disiplin Modu',
-                                          value: _disciplineModeText(
+                                          value: disciplineModeText(
                                             overview.disciplineMode,
                                           ),
                                           icon: Icons.shield_outlined,
@@ -1176,18 +1176,6 @@ class StatisticsPage extends StatelessWidget {
         );
       },
     );
-  }
-
-  static String _disciplineModeText(String mode) {
-    switch (mode) {
-      case 'block_bet':
-        return 'Bahsi Engelle';
-      case 'lock_day':
-        return 'Günü Kilitle';
-      case 'warning':
-      default:
-        return 'Sadece Uyarı';
-    }
   }
 
   static void _showResetDialog(BuildContext context) {

@@ -258,6 +258,17 @@ class BetFormHelpers {
     }
   }
 
+  static bool isSameDay(DateTime a, DateTime b) {
+    return a.year == b.year && a.month == b.month && a.day == b.day;
+  }
+
+  static String formatShortDate(DateTime date) {
+    final day = date.day.toString().padLeft(2, '0');
+    final month = date.month.toString().padLeft(2, '0');
+    final year = date.year.toString();
+    return '$day.$month.$year';
+  }
+
   static String buildMaxStakeInfoText({
     required double currentDynamicMaxStake,
     required String maxStakeMode,
