@@ -156,9 +156,11 @@ class BankrollPage extends StatelessWidget {
     return '$day.$month.$year  $hour:$minute';
   }
 
-  static ButtonStyle _primaryDialogButtonStyle() {
+  static ButtonStyle _dialogButtonStyle({
+    required Color backgroundColor,
+  }) {
     return ElevatedButton.styleFrom(
-      backgroundColor: AppColors.primary,
+      backgroundColor: backgroundColor,
       foregroundColor: Colors.white,
       minimumSize: const Size(0, 46),
       padding: const EdgeInsets.symmetric(
@@ -171,18 +173,15 @@ class BankrollPage extends StatelessWidget {
     );
   }
 
+  static ButtonStyle _primaryDialogButtonStyle() {
+    return _dialogButtonStyle(
+      backgroundColor: AppColors.primary,
+    );
+  }
+
   static ButtonStyle _dangerDialogButtonStyle() {
-    return ElevatedButton.styleFrom(
+    return _dialogButtonStyle(
       backgroundColor: AppColors.danger,
-      foregroundColor: Colors.white,
-      minimumSize: const Size(0, 46),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
     );
   }
 
