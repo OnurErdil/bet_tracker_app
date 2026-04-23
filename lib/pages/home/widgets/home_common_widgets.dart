@@ -370,6 +370,7 @@ class DashboardCard extends StatelessWidget {
   final String value;
   final IconData icon;
   final Color? valueColor;
+  final StatusTone? iconTone;
 
   const DashboardCard({
     super.key,
@@ -377,6 +378,7 @@ class DashboardCard extends StatelessWidget {
     required this.value,
     required this.icon,
     this.valueColor,
+    this.iconTone,
   });
 
   @override
@@ -386,6 +388,7 @@ class DashboardCard extends StatelessWidget {
       value: value,
       icon: icon,
       valueColor: valueColor,
+      iconTone: iconTone,
     );
   }
 }

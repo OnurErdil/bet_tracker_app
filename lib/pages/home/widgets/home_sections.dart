@@ -48,6 +48,9 @@ class DisciplineSection extends StatelessWidget {
                 valueColor:
                 stats.todayLoss > 0 ? homeDangerColor() : null,
                 icon: Icons.trending_down,
+                iconTone: stats.todayLoss > 0
+                    ? StatusTone.danger
+                    : StatusTone.primary,
               ),
               DashboardCard(
                 title: 'Kalan Limit',
@@ -58,6 +61,9 @@ class DisciplineSection extends StatelessWidget {
                     ? homeDangerColor()
                     : homeSuccessColor(),
                 icon: Icons.speed,
+                iconTone: stats.isDailyLossExceeded
+                    ? StatusTone.danger
+                    : StatusTone.success,
               ),
             ],
           ),
@@ -109,6 +115,10 @@ class MiniAnalysisSection extends StatelessWidget {
                 ? homeSuccessColor()
                 : null,
             icon: Icons.arrow_upward,
+            iconTone: stats.biggestWin != null &&
+                stats.biggestWin!.netProfit > 0
+                ? StatusTone.success
+                : StatusTone.primary,
           ),
           DashboardCard(
             title: 'En Büyük Kayıp',
@@ -120,6 +130,10 @@ class MiniAnalysisSection extends StatelessWidget {
                 ? homeDangerColor()
                 : null,
             icon: Icons.arrow_downward,
+            iconTone: stats.biggestLoss != null &&
+                stats.biggestLoss!.netProfit < 0
+                ? StatusTone.danger
+                : StatusTone.primary,
           ),
           DashboardCard(
             title: 'En Çok Oynanan Bahis Türü',
