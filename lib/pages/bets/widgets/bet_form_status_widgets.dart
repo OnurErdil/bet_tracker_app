@@ -17,10 +17,10 @@ class BetLockedWarningCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.danger.withOpacity(0.12),
+        color: statusToneFill(StatusTone.danger),
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: AppColors.danger.withOpacity(0.35),
+          color: statusToneBorder(StatusTone.danger),
         ),
       ),
       child: Text(
@@ -63,10 +63,10 @@ class BetDisciplineInfoCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
       padding: const EdgeInsets.all(AppSpacing.md),
       decoration: BoxDecoration(
-        color: AppColors.primary.withOpacity(0.10),
+        color: statusToneFill(StatusTone.primary),
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: AppColors.primary.withOpacity(0.35),
+          color: statusToneBorder(StatusTone.primary),
         ),
       ),
       child: Column(
@@ -210,9 +210,10 @@ class BetConfidenceScoreCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final accentColor = isHighConfidenceSelected
-        ? homeWarningColor()
-        : AppColors.primary;
+    final accentTone = isHighConfidenceSelected
+        ? StatusTone.warning
+        : StatusTone.primary;
+    final accentColor = statusToneColor(accentTone);
 
     final helperText = isHighConfidenceSelected && effectiveMaxStake > 0
         ? 'Yüksek güven aktif • Bu seçim için max: ${effectiveMaxStake.toStringAsFixed(2)} ₺'
@@ -226,7 +227,7 @@ class BetConfidenceScoreCard extends StatelessWidget {
         color: AppColors.surfaceAlt,
         borderRadius: BorderRadius.circular(AppRadius.md),
         border: Border.all(
-          color: accentColor.withOpacity(0.30),
+          color: statusToneBorder(accentTone),
         ),
       ),
       child: Column(
@@ -248,10 +249,10 @@ class BetConfidenceScoreCard extends StatelessWidget {
                   vertical: 6,
                 ),
                 decoration: BoxDecoration(
-                  color: accentColor.withOpacity(0.14),
+                  color: statusToneFill(accentTone),
                   borderRadius: BorderRadius.circular(AppRadius.pill),
                   border: Border.all(
-                    color: accentColor.withOpacity(0.35),
+                    color: statusToneBorder(accentTone),
                   ),
                 ),
                 child: Text(
@@ -270,7 +271,7 @@ class BetConfidenceScoreCard extends StatelessWidget {
               activeTrackColor: accentColor,
               inactiveTrackColor: AppColors.border,
               thumbColor: accentColor,
-              overlayColor: accentColor.withOpacity(0.12),
+              overlayColor: statusToneFill(accentTone),
               valueIndicatorColor: accentColor,
             ),
             child: Slider(

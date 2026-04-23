@@ -37,6 +37,7 @@ Color homeInfoColor() => const Color(0xFF0EA5E9);
 Color homeHighConfidenceColor() => const Color(0xFFEA580C);
 
 enum StatusTone {
+  primary,
   success,
   danger,
   warning,
@@ -47,6 +48,8 @@ enum StatusTone {
 
 Color statusToneColor(StatusTone tone) {
   switch (tone) {
+    case StatusTone.primary:
+      return AppColors.primary;
     case StatusTone.success:
       return homeSuccessColor();
     case StatusTone.danger:
@@ -951,6 +954,71 @@ class SecondaryActionButton extends StatelessWidget {
   }
 }
 
+class StateMessageCard extends StatelessWidget {
+  final String text;
+  final StatusTone tone;
+  final IconData icon;
+  final bool centered;
+
+  const StateMessageCard({
+    super.key,
+    required this.text,
+    required this.tone,
+    required this.icon,
+    this.centered = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = statusToneColor(tone);
+
+    return Card(
+      color: AppColors.surface,
+      elevation: 0,
+      shape: AppStyles.cardShape(radius: AppRadius.lg),
+      child: Padding(
+        padding: const EdgeInsets.all(AppSpacing.xl),
+        child: Column(
+          crossAxisAlignment:
+          centered ? CrossAxisAlignment.center : CrossAxisAlignment.start,
+          children: [
+            Container(
+              width: 52,
+              height: 52,
+              decoration: BoxDecoration(
+                color: statusToneFill(tone),
+                borderRadius: BorderRadius.circular(AppRadius.lg),
+                border: Border.all(
+                  color: statusToneBorder(tone),
+                ),
+              ),
+              child: Icon(
+                icon,
+                color: color,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(
+              text,
+              textAlign: centered ? TextAlign.center : TextAlign.left,
+              style: TextStyle(
+                color: tone == StatusTone.danger
+                    ? AppColors.textDangerSoft
+                    : AppColors.textPrimary,
+                fontWeight: tone == StatusTone.danger
+                    ? FontWeight.bold
+                    : FontWeight.w500,
+                height: 1.4,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
 class InfoCard extends StatelessWidget {
   final String text;
 
@@ -961,17 +1029,10 @@ class InfoCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      color: AppColors.surface,
-      elevation: 0,
-      shape: AppStyles.cardShape(radius: AppRadius.lg),
-      child: Padding(
-        padding: const EdgeInsets.all(AppSpacing.xl),
-        child: Text(
-          text,
-          textAlign: TextAlign.center,
-        ),
-      ),
+    return StateMessageCard(
+      text: text,
+      tone: StatusTone.info,
+      icon: Icons.info_outline,
     );
   }
 }
@@ -986,24 +1047,11 @@ class WarningCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.all(AppSpacing.md),
-      decoration: BoxDecoration(
-        color: AppColors.danger.withOpacity(0.12),
-        borderRadius: BorderRadius.circular(AppRadius.md),
-        border: Border.all(
-          color: AppColors.danger.withOpacity(0.35),
-        ),
-      ),
-      child: Text(
-        message,
-        style: const TextStyle(
-          color: AppColors.textDangerSoft,
-          fontWeight: FontWeight.bold,
-          height: 1.35,
-        ),
-      ),
+    return StateMessageCard(
+      text: message,
+      tone: StatusTone.danger,
+      icon: Icons.warning_amber_rounded,
+      centered: false,
     );
   }
 }
@@ -1019,11 +1067,12 @@ class ErrorStateCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(24),
-        child: Text(
-          message,
-          textAlign: TextAlign.center,
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: 560),
+        child: StateMessageCard(
+          text: message,
+          tone: StatusTone.danger,
+          icon: Icons.error_outline,
         ),
       ),
     );
