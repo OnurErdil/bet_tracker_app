@@ -66,11 +66,11 @@ Color statusToneColor(StatusTone tone) {
 }
 
 Color statusToneFill(StatusTone tone) {
-  return statusToneColor(tone).withOpacity(0.14);
+  return statusToneColor(tone).withValues(alpha: 0.14);
 }
 
 Color statusToneBorder(StatusTone tone) {
-  return statusToneColor(tone).withOpacity(0.35);
+  return statusToneColor(tone).withValues(alpha: 0.35);
 }
 
 StatusTone confidenceBadgeTone(int score) {
@@ -497,12 +497,12 @@ class FormSequenceCard extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: resolvedTone != null
                           ? statusToneFill(resolvedTone)
-                          : resolvedColor.withOpacity(0.18),
+                          : resolvedColor.withValues(alpha: 0.18),
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                       border: Border.all(
                         color: resolvedTone != null
                             ? statusToneBorder(resolvedTone)
-                            : resolvedColor.withOpacity(0.34),
+                            : resolvedColor.withValues(alpha: 0.34),
                       ),
                     ),
                     child: Text(
