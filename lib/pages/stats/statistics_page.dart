@@ -690,15 +690,15 @@ class StatisticsPage extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.14),
+                      color: statusToneFill(StatusTone.primary),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.28),
+                        color: statusToneBorder(StatusTone.primary),
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.savings_outlined,
-                      color: AppColors.primary,
+                      color: statusToneColor(StatusTone.primary),
                       size: 20,
                     ),
                   ),
@@ -883,15 +883,15 @@ class StatisticsPage extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.14),
+                      color: statusToneFill(StatusTone.primary),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.28),
+                        color: statusToneBorder(StatusTone.primary),
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.tune,
-                      color: AppColors.primary,
+                      color: statusToneColor(StatusTone.primary),
                       size: 20,
                     ),
                   ),
@@ -1225,15 +1225,15 @@ class StatisticsPage extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: AppColors.danger.withOpacity(0.14),
+                      color: statusToneFill(StatusTone.danger),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.danger.withOpacity(0.28),
+                        color: statusToneBorder(StatusTone.danger),
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.delete_forever_outlined,
-                      color: AppColors.danger,
+                      color: statusToneColor(StatusTone.danger),
                       size: 20,
                     ),
                   ),
