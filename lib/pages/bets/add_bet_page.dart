@@ -465,11 +465,11 @@ class _AddBetPageState extends State<AddBetPage> {
     final isWide = MediaQuery.of(context).size.width > 700;
     final previewNetProfit = _previewNetProfit;
     final previewPayout = _previewPayout;
-    final previewNetColor = previewNetProfit > 0
-        ? homeSuccessColor()
+    final previewNetTone = previewNetProfit > 0
+        ? StatusTone.success
         : previewNetProfit < 0
-        ? homeDangerColor()
-        : homeWarningColor();
+        ? StatusTone.danger
+        : StatusTone.warning;
 
     return Scaffold(
       appBar: AppBar(
@@ -513,7 +513,7 @@ class _AddBetPageState extends State<AddBetPage> {
                       BetLivePreviewCard(
                         previewResultLabel: _previewResultLabel,
                         netProfit: previewNetProfit,
-                        netColor: previewNetColor,
+                        netTone: previewNetTone,
                         payout: previewPayout,
                         effectiveMaxStake: _effectiveMaxStake,
                         isPreviewLimitExceeded: _isPreviewLimitExceeded,

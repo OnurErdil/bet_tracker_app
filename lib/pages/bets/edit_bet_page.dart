@@ -234,10 +234,10 @@ class _EditBetPageState extends State<EditBetPage> {
     return BetFormHelpers.buildPreviewResultLabel(_selectedResult);
   }
 
-  Color get _previewNetColor {
-    if (_previewNetProfit > 0) return homeSuccessColor();
-    if (_previewNetProfit < 0) return homeDangerColor();
-    return homeWarningColor();
+  StatusTone get _previewNetTone {
+    if (_previewNetProfit > 0) return StatusTone.success;
+    if (_previewNetProfit < 0) return StatusTone.danger;
+    return StatusTone.warning;
   }
 
   bool get _isPreviewLimitExceeded {
@@ -687,7 +687,7 @@ class _EditBetPageState extends State<EditBetPage> {
                       BetLivePreviewCard(
                         previewResultLabel: _previewResultLabel,
                         netProfit: _previewNetProfit,
-                        netColor: _previewNetColor,
+                        netTone: _previewNetTone,
                         payout: _previewPayout,
                         effectiveMaxStake: _effectiveMaxStake,
                         isPreviewLimitExceeded: _isPreviewLimitExceeded,

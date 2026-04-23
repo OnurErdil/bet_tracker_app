@@ -107,7 +107,7 @@ class BetDisciplineInfoCard extends StatelessWidget {
 class BetLivePreviewCard extends StatelessWidget {
   final String previewResultLabel;
   final double netProfit;
-  final Color netColor;
+  final StatusTone netTone;
   final double payout;
   final double effectiveMaxStake;
   final bool isPreviewLimitExceeded;
@@ -117,7 +117,7 @@ class BetLivePreviewCard extends StatelessWidget {
     super.key,
     required this.previewResultLabel,
     required this.netProfit,
-    required this.netColor,
+    required this.netTone,
     required this.payout,
     required this.effectiveMaxStake,
     required this.isPreviewLimitExceeded,
@@ -152,36 +152,40 @@ class BetLivePreviewCard extends StatelessWidget {
           ),
           const SizedBox(height: 10),
           Wrap(
-            spacing: 16,
+            spacing: 8,
             runSpacing: 8,
             children: [
-              Text('• Senaryo: $previewResultLabel'),
-              Text(
-                '• Net Etki: ${netProfit.toStringAsFixed(2)} ₺',
-                style: TextStyle(
-                  color: netColor,
-                  fontWeight: FontWeight.bold,
+              BetInfoChip(
+                icon: Icons.visibility_outlined,
+                text: previewResultLabel,
+                tone: StatusTone.info,
+              ),
+              BetInfoChip(
+                icon: netProfit >= 0
+                    ? Icons.trending_up
+                    : Icons.trending_down,
+                text: 'Net ${netProfit.toStringAsFixed(2)} ₺',
+                tone: netTone,
+              ),
+              BetInfoChip(
+                icon: Icons.account_balance_wallet_outlined,
+                text: '$payoutLabel: ${payout.toStringAsFixed(2)} ₺',
+                tone: StatusTone.info,
+              ),
+              if (effectiveMaxStake > 0)
+                BetInfoChip(
+                  icon: Icons.money_off_csred_outlined,
+                  text: 'Max ${effectiveMaxStake.toStringAsFixed(2)} ₺',
+                  tone: StatusTone.warning,
                 ),
-              ),
-              Text(
-                '• $payoutLabel: ${payout.toStringAsFixed(2)} ₺',
-              ),
             ],
           ),
-          if (effectiveMaxStake > 0) ...[
-            const SizedBox(height: 8),
-            Text(
-              '• Bu güven için maksimum bahis: ${effectiveMaxStake.toStringAsFixed(2)} ₺',
-            ),
-          ],
           if (isPreviewLimitExceeded) ...[
             const SizedBox(height: 8),
-            const Text(
-              '• Girilen tutar maksimum bahis limitini aşıyor.',
-              style: TextStyle(
-                color: AppColors.textDangerSoft,
-                fontWeight: FontWeight.bold,
-              ),
+            const BetInfoChip(
+              icon: Icons.warning_amber_rounded,
+              text: 'Maksimum bahis limiti aşıldı',
+              tone: StatusTone.danger,
             ),
           ],
         ],
