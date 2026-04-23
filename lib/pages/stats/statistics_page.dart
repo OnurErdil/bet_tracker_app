@@ -1470,11 +1470,6 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-Color _positiveStatColor() => const Color(0xFF22C55E);
-Color _negativeStatColor() => const Color(0xFFEF4444);
-Color _warningStatColor() => const Color(0xFFF59E0B);
-Color _mutedStatColor() => const Color(0xFF94A3B8);
-
 ButtonStyle _primaryActionButtonStyle() {
   return ElevatedButton.styleFrom(
     backgroundColor: AppColors.primary,
@@ -1537,25 +1532,25 @@ class _Last10FormStat extends StatelessWidget {
 
   List<FormSequenceEntry> _buildItems() {
     return formItems.map((item) {
-      Color color;
+      final StatusTone tone;
 
       switch (item['color']) {
         case 'green':
-          color = _positiveStatColor();
+          tone = StatusTone.success;
           break;
         case 'red':
-          color = _negativeStatColor();
+          tone = StatusTone.danger;
           break;
         case 'orange':
-          color = _warningStatColor();
+          tone = StatusTone.warning;
           break;
         default:
-          color = _mutedStatColor();
+          tone = StatusTone.muted;
       }
 
       return FormSequenceEntry(
         label: item['label'] ?? '-',
-        color: color,
+        tone: tone,
       );
     }).toList();
   }

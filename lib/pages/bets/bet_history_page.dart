@@ -431,21 +431,6 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     });
   }
 
-  String _resultLabel(String value) {
-    switch (value) {
-      case 'kazandi':
-        return 'Kazandı';
-      case 'kaybetti':
-        return 'Kaybetti';
-      case 'iade':
-        return 'İade';
-      case 'Tümü':
-        return 'Tümü';
-      default:
-        return 'Beklemede';
-    }
-  }
-
   StatusTone _resultTone(String value) {
     switch (value) {
       case 'kazandi':
@@ -456,19 +441,6 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
         return StatusTone.warning;
       default:
         return StatusTone.muted;
-    }
-  }
-
-  Color _resultColor(String value) {
-    switch (value) {
-      case 'kazandi':
-        return homeSuccessColor();
-      case 'kaybetti':
-        return homeDangerColor();
-      case 'iade':
-        return homeWarningColor();
-      default:
-        return homeMutedColor();
     }
   }
   String _displayMatchName(BetModel bet) {
@@ -1268,13 +1240,13 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                   ),
                                 ),
                               ),
-                          child: _BetCard(
-                            bet: bet,
-                            resultLabel: _resultLabel(bet.result),
-                            resultColor: _resultColor(bet.result),
-                            formattedDate: _formatDate(bet.date),
-                            sportIcon: _sportIcon(bet.sport),
-                          ),
+                              child: _BetCard(
+                                bet: bet,
+                                resultLabel: resultLabel(bet.result),
+                                resultTone: _resultTone(bet.result),
+                                formattedDate: _formatDate(bet.date),
+                                sportIcon: _sportIcon(bet.sport),
+                              ),
                         ),
                       ),
                   ],
@@ -1373,7 +1345,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           .map(
             (result) => DropdownMenuItem(
           value: result,
-          child: Text(_resultLabel(result == 'Tümü' ? 'Tümü' : result)),
+          child: Text(resultLabel(result == 'Tümü' ? 'Tümü' : result)),
         ),
       )
           .toList(),
@@ -1419,14 +1391,14 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 class _BetCard extends StatelessWidget {
   final BetModel bet;
   final String resultLabel;
-  final Color resultColor;
+  final StatusTone resultTone;
   final String formattedDate;
   final IconData sportIcon;
 
   const _BetCard({
     required this.bet,
     required this.resultLabel,
-    required this.resultColor,
+    required this.resultTone,
     required this.formattedDate,
     required this.sportIcon,
   });
@@ -1601,13 +1573,7 @@ class _BetCard extends StatelessWidget {
               const SizedBox(height: AppSpacing.md),
               _BetOutcomeBar(
                 resultLabel: resultLabel,
-                resultTone: bet.result == 'kazandi'
-                    ? StatusTone.success
-                    : bet.result == 'kaybetti'
-                    ? StatusTone.danger
-                    : bet.result == 'iade'
-                    ? StatusTone.warning
-                    : StatusTone.muted,
+                resultTone: resultTone,
                 resultIcon: resultIcon,
                 netProfit: bet.netProfit,
                 netColor: netColor,
