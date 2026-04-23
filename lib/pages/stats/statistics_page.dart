@@ -1465,6 +1465,7 @@ class _StatBox extends StatelessWidget {
       value: value,
       icon: icon,
       valueColor: valueColor ?? (tone == null ? null : statusToneColor(tone!)),
+      iconTone: tone,
       compact: true,
     );
   }

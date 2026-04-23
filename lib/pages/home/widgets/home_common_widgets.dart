@@ -155,16 +155,16 @@ class WelcomeHeader extends StatelessWidget {
               width: 72,
               height: 72,
               decoration: BoxDecoration(
-                color: AppColors.primary.withOpacity(0.14),
+                color: statusToneFill(StatusTone.primary),
                 borderRadius: BorderRadius.circular(AppRadius.xl),
                 border: Border.all(
-                  color: AppColors.primary.withOpacity(0.30),
+                  color: statusToneBorder(StatusTone.primary),
                 ),
               ),
-              child: const Icon(
+              child: Icon(
                 Icons.verified_user,
                 size: 34,
-                color: AppColors.primary,
+                color: statusToneColor(StatusTone.primary),
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
@@ -230,6 +230,7 @@ class StatValueCard extends StatelessWidget {
   final String value;
   final IconData? icon;
   final Color? valueColor;
+  final StatusTone? iconTone;
   final bool centered;
   final bool compact;
 
@@ -239,6 +240,7 @@ class StatValueCard extends StatelessWidget {
     required this.value,
     this.icon,
     this.valueColor,
+    this.iconTone,
     this.centered = false,
     this.compact = false,
   });
@@ -246,6 +248,8 @@ class StatValueCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final resolvedValueColor = valueColor ?? AppColors.textPrimary;
+    final resolvedIconTone = iconTone ?? StatusTone.primary;
+    final resolvedIconColor = statusToneColor(resolvedIconTone);
     final borderRadius = compact ? AppRadius.md : AppRadius.lg;
     final verticalPadding = compact ? AppSpacing.md : AppSpacing.lg;
     final horizontalPadding = compact ? AppSpacing.md : 18.0;
@@ -259,15 +263,15 @@ class StatValueCard extends StatelessWidget {
         width: 44,
         height: 44,
         decoration: BoxDecoration(
-          color: AppColors.primary.withOpacity(0.14),
+          color: statusToneFill(resolvedIconTone),
           borderRadius: BorderRadius.circular(AppRadius.md),
           border: Border.all(
-            color: AppColors.primary.withOpacity(0.28),
+            color: statusToneBorder(resolvedIconTone),
           ),
         ),
         child: Icon(
           icon,
-          color: AppColors.primary,
+          color: resolvedIconColor,
           size: 22,
         ),
       );
@@ -429,15 +433,15 @@ class FormSequenceCard extends StatelessWidget {
                   width: 40,
                   height: 40,
                   decoration: BoxDecoration(
-                    color: AppColors.primary.withOpacity(0.14),
+                    color: statusToneFill(StatusTone.primary),
                     borderRadius: BorderRadius.circular(AppRadius.md),
                     border: Border.all(
-                      color: AppColors.primary.withOpacity(0.28),
+                      color: statusToneBorder(StatusTone.primary),
                     ),
                   ),
-                  child: const Icon(
+                  child: Icon(
                     Icons.insights_outlined,
-                    color: AppColors.primary,
+                    color: statusToneColor(StatusTone.primary),
                     size: 20,
                   ),
                 ),
@@ -481,16 +485,21 @@ class FormSequenceCard extends StatelessWidget {
                 runSpacing: 8,
                 children: items.map((item) {
                   final resolvedColor = item.resolvedColor;
+                  final resolvedTone = item.tone;
 
                   return Container(
                     width: 30,
                     height: 30,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: resolvedColor.withOpacity(0.18),
+                      color: resolvedTone != null
+                          ? statusToneFill(resolvedTone)
+                          : resolvedColor.withOpacity(0.18),
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                       border: Border.all(
-                        color: resolvedColor.withOpacity(0.34),
+                        color: resolvedTone != null
+                            ? statusToneBorder(resolvedTone)
+                            : resolvedColor.withOpacity(0.34),
                       ),
                     ),
                     child: Text(
