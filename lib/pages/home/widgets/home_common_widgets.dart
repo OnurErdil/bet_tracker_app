@@ -385,12 +385,18 @@ class DashboardCard extends StatelessWidget {
 
 class FormSequenceEntry {
   final String label;
-  final Color color;
+  final Color? color;
+  final StatusTone? tone;
 
   const FormSequenceEntry({
     required this.label,
-    required this.color,
-  });
+    this.color,
+    this.tone,
+  }) : assert(color != null || tone != null);
+
+  Color get resolvedColor {
+    return color ?? statusToneColor(tone!);
+  }
 }
 
 class FormSequenceCard extends StatelessWidget {
@@ -471,21 +477,23 @@ class FormSequenceCard extends StatelessWidget {
                 spacing: 8,
                 runSpacing: 8,
                 children: items.map((item) {
+                  final resolvedColor = item.resolvedColor;
+
                   return Container(
                     width: 30,
                     height: 30,
                     alignment: Alignment.center,
                     decoration: BoxDecoration(
-                      color: item.color.withOpacity(0.18),
+                      color: resolvedColor.withOpacity(0.18),
                       borderRadius: BorderRadius.circular(AppRadius.pill),
                       border: Border.all(
-                        color: item.color.withOpacity(0.34),
+                        color: resolvedColor.withOpacity(0.34),
                       ),
                     ),
                     child: Text(
                       item.label,
                       style: TextStyle(
-                        color: item.color,
+                        color: resolvedColor,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -511,24 +519,24 @@ class Last10FormCard extends StatelessWidget {
     return bets.map((bet) {
       switch (bet.result) {
         case 'kazandi':
-          return FormSequenceEntry(
+          return const FormSequenceEntry(
             label: 'W',
-            color: homeSuccessColor(),
+            tone: StatusTone.success,
           );
         case 'kaybetti':
-          return FormSequenceEntry(
+          return const FormSequenceEntry(
             label: 'L',
-            color: homeDangerColor(),
+            tone: StatusTone.danger,
           );
         case 'iade':
-          return FormSequenceEntry(
+          return const FormSequenceEntry(
             label: 'I',
-            color: homeWarningColor(),
+            tone: StatusTone.warning,
           );
         default:
-          return FormSequenceEntry(
+          return const FormSequenceEntry(
             label: 'B',
-            color: homeMutedColor(),
+            tone: StatusTone.muted,
           );
       }
     }).toList();
