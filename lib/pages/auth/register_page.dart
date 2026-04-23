@@ -1,3 +1,4 @@
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/auth_service.dart';
 import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
@@ -98,16 +99,16 @@ class _RegisterPageState extends State<RegisterPage> {
                       height: 64,
                       margin: const EdgeInsets.only(bottom: AppSpacing.lg),
                       decoration: BoxDecoration(
-                        color: AppColors.primary.withOpacity(0.14),
+                        color: statusToneFill(StatusTone.primary),
                         borderRadius: BorderRadius.circular(AppRadius.lg),
                         border: Border.all(
-                          color: AppColors.primary.withOpacity(0.28),
+                          color: statusToneBorder(StatusTone.primary),
                         ),
                       ),
-                      child: const Icon(
+                      child: Icon(
                         Icons.person_add_alt_1_outlined,
                         size: 30,
-                        color: AppColors.primary,
+                        color: statusToneColor(StatusTone.primary),
                       ),
                     ),
                     const Text(
