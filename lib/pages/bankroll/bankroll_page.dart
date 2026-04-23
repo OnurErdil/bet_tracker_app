@@ -56,8 +56,9 @@ class BankrollPage extends StatelessWidget {
               final tx = list[i];
 
               final isDeposit = tx.type == 'deposit';
-              final accentColor =
-              isDeposit ? homeSuccessColor() : homeDangerColor();
+              final accentTone =
+              isDeposit ? StatusTone.success : StatusTone.danger;
+              final accentColor = statusToneColor(accentTone);
 
               return Card(
                 color: AppColors.surface,
@@ -76,10 +77,10 @@ class BankrollPage extends StatelessWidget {
                           width: 44,
                           height: 44,
                           decoration: BoxDecoration(
-                            color: accentColor.withOpacity(0.14),
+                            color: statusToneFill(accentTone),
                             borderRadius: BorderRadius.circular(AppRadius.md),
                             border: Border.all(
-                              color: accentColor.withOpacity(0.32),
+                              color: statusToneBorder(accentTone),
                             ),
                           ),
                           child: Icon(
@@ -224,15 +225,15 @@ class BankrollPage extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.14),
+                      color: statusToneFill(StatusTone.primary),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.28),
+                        color: statusToneBorder(StatusTone.primary),
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.account_balance_wallet_outlined,
-                      color: AppColors.primary,
+                      color: statusToneColor(StatusTone.primary),
                       size: 20,
                     ),
                   ),
@@ -453,15 +454,15 @@ class BankrollPage extends StatelessWidget {
                     width: 42,
                     height: 42,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.14),
+                      color: statusToneFill(StatusTone.primary),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.28),
+                        color: statusToneBorder(StatusTone.primary),
                       ),
                     ),
-                    child: const Icon(
+                    child: Icon(
                       Icons.edit_outlined,
-                      color: AppColors.primary,
+                      color: statusToneColor(StatusTone.primary),
                       size: 20,
                     ),
                   ),
