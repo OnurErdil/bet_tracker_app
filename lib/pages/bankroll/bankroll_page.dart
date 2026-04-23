@@ -185,6 +185,149 @@ class BankrollPage extends StatelessWidget {
     );
   }
 
+  static void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  static Widget _buildDialogHeader({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    StatusTone tone = StatusTone.primary,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: statusToneFill(tone),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(
+              color: statusToneBorder(tone),
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: statusToneColor(tone),
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildTransactionAmountField({
+    required TextEditingController controller,
+    String? hintText,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(
+        decimal: true,
+      ),
+      decoration: InputDecoration(
+        labelText: 'Tutar',
+        hintText: hintText,
+        prefixIcon: const Icon(Icons.payments_outlined),
+      ),
+    );
+  }
+
+  static Widget _buildTransactionTypeField({
+    required String value,
+    required ValueChanged<String?> onChanged,
+  }) {
+    return DropdownButtonFormField<String>(
+      value: value,
+      decoration: const InputDecoration(
+        labelText: 'İşlem Türü',
+        prefixIcon: Icon(Icons.swap_horiz),
+      ),
+      items: const [
+        DropdownMenuItem(
+          value: 'deposit',
+          child: Text('Para Ekle'),
+        ),
+        DropdownMenuItem(
+          value: 'withdraw',
+          child: Text('Para Çek'),
+        ),
+      ],
+      onChanged: onChanged,
+    );
+  }
+
+  static Widget _buildTransactionNoteField({
+    required TextEditingController controller,
+  }) {
+    return TextField(
+      controller: controller,
+      decoration: const InputDecoration(
+        labelText: 'Not',
+        hintText: 'Örn: Nakit ekleme / çekim nedeni',
+        prefixIcon: Icon(Icons.note_alt_outlined),
+      ),
+    );
+  }
+
+  static double? _parseAmount(TextEditingController controller) {
+    return double.tryParse(
+      controller.text.trim().replaceAll(',', '.'),
+    );
+  }
+
+  static Widget _buildDialogLoadingChild() {
+    return const SizedBox(
+      height: 18,
+      width: 18,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  static Widget _buildDialogActionLabel({
+    required IconData icon,
+    required String label,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 18),
+        const SizedBox(width: 6),
+        Text(label),
+      ],
+    );
+  }
+
   static void _showAddDialog(BuildContext context) {
     final amountController = TextEditingController();
     final noteController = TextEditingController();
@@ -218,82 +361,22 @@ class BankrollPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: statusToneFill(StatusTone.primary),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(
-                        color: statusToneBorder(StatusTone.primary),
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.account_balance_wallet_outlined,
-                      color: statusToneColor(StatusTone.primary),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Yeni İşlem',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Kasaya para ekle veya çekme işlemi oluştur.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              title: _buildDialogHeader(
+                icon: Icons.account_balance_wallet_outlined,
+                title: 'Yeni İşlem',
+                subtitle: 'Kasaya para ekle veya çekme işlemi oluştur.',
               ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
+                    _buildTransactionAmountField(
                       controller: amountController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      decoration: const InputDecoration(
-                        labelText: 'Tutar',
-                        hintText: 'Örn: 1000',
-                        prefixIcon: Icon(Icons.payments_outlined),
-                      ),
+                      hintText: 'Örn: 1000',
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
+                    _buildTransactionTypeField(
                       value: type,
-                      decoration: const InputDecoration(
-                        labelText: 'İşlem Türü',
-                        prefixIcon: Icon(Icons.swap_horiz),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'deposit',
-                          child: Text('Para Ekle'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'withdraw',
-                          child: Text('Para Çek'),
-                        ),
-                      ],
                       onChanged: (val) {
                         setState(() {
                           type = val ?? 'deposit';
@@ -301,13 +384,8 @@ class BankrollPage extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 12),
-                    TextField(
+                    _buildTransactionNoteField(
                       controller: noteController,
-                      decoration: const InputDecoration(
-                        labelText: 'Not',
-                        hintText: 'Örn: Nakit ekleme / çekim nedeni',
-                        prefixIcon: Icon(Icons.note_alt_outlined),
-                      ),
                     ),
                   ],
                 ),
@@ -326,25 +404,15 @@ class BankrollPage extends StatelessWidget {
                       ? null
                       : () async {
                     final user = FirebaseAuth.instance.currentUser;
-                    final amount = double.tryParse(
-                      amountController.text.trim().replaceAll(',', '.'),
-                    );
+                    final amount = _parseAmount(amountController);
 
                     if (user == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Kullanıcı bulunamadı.'),
-                        ),
-                      );
+                      _showMessage(context, 'Kullanıcı bulunamadı.');
                       return;
                     }
 
                     if (amount == null || amount <= 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Geçerli bir tutar gir.'),
-                        ),
-                      );
+                      _showMessage(context, 'Geçerli bir tutar gir.');
                       return;
                     }
 
@@ -365,37 +433,20 @@ class BankrollPage extends StatelessWidget {
                     setState(() => isSaving = false);
 
                     if (result != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result)),
-                      );
+                      _showMessage(context, result);
                       return;
                     }
 
                     Navigator.pop(dialogContext);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('İşlem eklendi.'),
-                      ),
-                    );
+                    _showMessage(context, 'İşlem eklendi.');
                   },
                   style: _primaryDialogButtonStyle(),
                   child: isSaving
-                      ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.save_outlined, size: 18),
-                      SizedBox(width: 6),
-                      Text('Kaydet'),
-                    ],
+                      ? _buildDialogLoadingChild()
+                      : _buildDialogActionLabel(
+                    icon: Icons.save_outlined,
+                    label: 'Kaydet',
                   ),
                 ),
               ],
@@ -447,81 +498,21 @@ class BankrollPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: statusToneFill(StatusTone.primary),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(
-                        color: statusToneBorder(StatusTone.primary),
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.edit_outlined,
-                      color: statusToneColor(StatusTone.primary),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'İşlemi Düzenle',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Kasa hareketini güncelle veya sil.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              title: _buildDialogHeader(
+                icon: Icons.edit_outlined,
+                title: 'İşlemi Düzenle',
+                subtitle: 'Kasa hareketini güncelle veya sil.',
               ),
               content: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    TextField(
+                    _buildTransactionAmountField(
                       controller: amountController,
-                      keyboardType: const TextInputType.numberWithOptions(
-                        decimal: true,
-                      ),
-                      decoration: const InputDecoration(
-                        labelText: 'Tutar',
-                        prefixIcon: Icon(Icons.payments_outlined),
-                      ),
                     ),
                     const SizedBox(height: 12),
-                    DropdownButtonFormField<String>(
+                    _buildTransactionTypeField(
                       value: type,
-                      decoration: const InputDecoration(
-                        labelText: 'İşlem Türü',
-                        prefixIcon: Icon(Icons.swap_horiz),
-                      ),
-                      items: const [
-                        DropdownMenuItem(
-                          value: 'deposit',
-                          child: Text('Para Ekle'),
-                        ),
-                        DropdownMenuItem(
-                          value: 'withdraw',
-                          child: Text('Para Çek'),
-                        ),
-                      ],
                       onChanged: (val) {
                         setState(() {
                           type = val ?? 'deposit';
@@ -529,13 +520,8 @@ class BankrollPage extends StatelessWidget {
                       },
                     ),
                     const SizedBox(height: 12),
-                    TextField(
+                    _buildTransactionNoteField(
                       controller: noteController,
-                      decoration: const InputDecoration(
-                        labelText: 'Not',
-                        hintText: 'Örn: Nakit ekleme / çekim nedeni',
-                        prefixIcon: Icon(Icons.note_alt_outlined),
-                      ),
                     ),
                   ],
                 ),
@@ -553,16 +539,10 @@ class BankrollPage extends StatelessWidget {
                   onPressed: (isSaving || isDeleting)
                       ? null
                       : () async {
-                    final amount = double.tryParse(
-                      amountController.text.trim().replaceAll(',', '.'),
-                    );
+                    final amount = _parseAmount(amountController);
 
                     if (amount == null || amount <= 0) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Geçerli bir tutar gir.'),
-                        ),
-                      );
+                      _showMessage(context, 'Geçerli bir tutar gir.');
                       return;
                     }
 
@@ -585,37 +565,20 @@ class BankrollPage extends StatelessWidget {
                     setState(() => isSaving = false);
 
                     if (result != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result)),
-                      );
+                      _showMessage(context, result);
                       return;
                     }
 
                     Navigator.pop(dialogContext);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('İşlem güncellendi.'),
-                      ),
-                    );
+                    _showMessage(context, 'İşlem güncellendi.');
                   },
                   style: _primaryDialogButtonStyle(),
                   child: isSaving
-                      ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.edit_outlined, size: 18),
-                      SizedBox(width: 6),
-                      Text('Güncelle'),
-                    ],
+                      ? _buildDialogLoadingChild()
+                      : _buildDialogActionLabel(
+                    icon: Icons.edit_outlined,
+                    label: 'Güncelle',
                   ),
                 ),
                 ElevatedButton(
@@ -623,11 +586,7 @@ class BankrollPage extends StatelessWidget {
                       ? null
                       : () async {
                     if (tx.id == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Silinecek işlem bulunamadı.'),
-                        ),
-                      );
+                      _showMessage(context, 'Silinecek işlem bulunamadı.');
                       return;
                     }
 
@@ -644,37 +603,20 @@ class BankrollPage extends StatelessWidget {
                     setState(() => isDeleting = false);
 
                     if (result != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result)),
-                      );
+                      _showMessage(context, result);
                       return;
                     }
 
                     Navigator.pop(dialogContext);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('İşlem silindi.'),
-                      ),
-                    );
+                    _showMessage(context, 'İşlem silindi.');
                   },
                   style: _dangerDialogButtonStyle(),
                   child: isDeleting
-                      ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.delete_outline, size: 18),
-                      SizedBox(width: 6),
-                      Text('Sil'),
-                    ],
+                      ? _buildDialogLoadingChild()
+                      : _buildDialogActionLabel(
+                    icon: Icons.delete_outline,
+                    label: 'Sil',
                   ),
                 ),
               ],

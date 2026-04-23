@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'package:bet_tracker_app/data/bet_form_helpers.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/edit_bet_page.dart';
 import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
@@ -449,6 +450,14 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     });
   }
 
+  void _clearQuickFilterSelection() {
+    _selectedQuickFilter = 'Yok';
+  }
+
+  void _rebuildFilters() {
+    setState(() {});
+  }
+
   StatusTone _resultTone(String value) {
     switch (value) {
       case 'kazandi':
@@ -477,98 +486,26 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     );
   }
 
-  String _displayMatchName(BetModel bet) {
-    final home = bet.resolvedHomeTeam.trim();
-    final away = bet.resolvedAwayTeam.trim();
+  void _showMessage(
+      String message, {
+        bool clearPrevious = false,
+      }) {
+    final messenger = ScaffoldMessenger.of(context);
 
-    if (home.isNotEmpty && away.isNotEmpty) {
-      return '$home - $away';
+    if (clearPrevious) {
+      messenger.clearSnackBars();
     }
 
-    return bet.matchName;
-  }
-  String _formatDate(DateTime date) {
-    final day = date.day.toString().padLeft(2, '0');
-    final month = date.month.toString().padLeft(2, '0');
-    final year = date.year.toString();
-    return '$day.$month.$year';
-  }
-
-  IconData _sportIcon(String sport) {
-    switch (sport) {
-      case 'Futbol':
-        return Icons.sports_soccer;
-      case 'Basketbol':
-        return Icons.sports_basketball;
-      case 'Tenis':
-        return Icons.sports_tennis;
-      case 'Voleybol':
-        return Icons.sports_volleyball;
-      default:
-        return Icons.emoji_events_outlined;
-    }
-  }
-
-  Future<void> _pickStartDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _startDate ?? DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
+    messenger.showSnackBar(
+      SnackBar(content: Text(message)),
     );
-
-    if (picked != null) {
-      setState(() {
-        _selectedQuickFilter = 'Yok';
-        _startDate = picked;
-      });
-    }
   }
 
-  Future<void> _pickEndDate() async {
-    final picked = await showDatePicker(
-      context: context,
-      initialDate: _endDate ?? DateTime.now(),
-      firstDate: DateTime(2020),
-      lastDate: DateTime(2100),
-    );
+  void _showDeleteSuccessMessage(BetModel bet) {
+    final messenger = ScaffoldMessenger.of(context);
 
-    if (picked != null) {
-      setState(() {
-        _selectedQuickFilter = 'Yok';
-        _endDate = picked;
-      });
-    }
-  }
-
-  Future<bool> _handleDelete(BetModel bet) async {
-    final user = FirebaseAuth.instance.currentUser;
-
-    if (user == null || bet.id == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Silinecek bahis bulunamadı.'),
-        ),
-      );
-      return false;
-    }
-
-    final result = await BetService.deleteBet(
-      userId: user.uid,
-      betId: bet.id!,
-    );
-
-    if (!mounted) return false;
-
-    if (result != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result)),
-      );
-      return false;
-    }
-
-    ScaffoldMessenger.of(context).clearSnackBars();
-    ScaffoldMessenger.of(context).showSnackBar(
+    messenger.clearSnackBars();
+    messenger.showSnackBar(
       SnackBar(
         content: Text('${_displayMatchName(bet)} silindi.'),
         action: SnackBarAction(
@@ -598,21 +535,95 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
             if (!mounted) return;
 
             if (restoreResult != null) {
-              ScaffoldMessenger.of(context).showSnackBar(
-                SnackBar(content: Text(restoreResult)),
-              );
+              _showMessage(restoreResult);
               return;
             }
 
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Bahis geri yüklendi.'),
-              ),
-            );
+            _showMessage('Bahis geri yüklendi.');
           },
         ),
       ),
     );
+  }
+
+  String _displayMatchName(BetModel bet) {
+    final home = bet.resolvedHomeTeam.trim();
+    final away = bet.resolvedAwayTeam.trim();
+
+    if (home.isNotEmpty && away.isNotEmpty) {
+      return '$home - $away';
+    }
+
+    return bet.matchName;
+  }
+  IconData _sportIcon(String sport) {
+    switch (sport) {
+      case 'Futbol':
+        return Icons.sports_soccer;
+      case 'Basketbol':
+        return Icons.sports_basketball;
+      case 'Tenis':
+        return Icons.sports_tennis;
+      case 'Voleybol':
+        return Icons.sports_volleyball;
+      default:
+        return Icons.emoji_events_outlined;
+    }
+  }
+
+  Future<void> _pickStartDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _startDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _clearQuickFilterSelection();
+        _startDate = picked;
+      });
+    }
+  }
+
+  Future<void> _pickEndDate() async {
+    final picked = await showDatePicker(
+      context: context,
+      initialDate: _endDate ?? DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2100),
+    );
+
+    if (picked != null) {
+      setState(() {
+        _clearQuickFilterSelection();
+        _endDate = picked;
+      });
+    }
+  }
+
+  Future<bool> _handleDelete(BetModel bet) async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user == null || bet.id == null) {
+      _showMessage('Silinecek bahis bulunamadı.');
+      return false;
+    }
+
+    final result = await BetService.deleteBet(
+      userId: user.uid,
+      betId: bet.id!,
+    );
+
+    if (!mounted) return false;
+
+    if (result != null) {
+      _showMessage(result);
+      return false;
+    }
+
+    _showDeleteSuccessMessage(bet);
 
     return true;
   }
@@ -1004,7 +1015,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                         label: Text(
                                           _startDate == null
                                               ? 'Başlangıç Tarihi'
-                                              : _formatDate(_startDate!),
+                                              : BetFormHelpers.formatShortDate(_startDate!),
                                         ),
                                       ),
                                     ),
@@ -1016,7 +1027,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                         label: Text(
                                           _endDate == null
                                               ? 'Bitiş Tarihi'
-                                              : _formatDate(_endDate!),
+                                              : BetFormHelpers.formatShortDate(_endDate!),
                                         ),
                                       ),
                                     ),
@@ -1031,7 +1042,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                       label: Text(
                                         _startDate == null
                                             ? 'Başlangıç Tarihi'
-                                            : _formatDate(_startDate!),
+                                            : BetFormHelpers.formatShortDate(_startDate!),
                                       ),
                                     ),
                                     const SizedBox(height: 12),
@@ -1041,7 +1052,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                       label: Text(
                                         _endDate == null
                                             ? 'Bitiş Tarihi'
-                                            : _formatDate(_endDate!),
+                                            : BetFormHelpers.formatShortDate(_endDate!),
                                       ),
                                     ),
                                   ],
@@ -1051,32 +1062,18 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: TextField(
+                                      child: _buildFilterNumberField(
                                         controller: _minOddController,
-                                        keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
-                                        onChanged: (_) => setState(() {}),
-                                        decoration: const InputDecoration(
-                                          labelText: 'Min Oran',
-                                          prefixIcon: Icon(Icons.trending_up),
-                                        ),
+                                        label: 'Min Oran',
+                                        icon: Icons.trending_up,
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
-                                      child: TextField(
+                                      child: _buildFilterNumberField(
                                         controller: _maxOddController,
-                                        keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
-                                        onChanged: (_) => setState(() {}),
-                                        decoration: const InputDecoration(
-                                          labelText: 'Max Oran',
-                                          prefixIcon: Icon(Icons.trending_down),
-                                        ),
+                                        label: 'Max Oran',
+                                        icon: Icons.trending_down,
                                       ),
                                     ),
                                   ],
@@ -1084,30 +1081,16 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                               else
                                 Column(
                                   children: [
-                                    TextField(
+                                    _buildFilterNumberField(
                                       controller: _minOddController,
-                                      keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                      onChanged: (_) => setState(() {}),
-                                      decoration: const InputDecoration(
-                                        labelText: 'Min Oran',
-                                        prefixIcon: Icon(Icons.trending_up),
-                                      ),
+                                      label: 'Min Oran',
+                                      icon: Icons.trending_up,
                                     ),
                                     const SizedBox(height: 12),
-                                    TextField(
+                                    _buildFilterNumberField(
                                       controller: _maxOddController,
-                                      keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                      onChanged: (_) => setState(() {}),
-                                      decoration: const InputDecoration(
-                                        labelText: 'Max Oran',
-                                        prefixIcon: Icon(Icons.trending_down),
-                                      ),
+                                      label: 'Max Oran',
+                                      icon: Icons.trending_down,
                                     ),
                                   ],
                                 ),
@@ -1116,35 +1099,18 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                 Row(
                                   children: [
                                     Expanded(
-                                      child: TextField(
+                                      child: _buildFilterNumberField(
                                         controller: _minStakeController,
-                                        keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
-                                        onChanged: (_) => setState(() {}),
-                                        decoration: const InputDecoration(
-                                          labelText: 'Min Tutar',
-                                          prefixIcon:
-                                          Icon(Icons.payments_outlined),
-                                        ),
+                                        label: 'Min Tutar',
+                                        icon: Icons.payments_outlined,
                                       ),
                                     ),
                                     const SizedBox(width: 12),
                                     Expanded(
-                                      child: TextField(
+                                      child: _buildFilterNumberField(
                                         controller: _maxStakeController,
-                                        keyboardType:
-                                        const TextInputType.numberWithOptions(
-                                          decimal: true,
-                                        ),
-                                        onChanged: (_) => setState(() {}),
-                                        decoration: const InputDecoration(
-                                          labelText: 'Max Tutar',
-                                          prefixIcon: Icon(
-                                            Icons.account_balance_wallet_outlined,
-                                          ),
-                                        ),
+                                        label: 'Max Tutar',
+                                        icon: Icons.account_balance_wallet_outlined,
                                       ),
                                     ),
                                   ],
@@ -1152,33 +1118,16 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                               else
                                 Column(
                                   children: [
-                                    TextField(
+                                    _buildFilterNumberField(
                                       controller: _minStakeController,
-                                      keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                      onChanged: (_) => setState(() {}),
-                                      decoration: const InputDecoration(
-                                        labelText: 'Min Tutar',
-                                        prefixIcon:
-                                        Icon(Icons.payments_outlined),
-                                      ),
+                                      label: 'Min Tutar',
+                                      icon: Icons.payments_outlined,
                                     ),
                                     const SizedBox(height: 12),
-                                    TextField(
+                                    _buildFilterNumberField(
                                       controller: _maxStakeController,
-                                      keyboardType:
-                                      const TextInputType.numberWithOptions(
-                                        decimal: true,
-                                      ),
-                                      onChanged: (_) => setState(() {}),
-                                      decoration: const InputDecoration(
-                                        labelText: 'Max Tutar',
-                                        prefixIcon: Icon(
-                                          Icons.account_balance_wallet_outlined,
-                                        ),
-                                      ),
+                                      label: 'Max Tutar',
+                                      icon: Icons.account_balance_wallet_outlined,
                                     ),
                                   ],
                                 ),
@@ -1235,12 +1184,12 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                     vertical: 10,
                                   ),
                                   decoration: BoxDecoration(
-                                    color: Colors.white.withOpacity(0.10),
+                                    color: Colors.white.withValues(alpha: 0.10),
                                     borderRadius: BorderRadius.circular(
                                       AppRadius.pill,
                                     ),
                                     border: Border.all(
-                                      color: Colors.white.withOpacity(0.16),
+                                      color: Colors.white.withValues(alpha: 0.16),
                                     ),
                                   ),
                                   child: const Row(
@@ -1267,7 +1216,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                 bet: bet,
                                 resultLabel: resultLabel(bet.result),
                                 resultTone: _resultTone(bet.result),
-                                formattedDate: _formatDate(bet.date),
+                                formattedDate: BetFormHelpers.formatShortDate(bet.date),
                                 sportIcon: _sportIcon(bet.sport),
                               ),
                         ),
@@ -1278,6 +1227,24 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildFilterNumberField({
+    required TextEditingController controller,
+    required String label,
+    required IconData icon,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: const TextInputType.numberWithOptions(
+        decimal: true,
+      ),
+      onChanged: (_) => _rebuildFilters(),
+      decoration: InputDecoration(
+        labelText: label,
+        prefixIcon: Icon(icon),
       ),
     );
   }
@@ -1299,7 +1266,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           .toList(),
       onChanged: (value) {
         setState(() {
-          _selectedQuickFilter = 'Yok';
+          _clearQuickFilterSelection();
           _selectedSport = value ?? 'Tümü';
           _selectedCountry = 'Tümü';
           _selectedLeague = 'Tümü';
@@ -1325,7 +1292,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           .toList(),
       onChanged: (value) {
         setState(() {
-          _selectedQuickFilter = 'Yok';
+          _clearQuickFilterSelection();
           _selectedCountry = value ?? 'Tümü';
           _selectedLeague = 'Tümü';
         });
@@ -1350,7 +1317,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           .toList(),
       onChanged: (value) {
         setState(() {
-          _selectedQuickFilter = 'Yok';
+          _clearQuickFilterSelection();
           _selectedLeague = value ?? 'Tümü';
         });
       },
@@ -1374,7 +1341,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           .toList(),
       onChanged: (value) {
         setState(() {
-          _selectedQuickFilter = 'Yok';
+          _clearQuickFilterSelection();
           _selectedResult = value ?? 'Tümü';
         });
       },
@@ -1403,7 +1370,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
           .toList(),
       onChanged: (value) {
         setState(() {
-          _selectedQuickFilter = 'Yok';
+          _clearQuickFilterSelection();
           _selectedConfidence = value ?? 'Tümü';
         });
       },
