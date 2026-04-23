@@ -1488,16 +1488,16 @@ class _BetCard extends StatelessWidget {
                     width: 38,
                     height: 38,
                     decoration: BoxDecoration(
-                      color: AppColors.primary.withOpacity(0.14),
+                      color: statusToneFill(StatusTone.primary),
                       borderRadius: BorderRadius.circular(AppRadius.md),
                       border: Border.all(
-                        color: AppColors.primary.withOpacity(0.28),
+                        color: statusToneBorder(StatusTone.primary),
                       ),
                     ),
                     child: Icon(
                       sportIcon,
                       size: 18,
-                      color: AppColors.primary,
+                      color: statusToneColor(StatusTone.primary),
                     ),
                   ),
                   const SizedBox(width: AppSpacing.md),
