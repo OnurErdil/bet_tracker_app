@@ -116,21 +116,10 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                     ElevatedButton(
                       onPressed: _isLoading ? null : _resetPassword,
                       child: _isLoading
-                          ? const SizedBox(
-                        height: 22,
-                        width: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                          : const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.send_outlined, size: 18),
-                          SizedBox(width: 6),
-                          Text('Bağlantı Gönder'),
-                        ],
+                          ? const ButtonLoadingIndicator()
+                          : const ButtonIconLabel(
+                        icon: Icons.send_outlined,
+                        label: 'Bağlantı Gönder',
                       ),
                     ),
                   ],

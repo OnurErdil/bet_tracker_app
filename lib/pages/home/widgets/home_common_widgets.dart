@@ -565,6 +565,50 @@ class Last10FormCard extends StatelessWidget {
   }
 }
 
+class ButtonLoadingIndicator extends StatelessWidget {
+  final double size;
+
+  const ButtonLoadingIndicator({
+    super.key,
+    this.size = 22,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: size,
+      width: size,
+      child: const CircularProgressIndicator(
+        strokeWidth: 2,
+        color: Colors.white,
+      ),
+    );
+  }
+}
+
+class ButtonIconLabel extends StatelessWidget {
+  final IconData icon;
+  final String label;
+
+  const ButtonIconLabel({
+    super.key,
+    required this.icon,
+    required this.label,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 18),
+        const SizedBox(width: 6),
+        Text(label),
+      ],
+    );
+  }
+}
+
 class QuickActionButton extends StatelessWidget {
   final String label;
   final IconData icon;

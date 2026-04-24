@@ -183,21 +183,10 @@ class _RegisterPageState extends State<RegisterPage> {
                     ElevatedButton(
                       onPressed: _isLoading ? null : _register,
                       child: _isLoading
-                          ? const SizedBox(
-                        height: 22,
-                        width: 22,
-                        child: CircularProgressIndicator(
-                          strokeWidth: 2,
-                          color: Colors.white,
-                        ),
-                      )
-                          : const Row(
-                        mainAxisSize: MainAxisSize.min,
-                        children: [
-                          Icon(Icons.person_add_alt_1_outlined, size: 18),
-                          SizedBox(width: 6),
-                          Text('Kayıt Ol'),
-                        ],
+                          ? const ButtonLoadingIndicator()
+                          : const ButtonIconLabel(
+                        icon: Icons.person_add_alt_1_outlined,
+                        label: 'Kayıt Ol',
                       ),
                     ),
                   ],
