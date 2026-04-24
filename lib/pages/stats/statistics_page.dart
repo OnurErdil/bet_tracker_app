@@ -648,6 +648,95 @@ class StatisticsPage extends StatelessWidget {
     );
   }
 
+  static void _showMessage(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(message)),
+    );
+  }
+
+  static Widget _buildDialogHeader({
+    required IconData icon,
+    required String title,
+    required String subtitle,
+    StatusTone tone = StatusTone.primary,
+  }) {
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: statusToneFill(tone),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(
+              color: statusToneBorder(tone),
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: statusToneColor(tone),
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                  height: 1.3,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+
+  static Widget _buildDialogLoadingChild() {
+    return const SizedBox(
+      height: 18,
+      width: 18,
+      child: CircularProgressIndicator(
+        strokeWidth: 2,
+        color: Colors.white,
+      ),
+    );
+  }
+
+  static Widget _buildDialogActionLabel({
+    required IconData icon,
+    required String label,
+  }) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(icon, size: 18),
+        const SizedBox(width: 6),
+        Text(label),
+      ],
+    );
+  }
+
+  static double? _parseDoubleInput(TextEditingController controller) {
+    return double.tryParse(
+      controller.text.replaceAll(',', '.'),
+    );
+  }
+
   static void _showBankrollDialog(
       BuildContext context,
       double currentBankrollValue,
@@ -684,49 +773,10 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: statusToneFill(StatusTone.primary),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(
-                        color: statusToneBorder(StatusTone.primary),
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.savings_outlined,
-                      color: statusToneColor(StatusTone.primary),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Başlangıç Kasası',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Kasa başlangıç tutarını güncelle.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              title: _buildDialogHeader(
+                icon: Icons.savings_outlined,
+                title: 'Başlangıç Kasası',
+                subtitle: 'Kasa başlangıç tutarını güncelle.',
               ),
               content: TextField(
                 controller: controller,
@@ -752,16 +802,10 @@ class StatisticsPage extends StatelessWidget {
                   onPressed: isSaving
                       ? null
                       : () async {
-                    final amount = double.tryParse(
-                      controller.text.replaceAll(',', '.'),
-                    );
+                    final amount = _parseDoubleInput(controller);
 
                     if (amount == null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Geçerli bir sayı gir.'),
-                        ),
-                      );
+                      _showMessage(context, 'Geçerli bir sayı gir.');
                       return;
                     }
 
@@ -775,39 +819,23 @@ class StatisticsPage extends StatelessWidget {
                     setState(() => isSaving = false);
 
                     if (result != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result)),
-                      );
+                      _showMessage(context, result);
                       return;
                     }
 
                     Navigator.pop(dialogContext);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text(
-                          'Başlangıç kasası başarıyla kaydedildi.',
-                        ),
-                      ),
+                    _showMessage(
+                      context,
+                      'Başlangıç kasası başarıyla kaydedildi.',
                     );
                   },
                   style: _primaryActionButtonStyle(),
                   child: isSaving
-                      ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.save_outlined, size: 18),
-                      SizedBox(width: 6),
-                      Text('Kaydet'),
-                    ],
+                      ? _buildDialogLoadingChild()
+                      : _buildDialogActionLabel(
+                    icon: Icons.save_outlined,
+                    label: 'Kaydet',
                   ),
                 ),
               ],
@@ -877,49 +905,10 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: statusToneFill(StatusTone.primary),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(
-                        color: statusToneBorder(StatusTone.primary),
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.tune,
-                      color: statusToneColor(StatusTone.primary),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Disiplin Ayarları',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Maksimum bahis, günlük limit ve güven ayarlarını güncelle.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              title: _buildDialogHeader(
+                icon: Icons.tune,
+                title: 'Disiplin Ayarları',
+                subtitle: 'Maksimum bahis, günlük limit ve güven ayarlarını güncelle.',
               ),
               content: SingleChildScrollView(
                 child: Column(
@@ -1137,37 +1126,20 @@ class StatisticsPage extends StatelessWidget {
                     setState(() => isSaving = false);
 
                     if (result != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result)),
-                      );
+                      _showMessage(context, result);
                       return;
                     }
 
                     Navigator.pop(dialogContext);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Disiplin ayarları kaydedildi.'),
-                      ),
-                    );
+                    _showMessage(context, 'Disiplin ayarları kaydedildi.');
                   },
                   style: _primaryActionButtonStyle(),
                   child: isSaving
-                      ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.save_outlined, size: 18),
-                      SizedBox(width: 6),
-                      Text('Kaydet'),
-                    ],
+                      ? _buildDialogLoadingChild()
+                      : _buildDialogActionLabel(
+                    icon: Icons.save_outlined,
+                    label: 'Kaydet',
                   ),
                 ),
               ],
