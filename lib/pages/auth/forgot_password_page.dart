@@ -69,39 +69,11 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: statusToneFill(StatusTone.primary),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                        border: Border.all(
-                          color: statusToneBorder(StatusTone.primary),
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.lock_reset,
-                        size: 30,
-                        color: statusToneColor(StatusTone.primary),
-                      ),
-                    ),
-                    const Text(
-                      'Şifremi Unuttum',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    const Text(
+                    const AuthHeader(
+                      icon: Icons.lock_reset,
+                      title: 'Şifremi Unuttum',
+                      subtitle:
                       'E-posta adresini gir, sana sıfırlama bağlantısı gönderelim.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        height: 1.4,
-                      ),
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     TextField(

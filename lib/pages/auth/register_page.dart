@@ -94,39 +94,10 @@ class _RegisterPageState extends State<RegisterPage> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    Container(
-                      width: 64,
-                      height: 64,
-                      margin: const EdgeInsets.only(bottom: AppSpacing.lg),
-                      decoration: BoxDecoration(
-                        color: statusToneFill(StatusTone.primary),
-                        borderRadius: BorderRadius.circular(AppRadius.lg),
-                        border: Border.all(
-                          color: statusToneBorder(StatusTone.primary),
-                        ),
-                      ),
-                      child: Icon(
-                        Icons.person_add_alt_1_outlined,
-                        size: 30,
-                        color: statusToneColor(StatusTone.primary),
-                      ),
-                    ),
-                    const Text(
-                      'Yeni Hesap Oluştur',
-                      style: TextStyle(
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      textAlign: TextAlign.center,
-                    ),
-                    const SizedBox(height: AppSpacing.sm),
-                    const Text(
-                      'E-posta ve şifreni gir, hesabını oluşturalım.',
-                      textAlign: TextAlign.center,
-                      style: TextStyle(
-                        color: AppColors.textSecondary,
-                        height: 1.4,
-                      ),
+                    const AuthHeader(
+                      icon: Icons.person_add_alt_1_outlined,
+                      title: 'Yeni Hesap Oluştur',
+                      subtitle: 'E-posta ve şifreni gir, hesabını oluşturalım.',
                     ),
                     const SizedBox(height: AppSpacing.xl),
                     TextField(

@@ -609,6 +609,69 @@ class ButtonIconLabel extends StatelessWidget {
   }
 }
 
+class AuthHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final StatusTone tone;
+
+  const AuthHeader({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.tone = StatusTone.primary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    final color = statusToneColor(tone);
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Align(
+          alignment: Alignment.center,
+          child: Container(
+            width: 64,
+            height: 64,
+            margin: const EdgeInsets.only(bottom: AppSpacing.lg),
+            decoration: BoxDecoration(
+              color: statusToneFill(tone),
+              borderRadius: BorderRadius.circular(AppRadius.lg),
+              border: Border.all(
+                color: statusToneBorder(tone),
+              ),
+            ),
+            child: Icon(
+              icon,
+              size: 30,
+              color: color,
+            ),
+          ),
+        ),
+        Text(
+          title,
+          style: const TextStyle(
+            fontSize: 24,
+            fontWeight: FontWeight.bold,
+          ),
+          textAlign: TextAlign.center,
+        ),
+        const SizedBox(height: AppSpacing.sm),
+        Text(
+          subtitle,
+          textAlign: TextAlign.center,
+          style: const TextStyle(
+            color: AppColors.textSecondary,
+            height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
 class QuickActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
