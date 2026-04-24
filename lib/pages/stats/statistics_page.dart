@@ -1,4 +1,5 @@
 import 'package:bet_tracker_app/domain/statistics_calculator.dart';
+import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
@@ -50,7 +51,7 @@ class StatisticsPage extends StatelessWidget {
 
               final userData = userSnapshot.data ?? {};
 
-              return StreamBuilder<List<dynamic>>(
+              return StreamBuilder<List<BankrollTransaction>>(
                 stream: BankrollService.getTransactions(),
                 builder: (context, txSnapshot) {
                   if (txSnapshot.connectionState == ConnectionState.waiting) {
@@ -68,7 +69,7 @@ class StatisticsPage extends StatelessWidget {
 
                   final overview = StatisticsCalculator.calculate(
                     bets: bets,
-                    transactions: transactions.cast(),
+                    transactions: transactions,
                     userData: userData,
                   );
 
@@ -1087,22 +1088,18 @@ class StatisticsPage extends StatelessWidget {
 
                     if (selectedHighConfidenceEnabled &&
                         confidence9Value < 1) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text('Güven 9 çarpanı en az 1.0 olmalı.'),
-                        ),
+                      _showMessage(
+                        context,
+                        'Güven 9 çarpanı en az 1.0 olmalı.',
                       );
                       return;
                     }
 
                     if (selectedHighConfidenceEnabled &&
                         confidence10Value < confidence9Value) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(
-                          content: Text(
-                            'Güven 10 çarpanı, Güven 9 çarpanından küçük olamaz.',
-                          ),
-                        ),
+                      _showMessage(
+                        context,
+                        'Güven 10 çarpanı, Güven 9 çarpanından küçük olamaz.',
                       );
                       return;
                     }
@@ -1179,49 +1176,11 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: Row(
-                children: [
-                  Container(
-                    width: 42,
-                    height: 42,
-                    decoration: BoxDecoration(
-                      color: statusToneFill(StatusTone.danger),
-                      borderRadius: BorderRadius.circular(AppRadius.md),
-                      border: Border.all(
-                        color: statusToneBorder(StatusTone.danger),
-                      ),
-                    ),
-                    child: Icon(
-                      Icons.delete_forever_outlined,
-                      color: statusToneColor(StatusTone.danger),
-                      size: 20,
-                    ),
-                  ),
-                  const SizedBox(width: AppSpacing.md),
-                  const Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        Text(
-                          'Tüm Verileri Sıfırla',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        SizedBox(height: 4),
-                        Text(
-                          'Bu işlem tüm bahis, kasa ve disiplin verilerini temizler.',
-                          style: TextStyle(
-                            fontSize: 12,
-                            color: AppColors.textSecondary,
-                            height: 1.3,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+              title: _buildDialogHeader(
+                icon: Icons.delete_forever_outlined,
+                title: 'Tüm Verileri Sıfırla',
+                subtitle: 'Bu işlem tüm bahis, kasa ve disiplin verilerini temizler.',
+                tone: StatusTone.danger,
               ),
               content: const Text(
                 'Bu işlem tüm bahisleri, kasa hareketlerini ve başlangıç kasasını sıfırlar. Bu işlem geri alınamaz.',
@@ -1249,37 +1208,23 @@ class StatisticsPage extends StatelessWidget {
                     setState(() => isResetting = false);
 
                     if (result != null) {
-                      ScaffoldMessenger.of(context).showSnackBar(
-                        SnackBar(content: Text(result)),
-                      );
+                      _showMessage(context, result);
                       return;
                     }
 
                     Navigator.pop(dialogContext);
 
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('Tüm veriler başarıyla sıfırlandı.'),
-                      ),
+                    _showMessage(
+                      context,
+                      'Tüm veriler başarıyla sıfırlandı.',
                     );
                   },
                   style: _dangerActionButtonStyle(),
                   child: isResetting
-                      ? const SizedBox(
-                    height: 18,
-                    width: 18,
-                    child: CircularProgressIndicator(
-                      strokeWidth: 2,
-                      color: Colors.white,
-                    ),
-                  )
-                      : const Row(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Icon(Icons.delete_forever_outlined, size: 18),
-                      SizedBox(width: 6),
-                      Text('Sıfırla'),
-                    ],
+                      ? _buildDialogLoadingChild()
+                      : _buildDialogActionLabel(
+                    icon: Icons.delete_forever_outlined,
+                    label: 'Sıfırla',
                   ),
                 ),
               ],
