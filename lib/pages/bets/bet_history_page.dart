@@ -490,14 +490,10 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
       String message, {
         bool clearPrevious = false,
       }) {
-    final messenger = ScaffoldMessenger.of(context);
-
-    if (clearPrevious) {
-      messenger.clearSnackBars();
-    }
-
-    messenger.showSnackBar(
-      SnackBar(content: Text(message)),
+    showAppSnackBar(
+      context,
+      message,
+      clearPrevious: clearPrevious,
     );
   }
 

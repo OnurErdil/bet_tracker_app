@@ -185,9 +185,15 @@ class BankrollPage extends StatelessWidget {
     );
   }
 
-  static void _showMessage(BuildContext context, String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  static void _showMessage(
+      BuildContext context,
+      String message, {
+        bool clearPrevious = false,
+      }) {
+    showAppSnackBar(
+      context,
+      message,
+      clearPrevious: clearPrevious,
     );
   }
 
@@ -439,7 +445,11 @@ class BankrollPage extends StatelessWidget {
 
                     Navigator.pop(dialogContext);
 
-                    _showMessage(context, 'İşlem eklendi.');
+                    _showMessage(
+                      context,
+                      'İşlem eklendi.',
+                      clearPrevious: true,
+                    );
                   },
                   style: _primaryDialogButtonStyle(),
                   child: isSaving
@@ -571,7 +581,11 @@ class BankrollPage extends StatelessWidget {
 
                     Navigator.pop(dialogContext);
 
-                    _showMessage(context, 'İşlem güncellendi.');
+                    _showMessage(
+                      context,
+                      'İşlem güncellendi.',
+                      clearPrevious: true,
+                    );
                   },
                   style: _primaryDialogButtonStyle(),
                   child: isSaving
@@ -609,7 +623,11 @@ class BankrollPage extends StatelessWidget {
 
                     Navigator.pop(dialogContext);
 
-                    _showMessage(context, 'İşlem silindi.');
+                    _showMessage(
+                      context,
+                      'İşlem silindi.',
+                      clearPrevious: true,
+                    );
                   },
                   style: _dangerDialogButtonStyle(),
                   child: isDeleting

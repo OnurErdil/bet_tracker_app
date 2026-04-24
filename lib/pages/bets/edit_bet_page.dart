@@ -603,7 +603,7 @@ class _EditBetPageState extends State<EditBetPage> {
             ],
           ),
           content: Text(
-            '"${_currentMatchNameForDialog()}" kaydı silinecek. Bu işlem geri alınamaz.',
+            '"${_currentMatchNameForDialog()}" kaydı silinecek. Silme sonrası kısa süre içinde geri alabilirsin.',
           ),
           actions: [
             TextButton(
@@ -641,11 +641,15 @@ class _EditBetPageState extends State<EditBetPage> {
       return;
     }
 
+    final messenger = ScaffoldMessenger.of(context);
+    final navigator = Navigator.of(context);
+    final deletedBet = widget.bet;
+
     setState(() => _isDeleting = true);
 
     final result = await BetService.deleteBet(
-      userId: widget.bet.userId,
-      betId: widget.bet.id!,
+      userId: deletedBet.userId,
+      betId: deletedBet.id!,
     );
 
     if (!mounted) return;
@@ -656,11 +660,54 @@ class _EditBetPageState extends State<EditBetPage> {
       return;
     }
 
-    _showMessage(
-      'Bahis silindi.',
-      clearPrevious: true,
+    messenger.clearSnackBars();
+    navigator.pop();
+
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text('${_currentMatchNameForDialog()} silindi.'),
+        action: SnackBarAction(
+          label: 'Geri Al',
+          onPressed: () async {
+            final restoreResult = await BetService.addBet(
+              BetModel(
+                userId: deletedBet.userId,
+                date: deletedBet.date,
+                sport: deletedBet.sport,
+                country: deletedBet.country,
+                league: deletedBet.league,
+                homeTeam: deletedBet.resolvedHomeTeam,
+                awayTeam: deletedBet.resolvedAwayTeam,
+                matchName: deletedBet.matchName,
+                betType: deletedBet.betType,
+                odd: deletedBet.odd,
+                stake: deletedBet.stake,
+                result: deletedBet.result,
+                netProfit: deletedBet.netProfit,
+                note: deletedBet.note,
+                createdAt: deletedBet.createdAt,
+                confidenceScore: deletedBet.confidenceScore,
+              ),
+            );
+
+            messenger.clearSnackBars();
+
+            if (restoreResult != null) {
+              messenger.showSnackBar(
+                SnackBar(content: Text(restoreResult)),
+              );
+              return;
+            }
+
+            messenger.showSnackBar(
+              const SnackBar(
+                content: Text('Bahis geri yüklendi.'),
+              ),
+            );
+          },
+        ),
+      ),
     );
-    Navigator.pop(context);
   }
 
   @override
