@@ -2,7 +2,6 @@ import 'package:bet_tracker_app/data/bet_form_catalog.dart';
 import 'package:bet_tracker_app/data/bet_form_helpers.dart';
 import 'package:bet_tracker_app/domain/bet_calculator.dart';
 import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
-import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/widgets/bet_form_status_widgets.dart';
 import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
@@ -455,6 +454,8 @@ class _AddBetPageState extends State<AddBetPage> {
     }
 
     await _loadTeamSuggestions();
+
+    if (!mounted) return;
 
     _showMessage(
       'Bahis başarıyla kaydedildi.',

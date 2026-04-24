@@ -1358,14 +1358,12 @@ class _StatBox extends StatelessWidget {
   final String title;
   final String value;
   final IconData icon;
-  final Color? valueColor;
   final StatusTone? tone;
 
   const _StatBox({
     required this.title,
     required this.value,
     required this.icon,
-    this.valueColor,
     this.tone,
   });
 
@@ -1375,7 +1373,7 @@ class _StatBox extends StatelessWidget {
       title: title,
       value: value,
       icon: icon,
-      valueColor: valueColor ?? (tone == null ? null : statusToneColor(tone!)),
+      valueColor: tone == null ? null : statusToneColor(tone!),
       iconTone: tone,
       compact: true,
     );

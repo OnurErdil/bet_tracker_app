@@ -166,10 +166,6 @@ class HomeDataLoader extends StatelessWidget {
   }
 }
 
-Color _positiveHomeColor() => const Color(0xFF22C55E);
-Color _negativeHomeColor() => const Color(0xFFEF4444);
-Color _warningHomeColor() => const Color(0xFFF59E0B);
-
 class HomeContent extends StatelessWidget {
   final String userEmail;
   final HomeStats stats;

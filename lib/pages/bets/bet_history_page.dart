@@ -694,7 +694,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
             ],
           ),
           content: Text(
-            '"${_displayMatchName(bet)}" kaydı silinecek. Bu işlem geri alınamaz.',
+            '"${_displayMatchName(bet)}" kaydı silinecek. Silme sonrası kısa süre içinde geri alabilirsin.',
           ),
           actions: [
             TextButton(
