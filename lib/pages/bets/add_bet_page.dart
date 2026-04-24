@@ -258,9 +258,14 @@ class _AddBetPageState extends State<AddBetPage> {
     return BetFormHelpers.buildDisciplineModeLabel(_disciplineMode);
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  void _showMessage(
+      String message, {
+        bool clearPrevious = false,
+      }) {
+    showAppSnackBar(
+      context,
+      message,
+      clearPrevious: clearPrevious,
     );
   }
 
@@ -451,7 +456,10 @@ class _AddBetPageState extends State<AddBetPage> {
 
     await _loadTeamSuggestions();
 
-    _showMessage('Bahis başarıyla kaydedildi.');
+    _showMessage(
+      'Bahis başarıyla kaydedildi.',
+      clearPrevious: true,
+    );
     Navigator.pop(context);
   }
 

@@ -286,9 +286,14 @@ class _EditBetPageState extends State<EditBetPage> {
     return BetFormHelpers.buildDisciplineModeLabel(_disciplineMode);
   }
 
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+  void _showMessage(
+      String message, {
+        bool clearPrevious = false,
+      }) {
+    showAppSnackBar(
+      context,
+      message,
+      clearPrevious: clearPrevious,
     );
   }
 
@@ -512,7 +517,10 @@ class _EditBetPageState extends State<EditBetPage> {
 
     await _loadTeamSuggestions();
 
-    _showMessage('Bahis güncellendi.');
+    _showMessage(
+      'Bahis güncellendi.',
+      clearPrevious: true,
+    );
     Navigator.pop(context);
   }
   String _currentMatchNameForDialog() {
@@ -648,7 +656,10 @@ class _EditBetPageState extends State<EditBetPage> {
       return;
     }
 
-    _showMessage('Bahis silindi.');
+    _showMessage(
+      'Bahis silindi.',
+      clearPrevious: true,
+    );
     Navigator.pop(context);
   }
 
