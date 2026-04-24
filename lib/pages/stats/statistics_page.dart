@@ -713,31 +713,6 @@ class StatisticsPage extends StatelessWidget {
     );
   }
 
-  static Widget _buildDialogLoadingChild() {
-    return const SizedBox(
-      height: 18,
-      width: 18,
-      child: CircularProgressIndicator(
-        strokeWidth: 2,
-        color: Colors.white,
-      ),
-    );
-  }
-
-  static Widget _buildDialogActionLabel({
-    required IconData icon,
-    required String label,
-  }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 18),
-        const SizedBox(width: 6),
-        Text(label),
-      ],
-    );
-  }
-
   static double? _parseDoubleInput(TextEditingController controller) {
     return double.tryParse(
       controller.text.replaceAll(',', '.'),
@@ -839,8 +814,8 @@ class StatisticsPage extends StatelessWidget {
                   },
                   style: _primaryActionButtonStyle(),
                   child: isSaving
-                      ? _buildDialogLoadingChild()
-                      : _buildDialogActionLabel(
+                      ? const ButtonLoadingIndicator(size: 18)
+                      : const ButtonIconLabel(
                     icon: Icons.save_outlined,
                     label: 'Kaydet',
                   ),
@@ -1139,8 +1114,8 @@ class StatisticsPage extends StatelessWidget {
                   },
                   style: _primaryActionButtonStyle(),
                   child: isSaving
-                      ? _buildDialogLoadingChild()
-                      : _buildDialogActionLabel(
+                      ? const ButtonLoadingIndicator(size: 18)
+                      : const ButtonIconLabel(
                     icon: Icons.save_outlined,
                     label: 'Kaydet',
                   ),
@@ -1227,8 +1202,8 @@ class StatisticsPage extends StatelessWidget {
                   },
                   style: _dangerActionButtonStyle(),
                   child: isResetting
-                      ? _buildDialogLoadingChild()
-                      : _buildDialogActionLabel(
+                      ? const ButtonLoadingIndicator(size: 18)
+                      : const ButtonIconLabel(
                     icon: Icons.delete_forever_outlined,
                     label: 'Sıfırla',
                   ),

@@ -73,6 +73,51 @@ class BetModel {
     return 5;
   }
 
+  static double _readDouble(dynamic value) {
+    if (value is num) {
+      return value.toDouble();
+    }
+
+    if (value is String) {
+      return double.tryParse(value.trim().replaceAll(',', '.')) ?? 0.0;
+    }
+
+    return 0.0;
+  }
+
+  static DateTime _readDateTime(dynamic value) {
+    if (value is Timestamp) {
+      return value.toDate();
+    }
+
+    if (value is DateTime) {
+      return value;
+    }
+
+    if (value is int) {
+      return DateTime.fromMillisecondsSinceEpoch(value);
+    }
+
+    if (value is String) {
+      return DateTime.tryParse(value.trim()) ?? DateTime.now();
+    }
+
+    return DateTime.now();
+  }
+
+  static String _readResult(dynamic value) {
+    final normalized = (value ?? '').toString().trim();
+
+    if (normalized == 'kazandi' ||
+        normalized == 'kaybetti' ||
+        normalized == 'iade' ||
+        normalized == 'beklemede') {
+      return normalized;
+    }
+
+    return 'beklemede';
+  }
+
   String get resolvedHomeTeam {
     if (homeTeam.trim().isNotEmpty) return homeTeam.trim();
     return _parseMatchName(matchName)['homeTeam'] ?? '';
@@ -110,21 +155,21 @@ class BetModel {
 
     return BetModel(
       id: documentId,
-      userId: map['userId'] ?? '',
-      date: (map['date'] as Timestamp).toDate(),
-      sport: map['sport'] ?? '',
-      country: map['country'] ?? '',
-      league: map['league'] ?? '',
+      userId: (map['userId'] ?? '').toString(),
+      date: _readDateTime(map['date']),
+      sport: (map['sport'] ?? '').toString(),
+      country: (map['country'] ?? '').toString(),
+      league: (map['league'] ?? '').toString(),
       homeTeam: (map['homeTeam'] ?? parsed['homeTeam'] ?? '').toString(),
       awayTeam: (map['awayTeam'] ?? parsed['awayTeam'] ?? '').toString(),
       matchName: rawMatchName,
-      betType: map['betType'] ?? '',
-      odd: (map['odd'] ?? 0).toDouble(),
-      stake: (map['stake'] ?? 0).toDouble(),
-      result: map['result'] ?? 'beklemede',
-      netProfit: (map['netProfit'] ?? 0).toDouble(),
-      note: map['note'] ?? '',
-      createdAt: (map['createdAt'] as Timestamp).toDate(),
+      betType: (map['betType'] ?? '').toString(),
+      odd: _readDouble(map['odd']),
+      stake: _readDouble(map['stake']),
+      result: _readResult(map['result']),
+      netProfit: _readDouble(map['netProfit']),
+      note: (map['note'] ?? '').toString(),
+      createdAt: _readDateTime(map['createdAt']),
       confidenceScore: _readConfidenceScore(map['confidenceScore']),
     );
   }

@@ -52,6 +52,65 @@ class BankrollDisciplineCalculator {
   static const double defaultConfidence9Multiplier = 2.0;
   static const double defaultConfidence10Multiplier = 3.0;
 
+  static double _readDouble(
+      dynamic value, {
+        double fallback = 0.0,
+      }) {
+    if (value is num) {
+      return value.toDouble();
+    }
+
+    if (value is String) {
+      return double.tryParse(value.trim().replaceAll(',', '.')) ?? fallback;
+    }
+
+    return fallback;
+  }
+
+  static bool _readBool(
+      dynamic value, {
+        required bool fallback,
+      }) {
+    if (value is bool) {
+      return value;
+    }
+
+    if (value is String) {
+      final normalized = value.trim().toLowerCase();
+
+      if (normalized == 'true') return true;
+      if (normalized == 'false') return false;
+    }
+
+    if (value is num) {
+      return value != 0;
+    }
+
+    return fallback;
+  }
+
+  static String _readMaxStakeMode(dynamic value) {
+    final normalized = (value ?? '').toString().trim();
+
+    if (normalized == 'fixed' || normalized == 'percent') {
+      return normalized;
+    }
+
+    return 'fixed';
+  }
+
+  static String _readDisciplineMode(dynamic value) {
+    final normalized = (value ?? '').toString().trim();
+
+    if (normalized == 'warning' ||
+        normalized == 'block_bet' ||
+        normalized == 'lock_day') {
+      return normalized;
+    }
+
+    return 'warning';
+  }
+
   static BankrollDisciplineSnapshot calculate({
     required List<BetModel> bets,
     required List<BankrollTransaction> transactions,
@@ -60,24 +119,27 @@ class BankrollDisciplineCalculator {
   }) {
     final now = referenceDate ?? DateTime.now();
 
-    final startingBankroll = (userData['startingBankroll'] ?? 0).toDouble();
-    final maxStakeMode = (userData['maxStakeMode'] ?? 'fixed').toString();
-    final maxStakeValue = (userData['maxStakeValue'] ?? 0).toDouble();
-    final dailyLossLimit = (userData['dailyLossLimit'] ?? 0).toDouble();
-    final targetBankroll = (userData['targetBankroll'] ?? 0).toDouble();
-    final disciplineMode = (userData['disciplineMode'] ?? 'warning').toString();
+    final startingBankroll = _readDouble(userData['startingBankroll']);
+    final maxStakeMode = _readMaxStakeMode(userData['maxStakeMode']);
+    final maxStakeValue = _readDouble(userData['maxStakeValue']);
+    final dailyLossLimit = _readDouble(userData['dailyLossLimit']);
+    final targetBankroll = _readDouble(userData['targetBankroll']);
+    final disciplineMode = _readDisciplineMode(userData['disciplineMode']);
 
-    final highConfidenceEnabled =
-    (userData['highConfidenceEnabled'] ?? defaultHighConfidenceEnabled)
-    as bool;
+    final highConfidenceEnabled = _readBool(
+      userData['highConfidenceEnabled'],
+      fallback: defaultHighConfidenceEnabled,
+    );
 
-    final confidence9Multiplier =
-    (userData['confidence9Multiplier'] ?? defaultConfidence9Multiplier)
-        .toDouble();
+    final confidence9Multiplier = _readDouble(
+      userData['confidence9Multiplier'],
+      fallback: defaultConfidence9Multiplier,
+    );
 
-    final confidence10Multiplier =
-    (userData['confidence10Multiplier'] ?? defaultConfidence10Multiplier)
-        .toDouble();
+    final confidence10Multiplier = _readDouble(
+      userData['confidence10Multiplier'],
+      fallback: defaultConfidence10Multiplier,
+    );
 
     final totalProfit =
     bets.fold<double>(0, (sum, item) => sum + item.netProfit);

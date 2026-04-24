@@ -31,16 +31,14 @@ class HomePage extends StatelessWidget {
     if (!context.mounted) return;
 
     if (result != null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(result)),
-      );
+      showAppSnackBar(context, result);
       return;
     }
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text('Bahis sonucu güncellendi: ${resultLabel(newResult)}'),
-      ),
+    showAppSnackBar(
+      context,
+      'Bahis sonucu güncellendi: ${resultLabel(newResult)}',
+      clearPrevious: true,
     );
   }
 

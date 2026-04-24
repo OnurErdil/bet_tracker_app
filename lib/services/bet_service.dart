@@ -112,12 +112,10 @@ class BetService {
     double totalLoss = 0;
 
     for (final doc in snapshot.docs) {
-      final data = doc.data();
-      final result = data['result'] ?? '';
-      final netProfit = (data['netProfit'] ?? 0).toDouble();
+      final bet = BetModel.fromMap(doc.data(), doc.id);
 
-      if (result == 'kaybetti' && netProfit < 0) {
-        totalLoss += netProfit.abs();
+      if (bet.result == 'kaybetti' && bet.netProfit < 0) {
+        totalLoss += bet.netProfit.abs();
       }
     }
 
