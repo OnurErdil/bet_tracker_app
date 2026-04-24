@@ -24,7 +24,7 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     FocusScope.of(context).unfocus();
 
     if (_emailController.text.trim().isEmpty) {
-      _showMessage('E-posta adresini gir.');
+      showAppSnackBar(context, 'E-posta adresini gir.');
       return;
     }
 
@@ -36,16 +36,14 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
     setState(() => _isLoading = false);
 
     if (result != null) {
-      _showMessage(result);
+      showAppSnackBar(context, result);
       return;
     }
 
-    _showMessage('Şifre sıfırlama bağlantısı gönderildi.');
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    showAppSnackBar(
+      context,
+      'Şifre sıfırlama bağlantısı gönderildi.',
+      clearPrevious: true,
     );
   }
 

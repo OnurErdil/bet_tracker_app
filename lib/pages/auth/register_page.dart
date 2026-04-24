@@ -35,17 +35,17 @@ class _RegisterPageState extends State<RegisterPage> {
     final confirmPassword = _confirmPasswordController.text.trim();
 
     if (email.isEmpty || password.isEmpty || confirmPassword.isEmpty) {
-      _showMessage('Tüm alanları doldur.');
+      showAppSnackBar(context, 'Tüm alanları doldur.');
       return;
     }
 
     if (password.length < 6) {
-      _showMessage('Şifre en az 6 karakter olmalı.');
+      showAppSnackBar(context, 'Şifre en az 6 karakter olmalı.');
       return;
     }
 
     if (password != confirmPassword) {
-      _showMessage('Şifreler birbiriyle aynı değil.');
+      showAppSnackBar(context, 'Şifreler birbiriyle aynı değil.');
       return;
     }
 
@@ -60,18 +60,16 @@ class _RegisterPageState extends State<RegisterPage> {
     setState(() => _isLoading = false);
 
     if (result != null) {
-      _showMessage(result);
+      showAppSnackBar(context, result);
       return;
     }
 
-    _showMessage('Kayıt başarılı.');
-    Navigator.pop(context);
-  }
-
-  void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    showAppSnackBar(
+      context,
+      'Kayıt başarılı.',
+      clearPrevious: true,
     );
+    Navigator.pop(context);
   }
 
   @override

@@ -2,6 +2,22 @@ import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
+void showAppSnackBar(
+    BuildContext context,
+    String message, {
+      bool clearPrevious = false,
+    }) {
+  final messenger = ScaffoldMessenger.of(context);
+
+  if (clearPrevious) {
+    messenger.clearSnackBars();
+  }
+
+  messenger.showSnackBar(
+    SnackBar(content: Text(message)),
+  );
+}
+
 String resultLabel(String value) {
   switch (value) {
     case 'kazandi':
