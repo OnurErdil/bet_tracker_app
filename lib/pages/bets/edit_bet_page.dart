@@ -182,11 +182,6 @@ class _EditBetPageState extends State<EditBetPage> {
     }
   }
 
-  double? get _previewOdd =>
-      double.tryParse(_oddController.text.replaceAll(',', '.'));
-
-  double? get _previewStake =>
-      double.tryParse(_stakeController.text.replaceAll(',', '.'));
   double get _effectiveMaxStake {
     return BankrollDisciplineCalculator.calculateAllowedStakeForConfidence(
       baseMaxStake: _currentDynamicMaxStake,
@@ -197,6 +192,15 @@ class _EditBetPageState extends State<EditBetPage> {
     );
   }
 
+  BetFormPreviewData get _previewData {
+    return BetFormHelpers.buildPreviewData(
+      oddText: _oddController.text,
+      stakeText: _stakeController.text,
+      result: _selectedResult,
+      effectiveMaxStake: _effectiveMaxStake,
+    );
+  }
+
   bool get _isHighConfidenceSelected {
     return BankrollDisciplineCalculator.isHighConfidence(
       _confidenceScore,
@@ -204,34 +208,11 @@ class _EditBetPageState extends State<EditBetPage> {
     );
   }
 
-  double get _previewNetProfit {
-    final odd = _previewOdd;
-    final stake = _previewStake;
+  double get _previewNetProfit => _previewData.netProfit;
 
-    if (odd == null || stake == null) return 0;
+  double get _previewPayout => _previewData.payout;
 
-    return BetCalculator.calculateNetProfit(
-      odd: odd,
-      stake: stake,
-      result: _selectedResult,
-    );
-  }
-
-  double get _previewPayout {
-    final odd = _previewOdd;
-    final stake = _previewStake;
-
-    if (odd == null || stake == null) return 0;
-
-    return BetCalculator.calculatePayout(
-      odd: odd,
-      stake: stake,
-      result: _selectedResult,
-    );
-  }
-  String get _previewResultLabel {
-    return BetFormHelpers.buildPreviewResultLabel(_selectedResult);
-  }
+  String get _previewResultLabel => _previewData.resultLabel;
 
   StatusTone get _previewNetTone {
     if (_previewNetProfit > 0) return StatusTone.success;
@@ -239,12 +220,7 @@ class _EditBetPageState extends State<EditBetPage> {
     return StatusTone.warning;
   }
 
-  bool get _isPreviewLimitExceeded {
-    final stake = _previewStake;
-    if (stake == null) return false;
-    if (_effectiveMaxStake <= 0) return false;
-    return stake > _effectiveMaxStake;
-  }
+  bool get _isPreviewLimitExceeded => _previewData.isLimitExceeded;
 
   Future<void> _pickDate() async {
     final picked = await showDatePicker(

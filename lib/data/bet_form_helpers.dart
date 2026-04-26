@@ -1,5 +1,6 @@
 import 'package:bet_tracker_app/data/bet_form_catalog.dart';
 import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
+import 'package:bet_tracker_app/domain/bet_calculator.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 
 class ParsedMatchName {
@@ -51,6 +52,25 @@ class BetFormSelectionData {
     required this.availableBetTypes,
   });
 }
+
+class BetFormPreviewData {
+  final double? odd;
+  final double? stake;
+  final double netProfit;
+  final double payout;
+  final bool isLimitExceeded;
+  final String resultLabel;
+
+  const BetFormPreviewData({
+    required this.odd,
+    required this.stake,
+    required this.netProfit,
+    required this.payout,
+    required this.isLimitExceeded,
+    required this.resultLabel,
+  });
+}
+
 class BetFormHelpers {
   static ParsedMatchName parseMatchName(String matchName) {
     final parts = matchName.split(' - ');
@@ -232,6 +252,10 @@ class BetFormHelpers {
 
     return [...startsWithMatches, ...containsMatches].take(12).toList();
   }
+  static double? parseDecimalText(String value) {
+    return double.tryParse(value.trim().replaceAll(',', '.'));
+  }
+
   static String buildPreviewResultLabel(String result) {
     switch (result) {
       case 'kazandi':
@@ -244,6 +268,46 @@ class BetFormHelpers {
       default:
         return 'Bekleyen Senaryosu';
     }
+  }
+
+  static BetFormPreviewData buildPreviewData({
+    required String oddText,
+    required String stakeText,
+    required String result,
+    required double effectiveMaxStake,
+  }) {
+    final odd = parseDecimalText(oddText);
+    final stake = parseDecimalText(stakeText);
+
+    final hasValidNumbers = odd != null && stake != null;
+
+    final netProfit = hasValidNumbers
+        ? BetCalculator.calculateNetProfit(
+      odd: odd,
+      stake: stake,
+      result: result,
+    )
+        : 0.0;
+
+    final payout = hasValidNumbers
+        ? BetCalculator.calculatePayout(
+      odd: odd,
+      stake: stake,
+      result: result,
+    )
+        : 0.0;
+
+    final isLimitExceeded =
+        stake != null && effectiveMaxStake > 0 && stake > effectiveMaxStake;
+
+    return BetFormPreviewData(
+      odd: odd,
+      stake: stake,
+      netProfit: netProfit,
+      payout: payout,
+      isLimitExceeded: isLimitExceeded,
+      resultLabel: buildPreviewResultLabel(result),
+    );
   }
 
   static String buildDisciplineModeLabel(String disciplineMode) {
