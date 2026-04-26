@@ -297,29 +297,28 @@ class _EditBetPageState extends State<EditBetPage> {
   }
 
   ButtonStyle _dangerDialogButtonStyle() {
-    return ElevatedButton.styleFrom(
-      backgroundColor: statusToneColor(StatusTone.danger),
-      foregroundColor: Colors.white,
-      minimumSize: const Size(0, 46),
+    return solidToneButtonStyle(
+      tone: StatusTone.danger,
+    );
+  }
+
+  ButtonStyle _submitButtonStyle(StatusTone tone) {
+    return solidToneButtonStyle(
+      tone: tone,
+      minimumSize: const Size(double.infinity, 52),
       padding: const EdgeInsets.symmetric(
         horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
+        vertical: AppSpacing.md,
       ),
     );
   }
 
-  ButtonStyle _dangerPrimaryButtonStyle() {
-    return ElevatedButton.styleFrom(
-      backgroundColor: statusToneColor(StatusTone.danger),
-      foregroundColor: Colors.white,
-      minimumSize: const Size(double.infinity, 52),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
-    );
+  ButtonStyle _primarySubmitButtonStyle() {
+    return _submitButtonStyle(StatusTone.primary);
+  }
+
+  ButtonStyle _dangerSubmitButtonStyle() {
+    return _submitButtonStyle(StatusTone.danger);
   }
 
 
@@ -983,45 +982,24 @@ class _EditBetPageState extends State<EditBetPage> {
                         (_isLoading || _isDeleting || _isLockedForToday)
                             ? null
                             : _updateBet,
+                        style: _primarySubmitButtonStyle(),
                         child: _isLoading
-                            ? const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                            : const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.edit_outlined, size: 18),
-                            SizedBox(width: 6),
-                            Text('Güncelle'),
-                          ],
+                            ? const ButtonLoadingIndicator()
+                            : const ButtonIconLabel(
+                          icon: Icons.edit_outlined,
+                          label: 'Güncelle',
                         ),
                       ),
                       const SizedBox(height: 12),
                       ElevatedButton(
                         onPressed:
                         (_isLoading || _isDeleting) ? null : _confirmDelete,
-                        style: _dangerPrimaryButtonStyle(),
+                        style: _dangerSubmitButtonStyle(),
                         child: _isDeleting
-                            ? const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                            : const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.delete_outline, size: 18),
-                            SizedBox(width: 6),
-                            Text('Sil'),
-                          ],
+                            ? const ButtonLoadingIndicator()
+                            : const ButtonIconLabel(
+                          icon: Icons.delete_outline,
+                          label: 'Sil',
                         ),
                       ),
                     ],

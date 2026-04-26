@@ -1303,33 +1303,18 @@ class _StatBox extends StatelessWidget {
   }
 }
 
-ButtonStyle _actionButtonStyle({
-  required Color backgroundColor,
-}) {
-  return ElevatedButton.styleFrom(
-    backgroundColor: backgroundColor,
-    foregroundColor: Colors.white,
-    minimumSize: const Size(0, 46),
-    padding: const EdgeInsets.symmetric(
-      horizontal: AppSpacing.md,
-      vertical: AppSpacing.sm,
-    ),
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(AppRadius.md),
-    ),
+ButtonStyle _actionButtonStyle(StatusTone tone) {
+  return solidToneButtonStyle(
+    tone: tone,
   );
 }
 
 ButtonStyle _primaryActionButtonStyle() {
-  return _actionButtonStyle(
-    backgroundColor: statusToneColor(StatusTone.primary),
-  );
+  return _actionButtonStyle(StatusTone.primary);
 }
 
 ButtonStyle _dangerActionButtonStyle() {
-  return _actionButtonStyle(
-    backgroundColor: statusToneColor(StatusTone.danger),
-  );
+  return _actionButtonStyle(StatusTone.danger);
 }
 
 class _SectionEmptyState extends StatelessWidget {

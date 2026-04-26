@@ -77,7 +77,7 @@ class HomePage extends StatelessWidget {
         ],
       ),
       floatingActionButton: FloatingActionButton.extended(
-        backgroundColor: homeSuccessColor(),
+        backgroundColor: statusToneColor(StatusTone.success),
         foregroundColor: Colors.white,
         onPressed: () => _openPage(context, const AddBetPage()),
         icon: const Icon(Icons.add),
@@ -214,14 +214,14 @@ class HomeContent extends StatelessWidget {
                     title: 'Güncel Kasa',
                     value: '${stats.currentBankroll.toStringAsFixed(2)} ₺',
                     valueColor: stats.currentBankroll >= 0
-                        ? homeSuccessColor()
-                        : homeDangerColor(),
+                        ? statusToneColor(StatusTone.success)
+                        : statusToneColor(StatusTone.danger),
                     icon: Icons.account_balance_wallet,
                   ),
                   DashboardCard(
                     title: 'Maksimum Oynanabilir Tutar',
                     value: '${stats.maxPlayableAmount.toStringAsFixed(2)} ₺',
-                    valueColor: homeWarningColor(),
+                    valueColor: statusToneColor(StatusTone.warning),
                     icon: Icons.sports_score,
                   ),
                 ],
@@ -243,15 +243,15 @@ class HomeContent extends StatelessWidget {
                     title: 'Bugünkü Sonuç',
                     value: '${stats.todayProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.todayProfit >= 0
-                        ? homeSuccessColor()
-                        : homeDangerColor(),
+                        ? statusToneColor(StatusTone.success)
+                        : statusToneColor(StatusTone.danger),
                     icon: Icons.today,
                   ),
                   DashboardCard(
                     title: 'Bekleyen Bahis',
                     value: '${stats.pendingBets.length}',
                     valueColor: stats.pendingBets.isNotEmpty
-                        ? homeWarningColor()
+                        ? statusToneColor(StatusTone.warning)
                         : null,
                     icon: Icons.hourglass_bottom,
                   ),
@@ -259,16 +259,16 @@ class HomeContent extends StatelessWidget {
                     title: 'Toplam Kâr / Zarar',
                     value: '${stats.totalProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.totalProfit >= 0
-                        ? homeSuccessColor()
-                        : homeDangerColor(),
+                        ? statusToneColor(StatusTone.success)
+                        : statusToneColor(StatusTone.danger),
                     icon: Icons.account_balance_wallet_outlined,
                   ),
                   DashboardCard(
                     title: 'Son 7 Gün',
                     value: '${stats.last7DaysProfit.toStringAsFixed(2)} ₺',
                     valueColor: stats.last7DaysProfit >= 0
-                        ? homeSuccessColor()
-                        : homeDangerColor(),
+                        ? statusToneColor(StatusTone.success)
+                        : statusToneColor(StatusTone.danger),
                     icon: Icons.date_range,
                   ),
                 ],
@@ -299,7 +299,7 @@ class HomeContent extends StatelessWidget {
                       value: '${stats.pendingBets.length}',
                       icon: Icons.hourglass_bottom,
                       valueColor: stats.pendingBets.isNotEmpty
-                          ? homeWarningColor()
+                          ? statusToneColor(StatusTone.warning)
                           : null,
                       compact: true,
                     ),
@@ -308,7 +308,7 @@ class HomeContent extends StatelessWidget {
                       value: '${pendingStakeTotal.toStringAsFixed(2)} ₺',
                       icon: Icons.payments_outlined,
                       valueColor: pendingStakeTotal > 0
-                          ? homeWarningColor()
+                          ? statusToneColor(StatusTone.warning)
                           : null,
                       compact: true,
                     ),

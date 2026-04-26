@@ -45,8 +45,9 @@ class DisciplineSection extends StatelessWidget {
               DashboardCard(
                 title: 'Bugünkü Kayıp',
                 value: '${stats.todayLoss.toStringAsFixed(2)} ₺',
-                valueColor:
-                stats.todayLoss > 0 ? homeDangerColor() : null,
+                valueColor: stats.todayLoss > 0
+                    ? statusToneColor(StatusTone.danger)
+                    : null,
                 icon: Icons.trending_down,
                 iconTone: stats.todayLoss > 0
                     ? StatusTone.danger
@@ -58,8 +59,8 @@ class DisciplineSection extends StatelessWidget {
                     ? '${stats.remainingDailyLoss > 0 ? stats.remainingDailyLoss.toStringAsFixed(2) : '0.00'} ₺'
                     : 'Sınırsız',
                 valueColor: stats.isDailyLossExceeded
-                    ? homeDangerColor()
-                    : homeSuccessColor(),
+                    ? statusToneColor(StatusTone.danger)
+                    : statusToneColor(StatusTone.success),
                 icon: Icons.speed,
                 iconTone: stats.isDailyLossExceeded
                     ? StatusTone.danger
@@ -112,7 +113,7 @@ class MiniAnalysisSection extends StatelessWidget {
                 : '${stats.biggestWin!.netProfit.toStringAsFixed(2)} ₺',
             valueColor: stats.biggestWin != null &&
                 stats.biggestWin!.netProfit > 0
-                ? homeSuccessColor()
+                ? statusToneColor(StatusTone.success)
                 : null,
             icon: Icons.arrow_upward,
             iconTone: stats.biggestWin != null &&
@@ -127,7 +128,7 @@ class MiniAnalysisSection extends StatelessWidget {
                 : '${stats.biggestLoss!.netProfit.toStringAsFixed(2)} ₺',
             valueColor: stats.biggestLoss != null &&
                 stats.biggestLoss!.netProfit < 0
-                ? homeDangerColor()
+                ? statusToneColor(StatusTone.danger)
                 : null,
             icon: Icons.arrow_downward,
             iconTone: stats.biggestLoss != null &&

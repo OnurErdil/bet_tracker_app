@@ -1115,7 +1115,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                   horizontal: AppSpacing.lg,
                                 ),
                                 decoration: BoxDecoration(
-                                  color: AppColors.danger,
+                                  color: statusToneColor(StatusTone.danger),
                                   borderRadius: BorderRadius.circular(AppRadius.lg),
                                 ),
                                 alignment: Alignment.centerRight,
@@ -1347,26 +1347,27 @@ class _BetCard extends StatelessWidget {
 
     final hasNote = bet.note.trim().isNotEmpty;
 
-    final Color netColor;
+    final netTone = bet.netProfit > 0
+        ? StatusTone.success
+        : bet.netProfit < 0
+        ? StatusTone.danger
+        : resultTone;
+
     final IconData resultIcon;
 
     switch (bet.result) {
-    case 'kazandi':
-    netColor = homeSuccessColor();
-    resultIcon = Icons.check_circle_outline;
-    break;
-    case 'kaybetti':
-    netColor = homeDangerColor();
-    resultIcon = Icons.cancel_outlined;
-    break;
-    case 'iade':
-    netColor = homeWarningColor();
-    resultIcon = Icons.reply_all_outlined;
-    break;
-    default:
-    netColor = AppColors.textSecondary;
-    resultIcon = Icons.hourglass_bottom_outlined;
-    break;
+      case 'kazandi':
+        resultIcon = Icons.check_circle_outline;
+        break;
+      case 'kaybetti':
+        resultIcon = Icons.cancel_outlined;
+        break;
+      case 'iade':
+        resultIcon = Icons.reply_all_outlined;
+        break;
+      default:
+        resultIcon = Icons.hourglass_bottom_outlined;
+        break;
     }
 
     return Card(
@@ -1507,7 +1508,7 @@ class _BetCard extends StatelessWidget {
                 resultTone: resultTone,
                 resultIcon: resultIcon,
                 netProfit: bet.netProfit,
-                netColor: netColor,
+                netTone: netTone,
               ),
             ],
           ),
@@ -1522,14 +1523,14 @@ class _BetOutcomeBar extends StatelessWidget {
   final StatusTone resultTone;
   final IconData resultIcon;
   final double netProfit;
-  final Color netColor;
+  final StatusTone netTone;
 
   const _BetOutcomeBar({
     required this.resultLabel,
     required this.resultTone,
     required this.resultIcon,
     required this.netProfit,
-    required this.netColor,
+    required this.netTone,
   });
 
   @override
@@ -1570,7 +1571,7 @@ class _BetOutcomeBar extends StatelessWidget {
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   fontSize: 16,
-                  color: netColor,
+                  color: statusToneColor(netTone),
                 ),
               ),
             ],

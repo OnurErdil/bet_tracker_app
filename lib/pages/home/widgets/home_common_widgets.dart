@@ -103,6 +103,26 @@ Color statusToneBorder(StatusTone tone) {
   return statusToneColor(tone).withValues(alpha: 0.35);
 }
 
+ButtonStyle solidToneButtonStyle({
+  required StatusTone tone,
+  Size minimumSize = const Size(0, 46),
+  EdgeInsetsGeometry padding = const EdgeInsets.symmetric(
+    horizontal: AppSpacing.md,
+    vertical: AppSpacing.sm,
+  ),
+  double radius = AppRadius.md,
+}) {
+  return ElevatedButton.styleFrom(
+    backgroundColor: statusToneColor(tone),
+    foregroundColor: Colors.white,
+    minimumSize: minimumSize,
+    padding: padding,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(radius),
+    ),
+  );
+}
+
 StatusTone confidenceBadgeTone(int score) {
   if (score >= 10) return StatusTone.highConfidence;
   if (score >= 9) return StatusTone.warning;
@@ -803,7 +823,7 @@ class QuickActionButton extends StatelessWidget {
           Icon(
             icon,
             size: 18,
-            color: AppColors.primary,
+            color: statusToneColor(StatusTone.primary),
           ),
           const SizedBox(width: AppSpacing.xs),
           Text(
@@ -1098,21 +1118,11 @@ class StatusActionButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = statusToneColor(tone);
-
     return ElevatedButton(
       onPressed: onPressed,
-      style: ElevatedButton.styleFrom(
-        backgroundColor: color,
-        foregroundColor: Colors.white,
+      style: solidToneButtonStyle(
+        tone: tone,
         minimumSize: const Size(0, 44),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
-        ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppRadius.md),
-        ),
       ),
       child: Row(
         mainAxisSize: MainAxisSize.min,

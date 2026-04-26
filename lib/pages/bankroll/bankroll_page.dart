@@ -156,33 +156,18 @@ class BankrollPage extends StatelessWidget {
     return '$day.$month.$year  $hour:$minute';
   }
 
-  static ButtonStyle _dialogButtonStyle({
-    required Color backgroundColor,
-  }) {
-    return ElevatedButton.styleFrom(
-      backgroundColor: backgroundColor,
-      foregroundColor: Colors.white,
-      minimumSize: const Size(0, 46),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
+  static ButtonStyle _dialogButtonStyle(StatusTone tone) {
+    return solidToneButtonStyle(
+      tone: tone,
     );
   }
 
   static ButtonStyle _primaryDialogButtonStyle() {
-    return _dialogButtonStyle(
-      backgroundColor: statusToneColor(StatusTone.primary),
-    );
+    return _dialogButtonStyle(StatusTone.primary);
   }
 
   static ButtonStyle _dangerDialogButtonStyle() {
-    return _dialogButtonStyle(
-      backgroundColor: statusToneColor(StatusTone.danger),
-    );
+    return _dialogButtonStyle(StatusTone.danger);
   }
 
   static void _showMessage(
