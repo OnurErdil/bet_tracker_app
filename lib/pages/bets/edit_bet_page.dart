@@ -601,51 +601,82 @@ class _EditBetPageState extends State<EditBetPage> {
       return;
     }
 
+    final deletedMatchName = _currentMatchNameForDialog();
+
     messenger.clearSnackBars();
     navigator.pop();
 
+    Future<void> restoreDeletedBet() async {
+      final restoreResult = await BetService.addBet(
+        BetModel(
+          userId: deletedBet.userId,
+          date: deletedBet.date,
+          sport: deletedBet.sport,
+          country: deletedBet.country,
+          league: deletedBet.league,
+          homeTeam: deletedBet.resolvedHomeTeam,
+          awayTeam: deletedBet.resolvedAwayTeam,
+          matchName: deletedBet.matchName,
+          betType: deletedBet.betType,
+          odd: deletedBet.odd,
+          stake: deletedBet.stake,
+          result: deletedBet.result,
+          netProfit: deletedBet.netProfit,
+          note: deletedBet.note,
+          createdAt: deletedBet.createdAt,
+          confidenceScore: deletedBet.confidenceScore,
+        ),
+      );
+
+      messenger.clearSnackBars();
+
+      if (restoreResult != null) {
+        messenger.showSnackBar(
+          SnackBar(content: Text(restoreResult)),
+        );
+        return;
+      }
+
+      messenger.showSnackBar(
+        const SnackBar(
+          content: Text('Bahis geri yüklendi.'),
+        ),
+      );
+    }
+
     messenger.showSnackBar(
       SnackBar(
-        content: Text('${_currentMatchNameForDialog()} silindi.'),
-        action: SnackBarAction(
-          label: 'Geri Al',
-          onPressed: () async {
-            final restoreResult = await BetService.addBet(
-              BetModel(
-                userId: deletedBet.userId,
-                date: deletedBet.date,
-                sport: deletedBet.sport,
-                country: deletedBet.country,
-                league: deletedBet.league,
-                homeTeam: deletedBet.resolvedHomeTeam,
-                awayTeam: deletedBet.resolvedAwayTeam,
-                matchName: deletedBet.matchName,
-                betType: deletedBet.betType,
-                odd: deletedBet.odd,
-                stake: deletedBet.stake,
-                result: deletedBet.result,
-                netProfit: deletedBet.netProfit,
-                note: deletedBet.note,
-                createdAt: deletedBet.createdAt,
-                confidenceScore: deletedBet.confidenceScore,
+        duration: const Duration(seconds: 5),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.surfaceAlt,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '$deletedMatchName silindi.',
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
               ),
-            );
-
-            messenger.clearSnackBars();
-
-            if (restoreResult != null) {
-              messenger.showSnackBar(
-                SnackBar(content: Text(restoreResult)),
-              );
-              return;
-            }
-
-            messenger.showSnackBar(
-              const SnackBar(
-                content: Text('Bahis geri yüklendi.'),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: restoreDeletedBet,
+                icon: const Icon(Icons.restore, size: 18),
+                label: const Text('Geri Al'),
+                style: TextButton.styleFrom(
+                  foregroundColor: statusToneColor(StatusTone.warning),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                ),
               ),
-            );
-          },
+            ),
+          ],
         ),
       ),
     );
@@ -735,10 +766,87 @@ class _EditBetPageState extends State<EditBetPage> {
                         },
                       ),
                       const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
+                      if (isWide)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                value: _countryController.text.isEmpty
+                                    ? null
+                                    : _countryController.text,
+                                decoration: const InputDecoration(
+                                  labelText: 'Ülke',
+                                  prefixIcon: Icon(Icons.public),
+                                ),
+                                items: _availableCountries
+                                    .map(
+                                      (country) => DropdownMenuItem(
+                                    value: country,
+                                    child: Text(
+                                      country,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _countryController.text = value ?? '';
+                                    _leagueController.clear();
+                                    _homeTeamController.clear();
+                                    _awayTeamController.clear();
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Ülke seç';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                value: _leagueController.text.isEmpty
+                                    ? null
+                                    : _leagueController.text,
+                                decoration: const InputDecoration(
+                                  labelText: 'Lig',
+                                  prefixIcon: Icon(Icons.emoji_events_outlined),
+                                ),
+                                items: _availableLeagues
+                                    .map(
+                                      (league) => DropdownMenuItem(
+                                    value: league,
+                                    child: Text(
+                                      league,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _leagueController.text = value ?? '';
+                                    _homeTeamController.clear();
+                                    _awayTeamController.clear();
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Lig seç';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            DropdownButtonFormField<String>(
                               value: _countryController.text.isEmpty
                                   ? null
                                   : _countryController.text,
@@ -750,7 +858,10 @@ class _EditBetPageState extends State<EditBetPage> {
                                   .map(
                                     (country) => DropdownMenuItem(
                                   value: country,
-                                  child: Text(country),
+                                  child: Text(
+                                    country,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               )
                                   .toList(),
@@ -769,10 +880,8 @@ class _EditBetPageState extends State<EditBetPage> {
                                 return null;
                               },
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
+                            const SizedBox(height: AppSpacing.md),
+                            DropdownButtonFormField<String>(
                               value: _leagueController.text.isEmpty
                                   ? null
                                   : _leagueController.text,
@@ -784,7 +893,10 @@ class _EditBetPageState extends State<EditBetPage> {
                                   .map(
                                     (league) => DropdownMenuItem(
                                   value: league,
-                                  child: Text(league),
+                                  child: Text(
+                                    league,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               )
                                   .toList(),
@@ -802,9 +914,8 @@ class _EditBetPageState extends State<EditBetPage> {
                                 return null;
                               },
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       const SizedBox(height: 14),
                       Row(
                         children: [

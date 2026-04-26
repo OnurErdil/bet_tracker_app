@@ -60,7 +60,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   final TextEditingController _minStakeController = TextEditingController();
   final TextEditingController _maxStakeController = TextEditingController();
 
-  Timer? _searchDebounce;
+  late final Stream<List<BetModel>> _betsStream;
+
+  Timer? _filterDebounce;
   String _searchQuery = '';
   String _selectedSport = 'Tümü';
   String _selectedCountry = 'Tümü';
@@ -212,23 +214,30 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    _betsStream = BetService.getUserBets();
+  }
+
+  @override
   void dispose() {
     _searchController.dispose();
     _minOddController.dispose();
     _maxOddController.dispose();
     _minStakeController.dispose();
     _maxStakeController.dispose();
-    _searchDebounce?.cancel();
+    _filterDebounce?.cancel();
     super.dispose();
   }
-  void _onSearchChanged(String value) {
-    _searchDebounce?.cancel();
 
-    _searchDebounce = Timer(const Duration(milliseconds: 250), () {
+  void _onSearchChanged(String value) {
+    _filterDebounce?.cancel();
+
+    _filterDebounce = Timer(const Duration(milliseconds: 300), () {
       if (!mounted) return;
 
       setState(() {
-        _searchQuery = value.trim().toLowerCase();
+        _searchQuery = _searchController.text.trim().toLowerCase();
       });
     });
   }
@@ -356,7 +365,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   }
 
   void _clearFilters() {
-    _searchDebounce?.cancel();
+    _filterDebounce?.cancel();
 
     setState(() {
       _searchController.clear();
@@ -393,29 +402,35 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
     }
   }
 
+  void _clearActiveQuickFilterEffect() {
+    if (_selectedQuickFilter == 'Bugün' ||
+        _selectedQuickFilter == 'Son 7 Gün' ||
+        _selectedQuickFilter == 'Bu Ay') {
+      _startDate = null;
+      _endDate = null;
+    }
+
+    if (_selectedQuickFilter == 'Sadece Kaybedenler' ||
+        _selectedQuickFilter == 'Sadece Bekleyenler') {
+      _selectedResult = 'Tümü';
+    }
+
+    if (_selectedQuickFilter == 'Yüksek Güven') {
+      _selectedConfidence = 'Tümü';
+    }
+  }
+
   void _applyQuickFilter(String filter) {
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
     setState(() {
-      if (_selectedQuickFilter == filter) {
+      final isSameFilterSelected = _selectedQuickFilter == filter;
+
+      _clearActiveQuickFilterEffect();
+
+      if (isSameFilterSelected) {
         _selectedQuickFilter = 'Yok';
-
-        if (filter == 'Bugün' ||
-            filter == 'Son 7 Gün' ||
-            filter == 'Bu Ay') {
-          _startDate = null;
-          _endDate = null;
-        }
-
-        if (filter == 'Sadece Kaybedenler' ||
-            filter == 'Sadece Bekleyenler') {
-          _selectedResult = 'Tümü';
-        }
-
-        if (filter == 'Yüksek Güven') {
-          _selectedConfidence = 'Tümü';
-        }
         return;
       }
 
@@ -451,11 +466,17 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   }
 
   void _clearQuickFilterSelection() {
+    _clearActiveQuickFilterEffect();
     _selectedQuickFilter = 'Yok';
   }
 
   void _rebuildFilters() {
-    setState(() {});
+    _filterDebounce?.cancel();
+
+    _filterDebounce = Timer(const Duration(milliseconds: 300), () {
+      if (!mounted) return;
+      setState(() {});
+    });
   }
 
   ButtonStyle _dangerDialogButtonStyle() {
@@ -478,43 +499,74 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   void _showDeleteSuccessMessage(BetModel bet) {
     final messenger = ScaffoldMessenger.of(context);
 
-    messenger.clearSnackBars();
+    Future<void> restoreDeletedBet() async {
+      final restoreResult = await BetService.addBet(
+        BetModel(
+          userId: bet.userId,
+          date: bet.date,
+          sport: bet.sport,
+          country: bet.country,
+          league: bet.league,
+          homeTeam: bet.resolvedHomeTeam,
+          awayTeam: bet.resolvedAwayTeam,
+          matchName: bet.matchName,
+          betType: bet.betType,
+          odd: bet.odd,
+          stake: bet.stake,
+          result: bet.result,
+          netProfit: bet.netProfit,
+          note: bet.note,
+          createdAt: bet.createdAt,
+          confidenceScore: bet.confidenceScore,
+        ),
+      );
+
+      if (!mounted) return;
+
+      messenger.clearSnackBars();
+
+      if (restoreResult != null) {
+        _showMessage(restoreResult);
+        return;
+      }
+
+      _showMessage('Bahis geri yüklendi.');
+    }
+
+    messenger.clearSnackBars();messenger.clearSnackBars();
     messenger.showSnackBar(
       SnackBar(
-        content: Text('${_displayMatchName(bet)} silindi.'),
-        action: SnackBarAction(
-          label: 'Geri Al',
-          onPressed: () async {
-            final restoreResult = await BetService.addBet(
-              BetModel(
-                userId: bet.userId,
-                date: bet.date,
-                sport: bet.sport,
-                country: bet.country,
-                league: bet.league,
-                homeTeam: bet.resolvedHomeTeam,
-                awayTeam: bet.resolvedAwayTeam,
-                matchName: bet.matchName,
-                betType: bet.betType,
-                odd: bet.odd,
-                stake: bet.stake,
-                result: bet.result,
-                netProfit: bet.netProfit,
-                note: bet.note,
-                createdAt: bet.createdAt,
-                confidenceScore: bet.confidenceScore,
+        duration: const Duration(seconds: 5),
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: AppColors.surfaceAlt,
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '${_displayMatchName(bet)} silindi.',
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
               ),
-            );
-
-            if (!mounted) return;
-
-            if (restoreResult != null) {
-              _showMessage(restoreResult);
-              return;
-            }
-
-            _showMessage('Bahis geri yüklendi.');
-          },
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: TextButton.icon(
+                onPressed: restoreDeletedBet,
+                icon: const Icon(Icons.restore, size: 18),
+                label: const Text('Geri Al'),
+                style: TextButton.styleFrom(
+                  foregroundColor: statusToneColor(StatusTone.warning),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: AppSpacing.md,
+                    vertical: AppSpacing.sm,
+                  ),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );
@@ -672,7 +724,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
         title: const Text('Bahis Geçmişi'),
       ),
       body: StreamBuilder<List<BetModel>>(
-        stream: BetService.getUserBets(),
+        stream: _betsStream,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(
@@ -712,9 +764,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                           crossAxisCount: isWide ? 5 : 2,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          mainAxisSpacing: 14,
-                          crossAxisSpacing: 14,
-                          childAspectRatio: isWide ? 2.4 : 2.8,
+                          mainAxisSpacing: AppSpacing.md,
+                          crossAxisSpacing: AppSpacing.md,
+                          childAspectRatio: isWide ? 2.15 : 1.55,
                           children: [
                             _TopStat(
                               title: 'Kayıt',
@@ -1586,12 +1638,53 @@ class _TopStat extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return StatValueCard(
-      title: title,
-      value: value,
-      valueColor: tone == null ? null : statusToneColor(tone!),
-      centered: true,
-      compact: true,
+    final valueColor = tone == null
+        ? AppColors.textPrimary
+        : statusToneColor(tone!);
+
+    return Card(
+      margin: EdgeInsets.zero,
+      color: AppColors.surfaceAlt,
+      elevation: 0,
+      shape: AppStyles.cardShape(radius: AppRadius.lg),
+      child: Padding(
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.xs,
+          vertical: AppSpacing.xs,
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Text(
+              title,
+              textAlign: TextAlign.center,
+              maxLines: 2,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 11,
+                height: 1.05,
+                fontWeight: FontWeight.w700,
+              ),
+            ),
+            const SizedBox(height: 6),
+            FittedBox(
+              fit: BoxFit.scaleDown,
+              child: Text(
+                value,
+                textAlign: TextAlign.center,
+                maxLines: 1,
+                style: TextStyle(
+                  color: valueColor,
+                  fontSize: 18,
+                  height: 1,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }
