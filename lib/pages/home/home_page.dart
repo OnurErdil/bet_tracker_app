@@ -12,6 +12,7 @@ import 'package:bet_tracker_app/services/auth_service.dart';
 import 'package:bet_tracker_app/services/bankroll_service.dart';
 import 'package:bet_tracker_app/services/bet_service.dart';
 import 'package:bet_tracker_app/services/user_service.dart';
+import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -193,7 +194,7 @@ class HomeContent extends StatelessWidget {
 
     return Center(
       child: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
+        padding: const EdgeInsets.all(AppSpacing.xl),
         child: ConstrainedBox(
           constraints: const BoxConstraints(maxWidth: 1100),
           child: Column(
@@ -227,10 +228,10 @@ class HomeContent extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
               DisciplineSection(stats: stats, isWide: isWide),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
               GridView.count(
                 crossAxisCount: isWide ? 4 : 1,
                 shrinkWrap: true,
@@ -274,7 +275,7 @@ class HomeContent extends StatelessWidget {
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
               QuickActionsSection(
                 onAddBet: () => _openPage(context, const AddBetPage()),
                 onBetHistory: () => _openPage(context, const BetHistoryPage()),
@@ -282,10 +283,10 @@ class HomeContent extends StatelessWidget {
                 onBankroll: () => _openPage(context, const BankrollPage()),
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: AppSpacing.xl),
               SectionCardShell(
                 title: 'Bekleyen Özet',
-                padding: const EdgeInsets.all(18),
+                padding: const EdgeInsets.all(AppSpacing.lg),
                 child: GridView.count(
                   crossAxisCount: isWide ? 2 : 1,
                   shrinkWrap: true,

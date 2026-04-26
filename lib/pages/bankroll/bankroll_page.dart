@@ -50,7 +50,7 @@ class BankrollPage extends StatelessWidget {
           }
 
           return ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppSpacing.lg),
             itemCount: list.length,
             itemBuilder: (_, i) {
               final tx = list[i];
@@ -64,7 +64,7 @@ class BankrollPage extends StatelessWidget {
                 color: AppColors.surface,
                 elevation: 0,
                 shape: AppStyles.cardShape(radius: AppRadius.lg),
-                margin: const EdgeInsets.only(bottom: 12),
+                margin: const EdgeInsets.only(bottom: AppSpacing.md),
                 child: InkWell(
                   borderRadius: BorderRadius.circular(AppRadius.lg),
                   onTap: () => _showEditDialog(context, tx),

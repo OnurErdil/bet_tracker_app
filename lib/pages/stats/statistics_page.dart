@@ -77,7 +77,7 @@ class StatisticsPage extends StatelessWidget {
 
                   return Center(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.all(24),
+                      padding: const EdgeInsets.all(AppSpacing.xl),
                       child: ConstrainedBox(
                         constraints: const BoxConstraints(maxWidth: 1100),
                         child: Column(
@@ -86,7 +86,7 @@ class StatisticsPage extends StatelessWidget {
                             if (overview.dailyLossLimit > 0 &&
                                 overview.todayLoss >= overview.dailyLossLimit)
                               const Padding(
-                                padding: EdgeInsets.only(bottom: 16),
+                                padding: EdgeInsets.only(bottom: AppSpacing.lg),
                                 child: WarningCard(
                                   message:
                                   'Bugünkü kayıp limiti aşıldı. Bugün frene basma zamanı.',
@@ -96,16 +96,16 @@ class StatisticsPage extends StatelessWidget {
                                 overview.currentBankroll >=
                                     overview.targetBankroll)
                               const Padding(
-                                padding: EdgeInsets.only(bottom: 16),
+                                padding: EdgeInsets.only(bottom: AppSpacing.lg),
                                 child: WarningCard(
                                   message:
                                   'Hedef kasaya ulaştın. Hedef tamam, havaya zıplamak serbest.',
                                 ),
                               ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Genel Durum',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: GridView.count(
                                 crossAxisCount: isWide ? 3 : 1,
                                 shrinkWrap: true,
@@ -154,10 +154,10 @@ class StatisticsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Kasa Özeti',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
@@ -171,7 +171,7 @@ class StatisticsPage extends StatelessWidget {
                                             icon: Icons.savings_outlined,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: AppSpacing.md),
                                         Expanded(
                                           child: _StatBox(
                                             title: 'Net Kâr / Zarar',
@@ -182,7 +182,7 @@ class StatisticsPage extends StatelessWidget {
                                             icon: Icons.account_balance_wallet,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: AppSpacing.md),
                                         Expanded(
                                           child: _StatBox(
                                             title: 'Kasa Hareketleri',
@@ -193,7 +193,7 @@ class StatisticsPage extends StatelessWidget {
                                             icon: Icons.swap_horiz,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: AppSpacing.md),
                                         Expanded(
                                           child: _StatBox(
                                             title: 'Mevcut Kasa',
@@ -214,7 +214,7 @@ class StatisticsPage extends StatelessWidget {
                                           value: '${overview.startingBankroll.toStringAsFixed(2)} ₺',
                                           icon: Icons.savings_outlined,
                                         ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: AppSpacing.md),
                                         _StatBox(
                                           title: 'Net Kâr / Zarar',
                                           value: '${overview.totalProfit.toStringAsFixed(2)} ₺',
@@ -223,7 +223,7 @@ class StatisticsPage extends StatelessWidget {
                                               : StatusTone.danger,
                                           icon: Icons.account_balance_wallet,
                                         ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: AppSpacing.md),
                                         _StatBox(
                                           title: 'Kasa Hareketleri',
                                           value: '${overview.bankrollMovement.toStringAsFixed(2)} ₺',
@@ -232,7 +232,7 @@ class StatisticsPage extends StatelessWidget {
                                               : StatusTone.danger,
                                           icon: Icons.swap_horiz,
                                         ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: AppSpacing.md),
                                         _StatBox(
                                           title: 'Mevcut Kasa',
                                           value: '${overview.currentBankroll.toStringAsFixed(2)} ₺',
@@ -243,7 +243,7 @@ class StatisticsPage extends StatelessWidget {
                                         ),
                                       ],
                                     ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: AppSpacing.lg),
                                   ElevatedButton.icon(
                                     onPressed: () {
                                       _showBankrollDialog(
@@ -258,10 +258,10 @@ class StatisticsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Disiplin Ayarları',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: Column(
                                 crossAxisAlignment: CrossAxisAlignment.stretch,
                                 children: [
@@ -277,7 +277,7 @@ class StatisticsPage extends StatelessWidget {
                                             icon: Icons.money_off_csred_outlined,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: AppSpacing.md),
                                         Expanded(
                                           child: _StatBox(
                                             title: 'Günlük Kayıp Limiti',
@@ -285,7 +285,7 @@ class StatisticsPage extends StatelessWidget {
                                             icon: Icons.warning_amber_rounded,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: AppSpacing.md),
                                         Expanded(
                                           child: _StatBox(
                                             title: 'Hedef Kasa',
@@ -293,7 +293,7 @@ class StatisticsPage extends StatelessWidget {
                                             icon: Icons.flag_outlined,
                                           ),
                                         ),
-                                        const SizedBox(width: 12),
+                                        const SizedBox(width: AppSpacing.md),
                                         Expanded(
                                           child: _StatBox(
                                             title: 'Disiplin Modu',
@@ -315,19 +315,19 @@ class StatisticsPage extends StatelessWidget {
                                               : '${overview.computedMaxStake.toStringAsFixed(2)} ₺',
                                           icon: Icons.money_off_csred_outlined,
                                         ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: AppSpacing.md),
                                         _StatBox(
                                           title: 'Günlük Kayıp Limiti',
                                           value: '${overview.dailyLossLimit.toStringAsFixed(2)} ₺',
                                           icon: Icons.warning_amber_rounded,
                                         ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: AppSpacing.md),
                                         _StatBox(
                                           title: 'Hedef Kasa',
                                           value: '${overview.targetBankroll.toStringAsFixed(2)} ₺',
                                           icon: Icons.flag_outlined,
                                         ),
-                                        const SizedBox(height: 12),
+                                        const SizedBox(height: AppSpacing.md),
                                         _StatBox(
                                           title: 'Disiplin Modu',
                                           value: disciplineModeText(
@@ -337,7 +337,7 @@ class StatisticsPage extends StatelessWidget {
                                         ),
                                       ],
                                     ),
-                                  const SizedBox(height: 16),
+                                  const SizedBox(height: AppSpacing.lg),
                                   ElevatedButton.icon(
                                     onPressed: () {
                                       _showDisciplineDialog(
@@ -371,10 +371,10 @@ class StatisticsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Akıllı Analiz',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: GridView.count(
                                 crossAxisCount: isWide ? 2 : 1,
                                 shrinkWrap: true,
@@ -411,10 +411,10 @@ class StatisticsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Seri ve Gün Analizi',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: GridView.count(
                                 crossAxisCount: isWide ? 2 : 1,
                                 shrinkWrap: true,
@@ -450,10 +450,10 @@ class StatisticsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Güven Analizi',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: GridView.count(
                                 crossAxisCount: isWide ? 2 : 1,
                                 shrinkWrap: true,
@@ -495,10 +495,10 @@ class StatisticsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Güven Puanına Göre Özet',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: overview.confidenceStats.isEmpty
                                   ? const _SectionEmptyState(
                                 text:
@@ -532,10 +532,10 @@ class StatisticsPage extends StatelessWidget {
                                 })(),
                               ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Bahis Türüne Göre Özet',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: overview.betTypeStats.isEmpty
                                   ? const _SectionEmptyState(
                                 text:
@@ -567,10 +567,10 @@ class StatisticsPage extends StatelessWidget {
                                 }).toList(),
                               ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Spor Dalına Göre Özet',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: overview.sportStats.isEmpty
                                   ? const _SectionEmptyState(
                                 text:
@@ -599,10 +599,10 @@ class StatisticsPage extends StatelessWidget {
                                 }).toList(),
                               ),
                             ),
-                            const SizedBox(height: 24),
+                            const SizedBox(height: AppSpacing.xl),
                             SectionCardShell(
                               title: 'Performans Özeti',
-                              padding: const EdgeInsets.all(20),
+                              padding: const EdgeInsets.all(AppSpacing.lg),
                               child: GridView.count(
                                 crossAxisCount: isWide ? 2 : 1,
                                 shrinkWrap: true,
@@ -634,7 +634,7 @@ class StatisticsPage extends StatelessWidget {
                                 ],
                               ),
                             ),
-                            const SizedBox(height: 20),
+                            const SizedBox(height: AppSpacing.xl),
                           ],
                         ),
                       ),

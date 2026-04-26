@@ -1101,7 +1101,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                           direction: DismissDirection.endToStart,
                           confirmDismiss: (_) => _confirmDelete(bet),
                               background: Container(
-                                margin: const EdgeInsets.only(bottom: 12),
+                                margin: const EdgeInsets.only(bottom: AppSpacing.md),
                                 padding: const EdgeInsets.symmetric(
                                   horizontal: AppSpacing.lg,
                                 ),
@@ -1112,8 +1112,8 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                 alignment: Alignment.centerRight,
                                 child: Container(
                                   padding: const EdgeInsets.symmetric(
-                                    horizontal: 12,
-                                    vertical: 10,
+                                    horizontal: AppSpacing.md,
+                                    vertical: AppSpacing.sm,
                                   ),
                                   decoration: BoxDecoration(
                                     color: Colors.white.withValues(alpha: 0.10),
@@ -1132,7 +1132,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                         color: Colors.white,
                                         size: 18,
                                       ),
-                                      SizedBox(width: 6),
+                                      SizedBox(width: AppSpacing.xs),
                                       Text(
                                         'Sil',
                                         style: TextStyle(

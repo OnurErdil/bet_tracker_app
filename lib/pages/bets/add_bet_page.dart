@@ -457,7 +457,7 @@ class _AddBetPageState extends State<AddBetPage> {
       ),
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.all(AppSpacing.xl),
           child: ConstrainedBox(
             constraints: BoxConstraints(
               maxWidth: isWide ? 700 : double.infinity,
@@ -733,7 +733,7 @@ class _AddBetPageState extends State<AddBetPage> {
                       const SizedBox(height: 14),
                       InkWell(
                         onTap: _pickDate,
-                        borderRadius: BorderRadius.circular(14),
+                        borderRadius: BorderRadius.circular(AppRadius.md),
                         child: InputDecorator(
                           decoration: const InputDecoration(
                             labelText: 'Tarih',
@@ -758,27 +758,16 @@ class _AddBetPageState extends State<AddBetPage> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 24),
+                      const SizedBox(height: AppSpacing.xl),
                       ElevatedButton(
                         onPressed: (_isLoading || _isLockedForToday)
                             ? null
                             : _saveBet,
                         child: _isLoading
-                            ? const SizedBox(
-                          height: 22,
-                          width: 22,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2,
-                            color: Colors.white,
-                          ),
-                        )
-                            : const Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(Icons.save_outlined, size: 18),
-                            SizedBox(width: 6),
-                            Text('Bahsi Kaydet'),
-                          ],
+                            ? const ButtonLoadingIndicator()
+                            : const ButtonIconLabel(
+                          icon: Icons.save_outlined,
+                          label: 'Bahsi Kaydet',
                         ),
                       ),
                     ],
