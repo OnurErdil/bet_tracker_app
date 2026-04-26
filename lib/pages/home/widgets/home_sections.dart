@@ -294,13 +294,7 @@ class RecentBetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final resultTone = bet.result == 'kazandi'
-        ? StatusTone.success
-        : bet.result == 'kaybetti'
-        ? StatusTone.danger
-        : bet.result == 'iade'
-        ? StatusTone.warning
-        : StatusTone.muted;
+    final resultTone = betResultTone(bet.result);
 
     final netTone =
     bet.netProfit >= 0 ? StatusTone.success : StatusTone.danger;

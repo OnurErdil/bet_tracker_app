@@ -661,58 +661,6 @@ class StatisticsPage extends StatelessWidget {
     );
   }
 
-  static Widget _buildDialogHeader({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    StatusTone tone = StatusTone.primary,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: statusToneFill(tone),
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(
-              color: statusToneBorder(tone),
-            ),
-          ),
-          child: Icon(
-            icon,
-            color: statusToneColor(tone),
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
-    );
-  }
-
   static double? _parseDoubleInput(TextEditingController controller) {
     return double.tryParse(
       controller.text.replaceAll(',', '.'),
@@ -755,7 +703,7 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: _buildDialogHeader(
+              title: const AppDialogHeader(
                 icon: Icons.savings_outlined,
                 title: 'Başlangıç Kasası',
                 subtitle: 'Kasa başlangıç tutarını güncelle.',
@@ -887,7 +835,7 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: _buildDialogHeader(
+              title: const AppDialogHeader(
                 icon: Icons.tune,
                 title: 'Disiplin Ayarları',
                 subtitle: 'Maksimum bahis, günlük limit ve güven ayarlarını güncelle.',
@@ -1157,7 +1105,7 @@ class StatisticsPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: _buildDialogHeader(
+              title: const AppDialogHeader(
                 icon: Icons.delete_forever_outlined,
                 title: 'Tüm Verileri Sıfırla',
                 subtitle: 'Bu işlem tüm bahis, kasa ve disiplin verilerini temizler.',
@@ -1374,13 +1322,13 @@ ButtonStyle _actionButtonStyle({
 
 ButtonStyle _primaryActionButtonStyle() {
   return _actionButtonStyle(
-    backgroundColor: AppColors.primary,
+    backgroundColor: statusToneColor(StatusTone.primary),
   );
 }
 
 ButtonStyle _dangerActionButtonStyle() {
   return _actionButtonStyle(
-    backgroundColor: AppColors.danger,
+    backgroundColor: statusToneColor(StatusTone.danger),
   );
 }
 

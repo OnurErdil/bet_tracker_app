@@ -298,7 +298,7 @@ class _EditBetPageState extends State<EditBetPage> {
 
   ButtonStyle _dangerDialogButtonStyle() {
     return ElevatedButton.styleFrom(
-      backgroundColor: AppColors.danger,
+      backgroundColor: statusToneColor(StatusTone.danger),
       foregroundColor: Colors.white,
       minimumSize: const Size(0, 46),
       padding: const EdgeInsets.symmetric(
@@ -313,7 +313,7 @@ class _EditBetPageState extends State<EditBetPage> {
 
   ButtonStyle _dangerPrimaryButtonStyle() {
     return ElevatedButton.styleFrom(
-      backgroundColor: AppColors.danger,
+      backgroundColor: statusToneColor(StatusTone.danger),
       foregroundColor: Colors.white,
       minimumSize: const Size(double.infinity, 52),
       shape: RoundedRectangleBorder(
@@ -559,49 +559,11 @@ class _EditBetPageState extends State<EditBetPage> {
             AppSpacing.lg,
             AppSpacing.lg,
           ),
-          title: Row(
-            children: [
-              Container(
-                width: 42,
-                height: 42,
-                decoration: BoxDecoration(
-                  color: statusToneFill(StatusTone.danger),
-                  borderRadius: BorderRadius.circular(AppRadius.md),
-                  border: Border.all(
-                    color: statusToneBorder(StatusTone.danger),
-                  ),
-                ),
-                child: Icon(
-                  Icons.delete_outline,
-                  color: statusToneColor(StatusTone.danger),
-                  size: 20,
-                ),
-              ),
-              const SizedBox(width: AppSpacing.md),
-              const Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      'Bahsi Sil',
-                      style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    SizedBox(height: 4),
-                    Text(
-                      'Bu kayıt düzenleme ekranından kaldırılacak.',
-                      style: TextStyle(
-                        fontSize: 12,
-                        color: AppColors.textSecondary,
-                        height: 1.3,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-            ],
+          title: const AppDialogHeader(
+            icon: Icons.delete_outline,
+            title: 'Bahsi Sil',
+            subtitle: 'Bu kayıt düzenleme ekranından kaldırılacak.',
+            tone: StatusTone.danger,
           ),
           content: Text(
             '"${_currentMatchNameForDialog()}" kaydı silinecek. Silme sonrası kısa süre içinde geri alabilirsin.',
@@ -618,13 +580,9 @@ class _EditBetPageState extends State<EditBetPage> {
                 Navigator.pop(dialogContext, true);
               },
               style: _dangerDialogButtonStyle(),
-              child: const Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Icon(Icons.delete_outline, size: 18),
-                  SizedBox(width: 6),
-                  Text('Sil'),
-                ],
+              child: const ButtonIconLabel(
+                icon: Icons.delete_outline,
+                label: 'Sil',
               ),
             ),
           ],

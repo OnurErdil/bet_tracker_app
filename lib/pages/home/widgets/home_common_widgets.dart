@@ -62,6 +62,20 @@ enum StatusTone {
   highConfidence,
 }
 
+StatusTone betResultTone(String value) {
+  switch (value) {
+    case 'kazandi':
+      return StatusTone.success;
+    case 'kaybetti':
+      return StatusTone.danger;
+    case 'iade':
+      return StatusTone.warning;
+    case 'beklemede':
+    default:
+      return StatusTone.muted;
+  }
+}
+
 Color statusToneColor(StatusTone tone) {
   switch (tone) {
     case StatusTone.primary:
@@ -681,6 +695,69 @@ class AuthHeader extends StatelessWidget {
           style: const TextStyle(
             color: AppColors.textSecondary,
             height: 1.4,
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class AppDialogHeader extends StatelessWidget {
+  final IconData icon;
+  final String title;
+  final String subtitle;
+  final StatusTone tone;
+
+  const AppDialogHeader({
+    super.key,
+    required this.icon,
+    required this.title,
+    required this.subtitle,
+    this.tone = StatusTone.primary,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 42,
+          height: 42,
+          decoration: BoxDecoration(
+            color: statusToneFill(tone),
+            borderRadius: BorderRadius.circular(AppRadius.md),
+            border: Border.all(
+              color: statusToneBorder(tone),
+            ),
+          ),
+          child: Icon(
+            icon,
+            color: statusToneColor(tone),
+            size: 20,
+          ),
+        ),
+        const SizedBox(width: AppSpacing.md),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Text(
+                title,
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+              const SizedBox(height: 4),
+              Text(
+                subtitle,
+                style: const TextStyle(
+                  fontSize: 12,
+                  color: AppColors.textSecondary,
+                  height: 1.3,
+                ),
+              ),
+            ],
           ),
         ),
       ],

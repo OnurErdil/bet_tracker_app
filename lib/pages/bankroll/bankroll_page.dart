@@ -16,7 +16,7 @@ class BankrollPage extends StatelessWidget {
       ),
       floatingActionButton: FloatingActionButton.extended(
         onPressed: () => _showAddDialog(context),
-        backgroundColor: AppColors.primary,
+        backgroundColor: statusToneColor(StatusTone.primary),
         foregroundColor: Colors.white,
         icon: const Icon(Icons.add),
         label: const Text('İşlem Ekle'),
@@ -175,13 +175,13 @@ class BankrollPage extends StatelessWidget {
 
   static ButtonStyle _primaryDialogButtonStyle() {
     return _dialogButtonStyle(
-      backgroundColor: AppColors.primary,
+      backgroundColor: statusToneColor(StatusTone.primary),
     );
   }
 
   static ButtonStyle _dangerDialogButtonStyle() {
     return _dialogButtonStyle(
-      backgroundColor: AppColors.danger,
+      backgroundColor: statusToneColor(StatusTone.danger),
     );
   }
 
@@ -194,58 +194,6 @@ class BankrollPage extends StatelessWidget {
       context,
       message,
       clearPrevious: clearPrevious,
-    );
-  }
-
-  static Widget _buildDialogHeader({
-    required IconData icon,
-    required String title,
-    required String subtitle,
-    StatusTone tone = StatusTone.primary,
-  }) {
-    return Row(
-      children: [
-        Container(
-          width: 42,
-          height: 42,
-          decoration: BoxDecoration(
-            color: statusToneFill(tone),
-            borderRadius: BorderRadius.circular(AppRadius.md),
-            border: Border.all(
-              color: statusToneBorder(tone),
-            ),
-          ),
-          child: Icon(
-            icon,
-            color: statusToneColor(tone),
-            size: 20,
-          ),
-        ),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Text(
-                title,
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                ),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                subtitle,
-                style: const TextStyle(
-                  fontSize: 12,
-                  color: AppColors.textSecondary,
-                  height: 1.3,
-                ),
-              ),
-            ],
-          ),
-        ),
-      ],
     );
   }
 
@@ -309,31 +257,6 @@ class BankrollPage extends StatelessWidget {
     );
   }
 
-  static Widget _buildDialogLoadingChild() {
-    return const SizedBox(
-      height: 18,
-      width: 18,
-      child: CircularProgressIndicator(
-        strokeWidth: 2,
-        color: Colors.white,
-      ),
-    );
-  }
-
-  static Widget _buildDialogActionLabel({
-    required IconData icon,
-    required String label,
-  }) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(icon, size: 18),
-        const SizedBox(width: 6),
-        Text(label),
-      ],
-    );
-  }
-
   static void _showAddDialog(BuildContext context) {
     final amountController = TextEditingController();
     final noteController = TextEditingController();
@@ -367,7 +290,7 @@ class BankrollPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: _buildDialogHeader(
+              title: const AppDialogHeader(
                 icon: Icons.account_balance_wallet_outlined,
                 title: 'Yeni İşlem',
                 subtitle: 'Kasaya para ekle veya çekme işlemi oluştur.',
@@ -453,8 +376,8 @@ class BankrollPage extends StatelessWidget {
                   },
                   style: _primaryDialogButtonStyle(),
                   child: isSaving
-                      ? _buildDialogLoadingChild()
-                      : _buildDialogActionLabel(
+                      ? const ButtonLoadingIndicator(size: 18)
+                      : const ButtonIconLabel(
                     icon: Icons.save_outlined,
                     label: 'Kaydet',
                   ),
@@ -508,7 +431,7 @@ class BankrollPage extends StatelessWidget {
                 AppSpacing.lg,
                 AppSpacing.lg,
               ),
-              title: _buildDialogHeader(
+              title: const AppDialogHeader(
                 icon: Icons.edit_outlined,
                 title: 'İşlemi Düzenle',
                 subtitle: 'Kasa hareketini güncelle veya sil.',
@@ -589,8 +512,8 @@ class BankrollPage extends StatelessWidget {
                   },
                   style: _primaryDialogButtonStyle(),
                   child: isSaving
-                      ? _buildDialogLoadingChild()
-                      : _buildDialogActionLabel(
+                      ? const ButtonLoadingIndicator(size: 18)
+                      : const ButtonIconLabel(
                     icon: Icons.edit_outlined,
                     label: 'Güncelle',
                   ),
@@ -631,8 +554,8 @@ class BankrollPage extends StatelessWidget {
                   },
                   style: _dangerDialogButtonStyle(),
                   child: isDeleting
-                      ? _buildDialogLoadingChild()
-                      : _buildDialogActionLabel(
+                      ? const ButtonLoadingIndicator(size: 18)
+                      : const ButtonIconLabel(
                     icon: Icons.delete_outline,
                     label: 'Sil',
                   ),
