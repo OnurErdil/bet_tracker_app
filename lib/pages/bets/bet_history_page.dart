@@ -459,17 +459,8 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   }
 
   ButtonStyle _dangerDialogButtonStyle() {
-    return ElevatedButton.styleFrom(
-      backgroundColor: statusToneColor(StatusTone.danger),
-      foregroundColor: Colors.white,
-      minimumSize: const Size(0, 46),
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.md,
-        vertical: AppSpacing.sm,
-      ),
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.md),
-      ),
+    return solidToneButtonStyle(
+      tone: StatusTone.danger,
     );
   }
 
