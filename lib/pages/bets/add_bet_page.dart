@@ -1,6 +1,5 @@
 import 'package:bet_tracker_app/data/bet_form_catalog.dart';
 import 'package:bet_tracker_app/data/bet_form_helpers.dart';
-import 'package:bet_tracker_app/domain/bet_calculator.dart';
 import 'package:bet_tracker_app/domain/bankroll_discipline_calculator.dart';
 import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/pages/bets/widgets/bet_form_status_widgets.dart';
@@ -267,7 +266,10 @@ class _AddBetPageState extends State<AddBetPage> {
     if (alreadyExceeded) {
       if (_disciplineMode == 'block_bet') {
         _showMessage(
-          'Günlük kayıp limiti zaten aşıldı. Yeni bahis eklenemez.',
+          BetFormHelpers.buildDailyLossAlreadyExceededMessage(
+            disciplineMode: _disciplineMode,
+            blockMessage: 'Yeni bahis eklenemez.',
+          ),
         );
         return false;
       }
@@ -277,13 +279,19 @@ class _AddBetPageState extends State<AddBetPage> {
           _isLockedForToday = true;
         });
         _showMessage(
-          'Günlük kayıp limiti aşıldı. Bugün bahis kapandı.',
+          BetFormHelpers.buildDailyLossAlreadyExceededMessage(
+            disciplineMode: _disciplineMode,
+            blockMessage: 'Yeni bahis eklenemez.',
+          ),
         );
         return false;
       }
 
       _showMessage(
-        'Uyarı: Günlük kayıp limiti zaten aşılmış durumda.',
+        BetFormHelpers.buildDailyLossAlreadyExceededMessage(
+          disciplineMode: _disciplineMode,
+          blockMessage: 'Yeni bahis eklenemez.',
+        ),
       );
       return true;
     }
@@ -292,10 +300,14 @@ class _AddBetPageState extends State<AddBetPage> {
       final projectedLoss = todayLoss + stake;
 
       if (projectedLoss > _dailyLossLimit) {
+        final message = BetFormHelpers.buildProjectedDailyLossLimitMessage(
+          disciplineMode: _disciplineMode,
+          actionLabel: 'Bu kayıt',
+          dailyLossLimit: _dailyLossLimit,
+        );
+
         if (_disciplineMode == 'block_bet') {
-          _showMessage(
-            'Bu kayıt günlük kayıp limitini aşıyor. Limit: ${_dailyLossLimit.toStringAsFixed(2)} ₺',
-          );
+          _showMessage(message);
           return false;
         }
 
@@ -303,15 +315,11 @@ class _AddBetPageState extends State<AddBetPage> {
           setState(() {
             _isLockedForToday = true;
           });
-          _showMessage(
-            'Bu kayıt günlük kayıp limitini aşıyor. Bugün bahis kapandı.',
-          );
+          _showMessage(message);
           return false;
         }
 
-        _showMessage(
-          'Uyarı: Bu kayıt günlük kayıp limitini aşıyor. Limit: ${_dailyLossLimit.toStringAsFixed(2)} ₺',
-        );
+        _showMessage(message);
       }
     }
 
@@ -327,11 +335,13 @@ class _AddBetPageState extends State<AddBetPage> {
       return true;
     }
 
-    final limitText = _isHighConfidenceSelected
-        ? 'Güven puanı $_confidenceScore için izin verilen limit: ${effectiveLimit.toStringAsFixed(2)} ₺'
-        : _maxStakeMode == 'percent'
-        ? '%${_maxStakeValue.toStringAsFixed(1)} moduna göre limit: ${effectiveLimit.toStringAsFixed(2)} ₺'
-        : 'Limit: ${effectiveLimit.toStringAsFixed(2)} ₺';
+    final limitText = BetFormHelpers.buildMaxStakeLimitText(
+      isHighConfidenceSelected: _isHighConfidenceSelected,
+      confidenceScore: _confidenceScore,
+      maxStakeMode: _maxStakeMode,
+      maxStakeValue: _maxStakeValue,
+      effectiveMaxStake: effectiveLimit,
+    );
 
     if (_disciplineMode == 'block_bet') {
       _showMessage('Bu bahis tutarı maksimum bahis limitini aşıyor. $limitText');
@@ -367,8 +377,9 @@ class _AddBetPageState extends State<AddBetPage> {
       return;
     }
 
-    final odd = double.tryParse(_oddController.text.replaceAll(',', '.'));
-    final stake = double.tryParse(_stakeController.text.replaceAll(',', '.'));
+    final previewData = _previewData;
+    final odd = previewData.odd;
+    final stake = previewData.stake;
 
     if (odd == null || stake == null) {
       _showMessage('Oran ve tutar sayısal olmalı.');
@@ -407,11 +418,7 @@ class _AddBetPageState extends State<AddBetPage> {
       odd: odd,
       stake: stake,
       result: _selectedResult,
-      netProfit: BetCalculator.calculateNetProfit(
-        odd: odd,
-        stake: stake,
-        result: _selectedResult,
-      ),
+      netProfit: previewData.netProfit,
       note: _noteController.text.trim(),
       createdAt: DateTime.now(),
       confidenceScore: _confidenceScore,

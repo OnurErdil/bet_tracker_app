@@ -1,6 +1,6 @@
 import 'package:bet_tracker_app/models/bankroll_transaction_model.dart';
+import 'package:bet_tracker_app/services/service_helpers.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 class BankrollService {
   static final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -11,6 +11,9 @@ class BankrollService {
 
   static Future<String?> addTransaction(BankrollTransaction tx) async {
     try {
+      final accessError = ServiceHelpers.validateCurrentUserAccess(tx.userId);
+      if (accessError != null) return accessError;
+
       await _ref(tx.userId).add(tx.toMap());
       return null;
     } catch (e) {
@@ -19,13 +22,13 @@ class BankrollService {
   }
 
   static Stream<List<BankrollTransaction>> getTransactions() {
-    final user = FirebaseAuth.instance.currentUser;
+    final userId = ServiceHelpers.currentUserId;
 
-    if (user == null) {
+    if (userId == null) {
       return const Stream.empty();
     }
 
-    return _ref(user.uid)
+    return _ref(userId)
         .orderBy('createdAt', descending: true)
         .snapshots()
         .map((snapshot) {
@@ -37,9 +40,14 @@ class BankrollService {
 
   static Future<String?> updateTransaction(BankrollTransaction tx) async {
     try {
-      if (tx.id == null) {
-        return 'Güncellenecek işlem bulunamadı.';
-      }
+      final idError = ServiceHelpers.validateDocumentId(
+        id: tx.id,
+        missingMessage: 'Güncellenecek işlem bulunamadı.',
+      );
+      if (idError != null) return idError;
+
+      final accessError = ServiceHelpers.validateCurrentUserAccess(tx.userId);
+      if (accessError != null) return accessError;
 
       await _ref(tx.userId).doc(tx.id).update(tx.toMap());
       return null;
@@ -53,6 +61,15 @@ class BankrollService {
     required String transactionId,
   }) async {
     try {
+      final idError = ServiceHelpers.validateDocumentId(
+        id: transactionId,
+        missingMessage: 'Silinecek işlem bulunamadı.',
+      );
+      if (idError != null) return idError;
+
+      final accessError = ServiceHelpers.validateCurrentUserAccess(userId);
+      if (accessError != null) return accessError;
+
       await _ref(userId).doc(transactionId).delete();
       return null;
     } catch (e) {
@@ -62,33 +79,18 @@ class BankrollService {
 
   static Future<String?> deleteAllTransactions() async {
     try {
-      final user = FirebaseAuth.instance.currentUser;
+      final userId = ServiceHelpers.currentUserId;
 
-      if (user == null) {
-        return 'Kullanıcı bulunamadı.';
+      if (userId == null) {
+        return ServiceHelpers.userNotFoundMessage;
       }
 
-      final snapshot = await _ref(user.uid).get();
-      final docs = snapshot.docs;
+      final snapshot = await _ref(userId).get();
 
-      if (docs.isEmpty) {
-        return null;
-      }
-
-      const deleteBatchSize = 400;
-
-      for (int i = 0; i < docs.length; i += deleteBatchSize) {
-        final batch = _firestore.batch();
-        final end = (i + deleteBatchSize > docs.length)
-            ? docs.length
-            : i + deleteBatchSize;
-
-        for (final doc in docs.sublist(i, end)) {
-          batch.delete(doc.reference);
-        }
-
-        await batch.commit();
-      }
+      await ServiceHelpers.deleteDocsInBatches(
+        firestore: _firestore,
+        docs: snapshot.docs,
+      );
 
       return null;
     } catch (e) {

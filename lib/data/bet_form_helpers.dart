@@ -363,6 +363,58 @@ class BetFormHelpers {
 
     return '• Maksimum bahis: ${currentDynamicMaxStake.toStringAsFixed(2)} ₺';
   }
+
+  static String buildMaxStakeLimitText({
+    required bool isHighConfidenceSelected,
+    required int confidenceScore,
+    required String maxStakeMode,
+    required double maxStakeValue,
+    required double effectiveMaxStake,
+  }) {
+    if (isHighConfidenceSelected) {
+      return 'Güven puanı $confidenceScore için izin verilen limit: ${effectiveMaxStake.toStringAsFixed(2)} ₺';
+    }
+
+    if (maxStakeMode == 'percent') {
+      return '%${maxStakeValue.toStringAsFixed(1)} moduna göre limit: ${effectiveMaxStake.toStringAsFixed(2)} ₺';
+    }
+
+    return 'Limit: ${effectiveMaxStake.toStringAsFixed(2)} ₺';
+  }
+
+  static String buildDailyLossAlreadyExceededMessage({
+    required String disciplineMode,
+    required String blockMessage,
+  }) {
+    if (disciplineMode == 'block_bet') {
+      return 'Günlük kayıp limiti zaten aşıldı. $blockMessage';
+    }
+
+    if (disciplineMode == 'lock_day') {
+      return 'Günlük kayıp limiti aşıldı. Bugün bahis kapandı.';
+    }
+
+    return 'Uyarı: Günlük kayıp limiti zaten aşılmış durumda.';
+  }
+
+  static String buildProjectedDailyLossLimitMessage({
+    required String disciplineMode,
+    required String actionLabel,
+    required double dailyLossLimit,
+  }) {
+    if (disciplineMode == 'lock_day') {
+      return '$actionLabel günlük kayıp limitini aşıyor. Bugün bahis kapandı.';
+    }
+
+    final limitText = 'Limit: ${dailyLossLimit.toStringAsFixed(2)} ₺';
+
+    if (disciplineMode == 'block_bet') {
+      return '$actionLabel günlük kayıp limitini aşıyor. $limitText';
+    }
+
+    return 'Uyarı: $actionLabel günlük kayıp limitini aşıyor. $limitText';
+  }
+
   static BetFormInitialData buildInitialDataFromBet(BetModel bet) {
     final homeTeam = bet.resolvedHomeTeam.trim();
     final awayTeam = bet.resolvedAwayTeam.trim();

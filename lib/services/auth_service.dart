@@ -8,49 +8,63 @@ class AuthService {
 
   static Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  static Future<String?> register({
-    required String email,
-    required String password,
+  static Future<String?> _runAuthAction({
+    required Future<dynamic> Function() action,
+    required String Function(Object error) fallbackMessage,
   }) async {
     try {
-      await _auth.createUserWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
+      await action();
       return null;
     } on FirebaseAuthException catch (e) {
       return _firebaseErrorMessage(e);
-    } catch (_) {
-      return 'Kayıt sırasında beklenmeyen bir hata oluştu.';
+    } catch (e) {
+      return fallbackMessage(e);
     }
+  }
+
+  static Future<String?> register({
+    required String email,
+    required String password,
+  }) {
+    return _runAuthAction(
+      action: () {
+        return _auth.createUserWithEmailAndPassword(
+          email: email.trim(),
+          password: password.trim(),
+        );
+      },
+      fallbackMessage: (_) {
+        return 'Kayıt sırasında beklenmeyen bir hata oluştu.';
+      },
+    );
   }
 
   static Future<String?> login({
     required String email,
     required String password,
-  }) async {
-    try {
-      await _auth.signInWithEmailAndPassword(
-        email: email.trim(),
-        password: password.trim(),
-      );
-      return null;
-    } on FirebaseAuthException catch (e) {
-      return _firebaseErrorMessage(e);
-    } catch (_) {
-      return 'Giriş sırasında beklenmeyen bir hata oluştu.';
-    }
+  }) {
+    return _runAuthAction(
+      action: () {
+        return _auth.signInWithEmailAndPassword(
+          email: email.trim(),
+          password: password.trim(),
+        );
+      },
+      fallbackMessage: (_) {
+        return 'Giriş sırasında beklenmeyen bir hata oluştu.';
+      },
+    );
   }
 
-  static Future<String?> resetPassword(String email) async {
-    try {
-      await _auth.sendPasswordResetEmail(email: email.trim());
-      return null;
-    } on FirebaseAuthException catch (e) {
-      return _firebaseErrorMessage(e);
-    } catch (_) {
-      return 'Şifre sıfırlama sırasında hata oluştu.';
-    }
+  static Future<String?> resetPassword(String email) {
+    return _runAuthAction(
+      action: () {
+        return _auth.sendPasswordResetEmail(email: email.trim());
+      },
+      fallbackMessage: (_) {
+        return 'Şifre sıfırlama sırasında hata oluştu.';
+      },
+    );
   }
 
   static Future<String?> signInWithGoogle() async {
