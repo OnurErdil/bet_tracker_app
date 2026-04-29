@@ -544,10 +544,87 @@ class _AddBetPageState extends State<AddBetPage> {
                           });
                         },
                       ),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
+                      if (isWide)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                value: _countryController.text.isEmpty
+                                    ? null
+                                    : _countryController.text,
+                                decoration: const InputDecoration(
+                                  labelText: 'Ülke',
+                                  prefixIcon: Icon(Icons.public),
+                                ),
+                                items: _availableCountries
+                                    .map(
+                                      (country) => DropdownMenuItem(
+                                    value: country,
+                                    child: Text(
+                                      country,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _countryController.text = value ?? '';
+                                    _leagueController.clear();
+                                    _homeTeamController.clear();
+                                    _awayTeamController.clear();
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Ülke seç';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                value: _leagueController.text.isEmpty
+                                    ? null
+                                    : _leagueController.text,
+                                decoration: const InputDecoration(
+                                  labelText: 'Lig',
+                                  prefixIcon: Icon(Icons.emoji_events_outlined),
+                                ),
+                                items: _availableLeagues
+                                    .map(
+                                      (league) => DropdownMenuItem(
+                                    value: league,
+                                    child: Text(
+                                      league,
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
+                                  ),
+                                )
+                                    .toList(),
+                                onChanged: (value) {
+                                  setState(() {
+                                    _leagueController.text = value ?? '';
+                                    _homeTeamController.clear();
+                                    _awayTeamController.clear();
+                                  });
+                                },
+                                validator: (value) {
+                                  if (value == null || value.isEmpty) {
+                                    return 'Lig seç';
+                                  }
+                                  return null;
+                                },
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            DropdownButtonFormField<String>(
                               value: _countryController.text.isEmpty
                                   ? null
                                   : _countryController.text,
@@ -559,7 +636,10 @@ class _AddBetPageState extends State<AddBetPage> {
                                   .map(
                                     (country) => DropdownMenuItem(
                                   value: country,
-                                  child: Text(country),
+                                  child: Text(
+                                    country,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               )
                                   .toList(),
@@ -578,10 +658,8 @@ class _AddBetPageState extends State<AddBetPage> {
                                 return null;
                               },
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: DropdownButtonFormField<String>(
+                            const SizedBox(height: AppSpacing.md),
+                            DropdownButtonFormField<String>(
                               value: _leagueController.text.isEmpty
                                   ? null
                                   : _leagueController.text,
@@ -593,7 +671,10 @@ class _AddBetPageState extends State<AddBetPage> {
                                   .map(
                                     (league) => DropdownMenuItem(
                                   value: league,
-                                  child: Text(league),
+                                  child: Text(
+                                    league,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
                                 ),
                               )
                                   .toList(),
@@ -611,14 +692,39 @@ class _AddBetPageState extends State<AddBetPage> {
                                 return null;
                               },
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTeamAutocompleteField(
+                      if (isWide)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTeamAutocompleteField(
+                                fieldKey: ValueKey(
+                                  'home_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
+                                ),
+                                controller: _homeTeamController,
+                                label: 'Ev Sahibi',
+                                hint: 'Örn: Galatasaray',
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: _buildTeamAutocompleteField(
+                                fieldKey: ValueKey(
+                                  'away_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
+                                ),
+                                controller: _awayTeamController,
+                                label: 'Deplasman',
+                                hint: 'Örn: Fenerbahçe',
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            _buildTeamAutocompleteField(
                               fieldKey: ValueKey(
                                 'home_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
                               ),
@@ -626,10 +732,8 @@ class _AddBetPageState extends State<AddBetPage> {
                               label: 'Ev Sahibi',
                               hint: 'Örn: Galatasaray',
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildTeamAutocompleteField(
+                            const SizedBox(height: AppSpacing.md),
+                            _buildTeamAutocompleteField(
                               fieldKey: ValueKey(
                                 'away_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
                               ),
@@ -637,9 +741,8 @@ class _AddBetPageState extends State<AddBetPage> {
                               label: 'Deplasman',
                               hint: 'Örn: Fenerbahçe',
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
                         value: _betTypeController.text.isEmpty

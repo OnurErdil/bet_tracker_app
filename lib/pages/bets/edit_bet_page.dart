@@ -925,10 +925,36 @@ class _EditBetPageState extends State<EditBetPage> {
                           ],
                         ),
                       const SizedBox(height: 14),
-                      Row(
-                        children: [
-                          Expanded(
-                            child: _buildTeamAutocompleteField(
+                      if (isWide)
+                        Row(
+                          children: [
+                            Expanded(
+                              child: _buildTeamAutocompleteField(
+                                fieldKey: ValueKey(
+                                  'home_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
+                                ),
+                                controller: _homeTeamController,
+                                label: 'Ev Sahibi',
+                                hint: 'Örn: Galatasaray',
+                              ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: _buildTeamAutocompleteField(
+                                fieldKey: ValueKey(
+                                  'away_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
+                                ),
+                                controller: _awayTeamController,
+                                label: 'Deplasman',
+                                hint: 'Örn: Fenerbahçe',
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        Column(
+                          children: [
+                            _buildTeamAutocompleteField(
                               fieldKey: ValueKey(
                                 'home_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
                               ),
@@ -936,10 +962,8 @@ class _EditBetPageState extends State<EditBetPage> {
                               label: 'Ev Sahibi',
                               hint: 'Örn: Galatasaray',
                             ),
-                          ),
-                          const SizedBox(width: 12),
-                          Expanded(
-                            child: _buildTeamAutocompleteField(
+                            const SizedBox(height: AppSpacing.md),
+                            _buildTeamAutocompleteField(
                               fieldKey: ValueKey(
                                 'away_${_sportController.text}_${_countryController.text}_${_leagueController.text}',
                               ),
@@ -947,9 +971,8 @@ class _EditBetPageState extends State<EditBetPage> {
                               label: 'Deplasman',
                               hint: 'Örn: Fenerbahçe',
                             ),
-                          ),
-                        ],
-                      ),
+                          ],
+                        ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
                         value: _betTypeController.text.isEmpty
