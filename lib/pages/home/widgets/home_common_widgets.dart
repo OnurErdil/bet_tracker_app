@@ -70,15 +70,9 @@ void showAppSnackBar(
   messenger.showSnackBar(
     SnackBar(
       duration: duration,
-      behavior: SnackBarBehavior.floating,
+      behavior: SnackBarBehavior.fixed,
       backgroundColor: AppColors.surfaceAlt,
       elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(AppRadius.lg),
-        side: BorderSide(
-          color: statusToneBorder(resolvedTone),
-        ),
-      ),
       content: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
