@@ -60,85 +60,120 @@ class BankrollPage extends StatelessWidget {
               isDeposit ? StatusTone.success : StatusTone.danger;
               final accentColor = statusToneColor(accentTone);
 
-              return Card(
-                color: AppColors.surface,
-                elevation: 0,
-                shape: AppStyles.cardShape(radius: AppRadius.lg),
-                margin: const EdgeInsets.only(bottom: AppSpacing.md),
-                child: InkWell(
-                  borderRadius: BorderRadius.circular(AppRadius.lg),
-                  onTap: () => _showEditDialog(context, tx),
-                  child: Padding(
-                    padding: const EdgeInsets.all(AppSpacing.lg),
-                    child: Row(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Container(
-                          width: 44,
-                          height: 44,
-                          decoration: BoxDecoration(
-                            color: statusToneFill(accentTone),
-                            borderRadius: BorderRadius.circular(AppRadius.md),
-                            border: Border.all(
-                              color: statusToneBorder(accentTone),
+              return LayoutBuilder(
+                builder: (context, constraints) {
+                  final isCompact = constraints.maxWidth < 430;
+                  final amountText =
+                      '${isDeposit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺';
+
+                  final leadingIcon = Container(
+                    width: isCompact ? 40 : 44,
+                    height: isCompact ? 40 : 44,
+                    decoration: BoxDecoration(
+                      color: statusToneFill(accentTone),
+                      borderRadius: BorderRadius.circular(AppRadius.md),
+                      border: Border.all(
+                        color: statusToneBorder(accentTone),
+                      ),
+                    ),
+                    child: Icon(
+                      isDeposit ? Icons.arrow_downward : Icons.arrow_upward,
+                      color: accentColor,
+                      size: isCompact ? 20 : 24,
+                    ),
+                  );
+
+                  final title = Text(
+                    tx.note.trim().isEmpty ? 'İşlem' : tx.note,
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                    ),
+                  );
+
+                  final typeChip = BetInfoChip(
+                    icon: isDeposit ? Icons.arrow_downward : Icons.arrow_upward,
+                    text: isDeposit ? 'Para Eklendi' : 'Para Çekildi',
+                    tone: isDeposit ? StatusTone.success : StatusTone.danger,
+                  );
+
+                  final dateChip = BetInfoChip(
+                    icon: Icons.schedule_outlined,
+                    text: _formatDate(tx.createdAt),
+                  );
+
+                  final amountChip = BetInfoChip(
+                    icon: isDeposit
+                        ? Icons.add_circle_outline
+                        : Icons.remove_circle_outline,
+                    text: amountText,
+                    tone: isDeposit ? StatusTone.success : StatusTone.danger,
+                  );
+
+                  return Card(
+                    color: AppColors.surface,
+                    elevation: 0,
+                    shape: AppStyles.cardShape(radius: AppRadius.lg),
+                    margin: const EdgeInsets.only(bottom: AppSpacing.md),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(AppRadius.lg),
+                      onTap: () => _showEditDialog(context, tx),
+                      child: Padding(
+                        padding: EdgeInsets.all(isCompact ? AppSpacing.md : AppSpacing.lg),
+                        child: isCompact
+                            ? Column(
+                          crossAxisAlignment: CrossAxisAlignment.stretch,
+                          children: [
+                            Row(
+                              children: [
+                                leadingIcon,
+                                const SizedBox(width: AppSpacing.md),
+                                Expanded(child: title),
+                              ],
                             ),
-                          ),
-                          child: Icon(
-                            isDeposit ? Icons.arrow_downward : Icons.arrow_upward,
-                            color: accentColor,
-                          ),
-                        ),
-                        const SizedBox(width: AppSpacing.md),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                tx.note.trim().isEmpty ? 'İşlem' : tx.note,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(height: AppSpacing.sm),
-                              Wrap(
-                                spacing: 8,
-                                runSpacing: 8,
+                            const SizedBox(height: AppSpacing.md),
+                            Wrap(
+                              spacing: AppSpacing.sm,
+                              runSpacing: AppSpacing.sm,
+                              children: [
+                                amountChip,
+                                typeChip,
+                                dateChip,
+                              ],
+                            ),
+                          ],
+                        )
+                            : Row(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            leadingIcon,
+                            const SizedBox(width: AppSpacing.md),
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
-                                  BetInfoChip(
-                                    icon: isDeposit
-                                        ? Icons.arrow_downward
-                                        : Icons.arrow_upward,
-                                    text: isDeposit
-                                        ? 'Para Eklendi'
-                                        : 'Para Çekildi',
-                                    tone: isDeposit
-                                        ? StatusTone.success
-                                        : StatusTone.danger,
-                                  ),
-                                  BetInfoChip(
-                                    icon: Icons.schedule_outlined,
-                                    text: _formatDate(tx.createdAt),
+                                  title,
+                                  const SizedBox(height: AppSpacing.sm),
+                                  Wrap(
+                                    spacing: 8,
+                                    runSpacing: 8,
+                                    children: [
+                                      typeChip,
+                                      dateChip,
+                                    ],
                                   ),
                                 ],
                               ),
-                            ],
-                          ),
+                            ),
+                            const SizedBox(width: AppSpacing.md),
+                            amountChip,
+                          ],
                         ),
-                        const SizedBox(width: AppSpacing.md),
-                        BetInfoChip(
-                          icon: isDeposit
-                              ? Icons.add_circle_outline
-                              : Icons.remove_circle_outline,
-                          text:
-                          '${isDeposit ? '+' : '-'}${tx.amount.toStringAsFixed(2)} ₺',
-                          tone: isDeposit
-                              ? StatusTone.success
-                              : StatusTone.danger,
-                        ),
-                      ],
+                      ),
                     ),
-                  ),
-                ),
+                  );
+                },
               );
             },
           );
