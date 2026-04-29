@@ -238,6 +238,87 @@ class PendingBetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 430;
+
+    if (isCompact) {
+      return BetCardShell(
+        title: bet.matchName,
+        confidenceScore: bet.confidenceScore,
+        titleFontSize: 15,
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '${bet.sport} • ${bet.betType}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                BetInfoChip(
+                  icon: Icons.percent,
+                  text: 'Oran ${bet.odd.toStringAsFixed(2)}',
+                  tone: StatusTone.info,
+                ),
+                BetInfoChip(
+                  icon: Icons.payments_outlined,
+                  text: '${bet.stake.toStringAsFixed(2)} ₺',
+                  tone: StatusTone.warning,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: AppSpacing.sm,
+              crossAxisSpacing: AppSpacing.sm,
+              childAspectRatio: 3.35,
+              children: [
+                StatusActionButton(
+                  onPressed: () => onQuickSettle(bet, 'kazandi'),
+                  tone: StatusTone.success,
+                  icon: Icons.check_circle_outline,
+                  label: 'Kazandı',
+                  compact: true,
+                ),
+                StatusActionButton(
+                  onPressed: () => onQuickSettle(bet, 'kaybetti'),
+                  tone: StatusTone.danger,
+                  icon: Icons.cancel_outlined,
+                  label: 'Kaybetti',
+                  compact: true,
+                ),
+                StatusActionButton(
+                  onPressed: () => onQuickSettle(bet, 'iade'),
+                  tone: StatusTone.warning,
+                  icon: Icons.reply_all_outlined,
+                  label: 'İade',
+                  compact: true,
+                ),
+                SecondaryActionButton(
+                  onPressed: onDetail,
+                  icon: Icons.open_in_new_outlined,
+                  label: 'Detay',
+                  compact: true,
+                ),
+              ],
+            ),
+          ],
+        ),
+      );
+    }
+
     return BetCardShell(
       title: bet.matchName,
       confidenceScore: bet.confidenceScore,
@@ -319,10 +400,67 @@ class RecentBetCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isCompact = MediaQuery.of(context).size.width < 430;
     final resultTone = betResultTone(bet.result);
+    final netTone = bet.netProfit >= 0 ? StatusTone.success : StatusTone.danger;
 
-    final netTone =
-    bet.netProfit >= 0 ? StatusTone.success : StatusTone.danger;
+    if (isCompact) {
+      return BetCardShell(
+        title: bet.matchName,
+        confidenceScore: bet.confidenceScore,
+        onTap: onTap,
+        titleFontSize: 15,
+        padding: const EdgeInsets.all(AppSpacing.md),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.stretch,
+          children: [
+            Text(
+              '${bet.sport} • ${bet.betType}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: const TextStyle(
+                color: AppColors.textSecondary,
+                fontSize: 12,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Wrap(
+              spacing: AppSpacing.sm,
+              runSpacing: AppSpacing.sm,
+              children: [
+                BetInfoChip(
+                  icon: Icons.percent,
+                  text: 'Oran ${bet.odd.toStringAsFixed(2)}',
+                  tone: StatusTone.info,
+                ),
+                BetInfoChip(
+                  icon: Icons.payments_outlined,
+                  text: '${bet.stake.toStringAsFixed(2)} ₺',
+                  tone: StatusTone.warning,
+                ),
+                BetInfoChip(
+                  icon: Icons.flag_outlined,
+                  text: resultLabel(bet.result),
+                  tone: resultTone,
+                ),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.sm),
+            Align(
+              alignment: Alignment.centerRight,
+              child: BetInfoChip(
+                icon: bet.netProfit >= 0
+                    ? Icons.trending_up
+                    : Icons.trending_down,
+                text: '${bet.netProfit.toStringAsFixed(2)} ₺',
+                tone: netTone,
+              ),
+            ),
+          ],
+        ),
+      );
+    }
 
     return BetCardShell(
       title: bet.matchName,

@@ -1102,9 +1102,12 @@ class BetCardShell extends StatelessWidget {
               Expanded(
                 child: Text(
                   title,
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     fontSize: titleFontSize,
+                    height: 1.15,
                   ),
                 ),
               ),
@@ -1191,6 +1194,7 @@ class StatusActionButton extends StatelessWidget {
   final String label;
   final StatusTone tone;
   final VoidCallback? onPressed;
+  final bool compact;
 
   const StatusActionButton({
     super.key,
@@ -1198,6 +1202,7 @@ class StatusActionButton extends StatelessWidget {
     required this.label,
     required this.tone,
     required this.onPressed,
+    this.compact = false,
   });
 
   @override
@@ -1206,14 +1211,29 @@ class StatusActionButton extends StatelessWidget {
       onPressed: onPressed,
       style: solidToneButtonStyle(
         tone: tone,
-        minimumSize: const Size(0, 44),
+        minimumSize: Size(0, compact ? 38 : 44),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? AppSpacing.sm : AppSpacing.md,
+          vertical: compact ? AppSpacing.xs : AppSpacing.sm,
+        ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          Icon(icon, size: 18),
+          Icon(icon, size: compact ? 16 : 18),
           const SizedBox(width: 6),
-          Text(label),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: compact ? 13 : null,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );
@@ -1224,12 +1244,14 @@ class SecondaryActionButton extends StatelessWidget {
   final IconData icon;
   final String label;
   final VoidCallback? onPressed;
+  final bool compact;
 
   const SecondaryActionButton({
     super.key,
     required this.icon,
     required this.label,
     required this.onPressed,
+    this.compact = false,
   });
 
   @override
@@ -1237,10 +1259,10 @@ class SecondaryActionButton extends StatelessWidget {
     return OutlinedButton(
       onPressed: onPressed,
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(0, 44),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.md,
-          vertical: AppSpacing.sm,
+        minimumSize: Size(0, compact ? 38 : 44),
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? AppSpacing.sm : AppSpacing.md,
+          vertical: compact ? AppSpacing.xs : AppSpacing.sm,
         ),
         backgroundColor: AppColors.surfaceAlt,
         side: const BorderSide(color: AppColors.border),
@@ -1249,11 +1271,22 @@ class SecondaryActionButton extends StatelessWidget {
         ),
       ),
       child: Row(
-        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
         children: [
-          Icon(icon, size: 18),
+          Icon(icon, size: compact ? 16 : 18),
           const SizedBox(width: 6),
-          Text(label),
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: compact ? 13 : null,
+                fontWeight: FontWeight.w600,
+              ),
+            ),
+          ),
         ],
       ),
     );
