@@ -170,31 +170,55 @@ class QuickActionsSection extends StatelessWidget {
       title: 'Hızlı İşlemler',
       subtitle: 'En sık kullandığın ekranlara buradan hızlıca geç.',
       padding: const EdgeInsets.all(AppSpacing.lg),
-      child: Wrap(
-        spacing: 12,
-        runSpacing: 12,
-        children: [
-          QuickActionButton(
-            label: 'Bahis Ekle',
-            icon: Icons.add_circle_outline,
-            onTap: onAddBet,
-          ),
-          QuickActionButton(
-            label: 'Bahis Geçmişi',
-            icon: Icons.history,
-            onTap: onBetHistory,
-          ),
-          QuickActionButton(
-            label: 'İstatistikler',
-            icon: Icons.bar_chart,
-            onTap: onStats,
-          ),
-          QuickActionButton(
-            label: 'Kasa Hareketleri',
-            icon: Icons.account_balance_wallet,
-            onTap: onBankroll,
-          ),
-        ],
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          final isCompact = constraints.maxWidth < 430;
+
+          final actions = [
+            QuickActionButton(
+              label: 'Bahis Ekle',
+              icon: Icons.add_circle_outline,
+              onTap: onAddBet,
+              compact: isCompact,
+            ),
+            QuickActionButton(
+              label: 'Geçmiş',
+              icon: Icons.history,
+              onTap: onBetHistory,
+              compact: isCompact,
+            ),
+            QuickActionButton(
+              label: 'İstatistik',
+              icon: Icons.bar_chart,
+              onTap: onStats,
+              compact: isCompact,
+            ),
+            QuickActionButton(
+              label: 'Kasa',
+              icon: Icons.account_balance_wallet,
+              onTap: onBankroll,
+              compact: isCompact,
+            ),
+          ];
+
+          if (isCompact) {
+            return GridView.count(
+              crossAxisCount: 2,
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              mainAxisSpacing: AppSpacing.sm,
+              crossAxisSpacing: AppSpacing.sm,
+              childAspectRatio: 2.65,
+              children: actions,
+            );
+          }
+
+          return Wrap(
+            spacing: 12,
+            runSpacing: 12,
+            children: actions,
+          );
+        },
       ),
     );
   }

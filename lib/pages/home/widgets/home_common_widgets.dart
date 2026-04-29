@@ -869,47 +869,51 @@ class QuickActionButton extends StatelessWidget {
   final String label;
   final IconData icon;
   final VoidCallback onTap;
+  final bool compact;
 
   const QuickActionButton({
     super.key,
     required this.label,
     required this.icon,
     required this.onTap,
+    this.compact = false,
   });
 
   @override
   Widget build(BuildContext context) {
-    return OutlinedButton.icon(
+    return OutlinedButton(
       onPressed: onTap,
       style: OutlinedButton.styleFrom(
-        minimumSize: const Size(190, 52),
+        minimumSize: compact ? const Size(0, 44) : const Size(190, 52),
         backgroundColor: AppColors.surfaceAlt,
         side: const BorderSide(color: AppColors.border),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.md,
+        padding: EdgeInsets.symmetric(
+          horizontal: compact ? AppSpacing.sm : AppSpacing.lg,
+          vertical: compact ? AppSpacing.sm : AppSpacing.md,
         ),
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(AppRadius.md),
         ),
       ),
-      icon: const Icon(
-        Icons.circle,
-        size: 0,
-      ),
-      label: Row(
-        mainAxisSize: MainAxisSize.min,
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.center,
+        mainAxisSize: compact ? MainAxisSize.max : MainAxisSize.min,
         children: [
           Icon(
             icon,
-            size: 18,
+            size: compact ? 17 : 18,
             color: statusToneColor(StatusTone.primary),
           ),
           const SizedBox(width: AppSpacing.xs),
-          Text(
-            label,
-            style: const TextStyle(
-              fontWeight: FontWeight.w600,
+          Flexible(
+            child: Text(
+              label,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TextStyle(
+                fontSize: compact ? 12 : 14,
+                fontWeight: FontWeight.w600,
+              ),
             ),
           ),
         ],

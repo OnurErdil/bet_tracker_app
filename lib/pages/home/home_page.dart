@@ -53,6 +53,7 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final user = FirebaseAuth.instance.currentUser;
+    final isCompactMobile = MediaQuery.of(context).size.width < 430;
 
     return Scaffold(
       appBar: AppBar(
@@ -77,7 +78,15 @@ class HomePage extends StatelessWidget {
           ),
         ],
       ),
-      floatingActionButton: FloatingActionButton.extended(
+      floatingActionButton: isCompactMobile
+          ? FloatingActionButton(
+        backgroundColor: statusToneColor(StatusTone.success),
+        foregroundColor: Colors.white,
+        tooltip: 'Bahis Ekle',
+        onPressed: () => _openPage(context, const AddBetPage()),
+        child: const Icon(Icons.add),
+      )
+          : FloatingActionButton.extended(
         backgroundColor: statusToneColor(StatusTone.success),
         foregroundColor: Colors.white,
         onPressed: () => _openPage(context, const AddBetPage()),
