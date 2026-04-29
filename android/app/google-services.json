@@ -12,7 +12,20 @@
           "package_name": "com.example.bet_tracker_app"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "849847234464-32a1s9cgo45faon6loaito14h0oprle1.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.bet_tracker_app",
+            "certificate_hash": "d52e40c093320672e996d26dee5d12b84f209a02"
+          }
+        },
+        {
+          "client_id": "849847234464-8fjli3jbs8lb7o2j50q6pqpo6of2tjid.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyAxNspaGIUqzhjgpMuOmQlwACuRuyMMNNA"
@@ -20,7 +33,12 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "849847234464-8fjli3jbs8lb7o2j50q6pqpo6of2tjid.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
         }
       }
     }
