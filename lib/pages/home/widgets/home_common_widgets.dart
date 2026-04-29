@@ -2,19 +2,105 @@ import 'package:bet_tracker_app/models/bet_model.dart';
 import 'package:bet_tracker_app/theme/app_design_tokens.dart';
 import 'package:flutter/material.dart';
 
+StatusTone _snackBarToneFromMessage(String message) {
+  final lowerMessage = message.toLowerCase();
+
+  if (lowerMessage.contains('başarı') ||
+      lowerMessage.contains('kaydedildi') ||
+      lowerMessage.contains('eklendi') ||
+      lowerMessage.contains('güncellendi') ||
+      lowerMessage.contains('sıfırlandı') ||
+      lowerMessage.contains('gönderildi') ||
+      lowerMessage.contains('yüklendi')) {
+    return StatusTone.success;
+  }
+
+  if (lowerMessage.contains('uyarı') ||
+      lowerMessage.contains('limit') ||
+      lowerMessage.contains('kapalı') ||
+      lowerMessage.contains('kilit') ||
+      lowerMessage.contains('iptal')) {
+    return StatusTone.warning;
+  }
+
+  if (lowerMessage.contains('hata') ||
+      lowerMessage.contains('başarısız') ||
+      lowerMessage.contains('bulunamadı') ||
+      lowerMessage.contains('doldur') ||
+      lowerMessage.contains('geçerli') ||
+      lowerMessage.contains('yanlış') ||
+      lowerMessage.contains('silinemedi')) {
+    return StatusTone.danger;
+  }
+
+  return StatusTone.info;
+}
+
+IconData _snackBarIcon(StatusTone tone) {
+  switch (tone) {
+    case StatusTone.success:
+      return Icons.check_circle_outline;
+    case StatusTone.danger:
+      return Icons.error_outline;
+    case StatusTone.warning:
+      return Icons.warning_amber_rounded;
+    case StatusTone.primary:
+    case StatusTone.info:
+    case StatusTone.highConfidence:
+    case StatusTone.muted:
+      return Icons.info_outline;
+  }
+}
+
 void showAppSnackBar(
     BuildContext context,
     String message, {
       bool clearPrevious = false,
+      StatusTone? tone,
+      Duration duration = const Duration(seconds: 3),
     }) {
   final messenger = ScaffoldMessenger.of(context);
+  final resolvedTone = tone ?? _snackBarToneFromMessage(message);
+  final color = statusToneColor(resolvedTone);
 
   if (clearPrevious) {
     messenger.clearSnackBars();
   }
 
   messenger.showSnackBar(
-    SnackBar(content: Text(message)),
+    SnackBar(
+      duration: duration,
+      behavior: SnackBarBehavior.floating,
+      backgroundColor: AppColors.surfaceAlt,
+      elevation: 0,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(AppRadius.lg),
+        side: BorderSide(
+          color: statusToneBorder(resolvedTone),
+        ),
+      ),
+      content: Row(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Icon(
+            _snackBarIcon(resolvedTone),
+            color: color,
+            size: 20,
+          ),
+          const SizedBox(width: AppSpacing.sm),
+          Expanded(
+            child: Text(
+              message,
+              style: const TextStyle(
+                color: AppColors.textPrimary,
+                fontWeight: FontWeight.w600,
+                height: 1.35,
+              ),
+            ),
+          ),
+        ],
+      ),
+    ),
   );
 }
 

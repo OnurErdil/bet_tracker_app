@@ -631,16 +631,24 @@ class _EditBetPageState extends State<EditBetPage> {
       messenger.clearSnackBars();
 
       if (restoreResult != null) {
-        messenger.showSnackBar(
-          SnackBar(content: Text(restoreResult)),
+        if (!mounted) return;
+
+        showAppSnackBar(
+          context,
+          restoreResult,
+          clearPrevious: true,
+          tone: StatusTone.danger,
         );
         return;
       }
 
-      messenger.showSnackBar(
-        const SnackBar(
-          content: Text('Bahis geri yüklendi.'),
-        ),
+      if (!mounted) return;
+
+      showAppSnackBar(
+        context,
+        'Bahis geri yüklendi.',
+        clearPrevious: true,
+        tone: StatusTone.success,
       );
     }
 

@@ -1,5 +1,6 @@
 import 'package:bet_tracker_app/pages/auth/forgot_password_page.dart';
 import 'package:bet_tracker_app/pages/auth/register_page.dart';
+import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 
@@ -64,8 +65,10 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   void _showMessage(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(content: Text(message)),
+    showAppSnackBar(
+      context,
+      message,
+      clearPrevious: true,
     );
   }
 
