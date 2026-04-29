@@ -814,36 +814,45 @@ class StatisticsPage extends StatelessWidget {
 
         return StatefulBuilder(
           builder: (context, setState) {
+            final isCompact = MediaQuery.of(context).size.width < 430;
+
             return AlertDialog(
-              backgroundColor: AppColors.surface,
-              shape: AppStyles.cardShape(radius: AppRadius.xl),
-              titlePadding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                AppSpacing.xl,
-                AppSpacing.xl,
-                AppSpacing.md,
-              ),
-              contentPadding: const EdgeInsets.fromLTRB(
-                AppSpacing.xl,
-                0,
-                AppSpacing.xl,
-                AppSpacing.lg,
-              ),
-              actionsPadding: const EdgeInsets.fromLTRB(
-                AppSpacing.lg,
-                0,
-                AppSpacing.lg,
-                AppSpacing.lg,
-              ),
-              title: const AppDialogHeader(
-                icon: Icons.tune,
-                title: 'Disiplin Ayarları',
-                subtitle: 'Maksimum bahis, günlük limit ve güven ayarlarını güncelle.',
-              ),
-              content: SingleChildScrollView(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
+                backgroundColor: AppColors.surface,
+                shape: AppStyles.cardShape(radius: AppRadius.xl),
+                insetPadding: EdgeInsets.symmetric(
+                  horizontal: isCompact ? AppSpacing.md : 40,
+                  vertical: AppSpacing.lg,
+                ),
+                titlePadding: EdgeInsets.fromLTRB(
+                  isCompact ? AppSpacing.lg : AppSpacing.xl,
+                  isCompact ? AppSpacing.lg : AppSpacing.xl,
+                  isCompact ? AppSpacing.lg : AppSpacing.xl,
+                  AppSpacing.sm,
+                ),
+                contentPadding: EdgeInsets.fromLTRB(
+                  isCompact ? AppSpacing.lg : AppSpacing.xl,
+                  0,
+                  isCompact ? AppSpacing.lg : AppSpacing.xl,
+                  isCompact ? AppSpacing.md : AppSpacing.lg,
+                ),
+                actionsPadding: EdgeInsets.fromLTRB(
+                  isCompact ? AppSpacing.md : AppSpacing.lg,
+                  0,
+                  isCompact ? AppSpacing.md : AppSpacing.lg,
+                  isCompact ? AppSpacing.md : AppSpacing.lg,
+                ),
+                title: const AppDialogHeader(
+                  icon: Icons.tune,
+                  title: 'Disiplin Ayarları',
+                  subtitle: 'Maksimum bahis, günlük limit ve güven ayarlarını güncelle.',
+                ),
+                content: SingleChildScrollView(
+                  clipBehavior: Clip.none,
+                  child: Padding(
+                    padding: const EdgeInsets.only(top: AppSpacing.sm),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
                     DropdownButtonFormField<String>(
                       value: selectedMode,
                       decoration: const InputDecoration(
@@ -974,9 +983,10 @@ class StatisticsPage extends StatelessWidget {
                         ),
                       ),
                     ],
-                  ],
+                      ],
+                    ),
+                  ),
                 ),
-              ),
               actions: [
                 TextButton(
                   onPressed: isSaving
