@@ -992,7 +992,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                                 ),
                               const SizedBox(height: 14),
                               DropdownButtonFormField<String>(
-                                value: _sortOption,
+                                initialValue: _sortOption,
                                 decoration: const InputDecoration(
                                   labelText: 'Sıralama',
                                   prefixIcon: Icon(Icons.sort),
@@ -1259,7 +1259,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
   Widget _buildSportDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedSport,
+      initialValue: _selectedSport,
       decoration: const InputDecoration(
         labelText: 'Spor Dalı',
         prefixIcon: Icon(Icons.sports_soccer),
@@ -1285,7 +1285,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
   Widget _buildCountryDropdown(List<String> countryOptions) {
     return DropdownButtonFormField<String>(
-      value: countryOptions.contains(_selectedCountry) ? _selectedCountry : 'Tümü',
+      initialValue: countryOptions.contains(_selectedCountry) ? _selectedCountry : 'Tümü',
       decoration: const InputDecoration(
         labelText: 'Ülke',
         prefixIcon: Icon(Icons.public),
@@ -1310,7 +1310,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
   Widget _buildLeagueDropdown(List<String> leagueOptions) {
     return DropdownButtonFormField<String>(
-      value: leagueOptions.contains(_selectedLeague) ? _selectedLeague : 'Tümü',
+      initialValue: leagueOptions.contains(_selectedLeague) ? _selectedLeague : 'Tümü',
       decoration: const InputDecoration(
         labelText: 'Lig',
         prefixIcon: Icon(Icons.emoji_events_outlined),
@@ -1334,7 +1334,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
   Widget _buildResultDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedResult,
+      initialValue: _selectedResult,
       decoration: const InputDecoration(
         labelText: 'Sonuç',
         prefixIcon: Icon(Icons.flag_outlined),
@@ -1357,7 +1357,7 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
   }
   Widget _buildConfidenceDropdown() {
     return DropdownButtonFormField<String>(
-      value: _selectedConfidence,
+      initialValue: _selectedConfidence,
       decoration: const InputDecoration(
         labelText: 'Güven',
         prefixIcon: Icon(Icons.verified_outlined),

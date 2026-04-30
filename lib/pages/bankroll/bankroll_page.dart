@@ -239,7 +239,7 @@ class BankrollPage extends StatelessWidget {
     required ValueChanged<String?> onChanged,
   }) {
     return DropdownButtonFormField<String>(
-      value: value,
+      initialValue: value,
       decoration: const InputDecoration(
         labelText: 'İşlem Türü',
         prefixIcon: Icon(Icons.swap_horiz),

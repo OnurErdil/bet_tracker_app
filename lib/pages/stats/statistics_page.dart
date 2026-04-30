@@ -854,7 +854,7 @@ class StatisticsPage extends StatelessWidget {
                       mainAxisSize: MainAxisSize.min,
                       children: [
                     DropdownButtonFormField<String>(
-                      value: selectedMode,
+                      initialValue: selectedMode,
                       decoration: const InputDecoration(
                         labelText: 'Maksimum Bahis Modu',
                         prefixIcon: Icon(Icons.tune),
@@ -917,7 +917,7 @@ class StatisticsPage extends StatelessWidget {
                     ),
                     const SizedBox(height: 12),
                     DropdownButtonFormField<String>(
-                      value: selectedDisciplineMode,
+                      initialValue: selectedDisciplineMode,
                       decoration: const InputDecoration(
                         labelText: 'Disiplin Modu',
                         prefixIcon: Icon(Icons.shield_outlined),
@@ -945,7 +945,7 @@ class StatisticsPage extends StatelessWidget {
                     const SizedBox(height: 12),
                     SwitchListTile(
                       value: selectedHighConfidenceEnabled,
-                      activeColor: AppColors.primary,
+                      activeThumbColor: AppColors.primary,
                       contentPadding: EdgeInsets.zero,
                       title: const Text('Yüksek Güven Limit Aşımı'),
                       subtitle: const Text(
