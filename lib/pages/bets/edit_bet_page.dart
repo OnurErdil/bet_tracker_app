@@ -207,6 +207,11 @@ class _EditBetPageState extends State<EditBetPage> {
     );
   }
 
+  bool get _isPendingBetSettlementUpdate {
+    return widget.bet.result == 'beklemede' &&
+        _selectedResult != 'beklemede';
+  }
+
   double get _previewNetProfit => _previewData.netProfit;
 
   double get _previewPayout => _previewData.payout;
@@ -433,7 +438,9 @@ class _EditBetPageState extends State<EditBetPage> {
 
     if (!_formKey.currentState!.validate()) return;
 
-    if (_disciplineMode == 'lock_day' && _isLockedForToday) {
+    if (_disciplineMode == 'lock_day' &&
+        _isLockedForToday &&
+        !_isPendingBetSettlementUpdate) {
       _showMessage('Bugün bahis kapalı. Günlük disiplin kilidi aktif.');
       return;
     }
@@ -447,15 +454,17 @@ class _EditBetPageState extends State<EditBetPage> {
       return;
     }
 
-    final dailyLossAllowed = await _handleDailyLossLimitBeforeUpdate(
-      stake: stake,
-    );
-    if (!dailyLossAllowed) return;
+    if (!_isPendingBetSettlementUpdate) {
+      final dailyLossAllowed = await _handleDailyLossLimitBeforeUpdate(
+        stake: stake,
+      );
+      if (!dailyLossAllowed) return;
 
-    final maxStakeAllowed = await _handleMaxStakeLimitBeforeUpdate(
-      stake: stake,
-    );
-    if (!maxStakeAllowed) return;
+      final maxStakeAllowed = await _handleMaxStakeLimitBeforeUpdate(
+        stake: stake,
+      );
+      if (!maxStakeAllowed) return;
+    }
 
     final homeTeam = _homeTeamController.text.trim();
     final awayTeam = _awayTeamController.text.trim();
@@ -501,7 +510,9 @@ class _EditBetPageState extends State<EditBetPage> {
     if (!mounted) return;
 
     _showMessage(
-      'Bahis güncellendi.',
+      _isPendingBetSettlementUpdate
+          ? 'Bahis sonucu kaydedildi.'
+          : 'Bahis güncellendi.',
       clearPrevious: true,
     );
     Navigator.pop(context);
