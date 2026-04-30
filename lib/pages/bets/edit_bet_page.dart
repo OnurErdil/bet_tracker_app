@@ -740,7 +740,7 @@ class _EditBetPageState extends State<EditBetPage> {
                         payoutLabel: 'Toplam Geri Ödeme',
                       ),
                       DropdownButtonFormField<String>(
-                        value: _sportController.text.isEmpty ||
+                        initialValue: _sportController.text.isEmpty ||
                             !BetFormCatalog.sports.contains(_sportController.text)
                             ? null
                             : _sportController.text,
@@ -779,7 +779,7 @@ class _EditBetPageState extends State<EditBetPage> {
                           children: [
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: _countryController.text.isEmpty
+                                initialValue: _countryController.text.isEmpty
                                     ? null
                                     : _countryController.text,
                                 decoration: const InputDecoration(
@@ -816,7 +816,7 @@ class _EditBetPageState extends State<EditBetPage> {
                             const SizedBox(width: AppSpacing.md),
                             Expanded(
                               child: DropdownButtonFormField<String>(
-                                value: _leagueController.text.isEmpty
+                                initialValue: _leagueController.text.isEmpty
                                     ? null
                                     : _leagueController.text,
                                 decoration: const InputDecoration(
@@ -855,7 +855,7 @@ class _EditBetPageState extends State<EditBetPage> {
                         Column(
                           children: [
                             DropdownButtonFormField<String>(
-                              value: _countryController.text.isEmpty
+                              initialValue: _countryController.text.isEmpty
                                   ? null
                                   : _countryController.text,
                               decoration: const InputDecoration(
@@ -890,7 +890,7 @@ class _EditBetPageState extends State<EditBetPage> {
                             ),
                             const SizedBox(height: AppSpacing.md),
                             DropdownButtonFormField<String>(
-                              value: _leagueController.text.isEmpty
+                              initialValue: _leagueController.text.isEmpty
                                   ? null
                                   : _leagueController.text,
                               decoration: const InputDecoration(
@@ -975,7 +975,7 @@ class _EditBetPageState extends State<EditBetPage> {
                         ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _betTypeController.text.isEmpty
+                        initialValue: _betTypeController.text.isEmpty
                             ? null
                             : _betTypeController.text,
                         decoration: const InputDecoration(
@@ -1044,7 +1044,7 @@ class _EditBetPageState extends State<EditBetPage> {
                       ),
                       const SizedBox(height: 14),
                       DropdownButtonFormField<String>(
-                        value: _selectedResult,
+                        initialValue: _selectedResult,
                         decoration: const InputDecoration(
                           labelText: 'Sonuç',
                           prefixIcon: Icon(Icons.flag_outlined),
