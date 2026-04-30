@@ -369,13 +369,18 @@ class _EditBetPageState extends State<EditBetPage> {
       return true;
     }
 
-    if (_selectedResult == 'kaybetti') {
+    final shouldCheckProjectedDailyLoss =
+        _selectedResult == 'kaybetti' || _selectedResult == 'beklemede';
+
+    if (shouldCheckProjectedDailyLoss) {
       final projectedLoss = adjustedTodayLoss + stake;
 
       if (projectedLoss > _dailyLossLimit) {
         final message = BetFormHelpers.buildProjectedDailyLossLimitMessage(
           disciplineMode: _disciplineMode,
-          actionLabel: 'Bu güncelleme',
+          actionLabel: _selectedResult == 'beklemede'
+              ? 'Bu bekleyen bahis riski'
+              : 'Bu güncelleme',
           dailyLossLimit: _dailyLossLimit,
         );
 
