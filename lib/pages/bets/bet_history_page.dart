@@ -717,7 +717,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
   @override
   Widget build(BuildContext context) {
-    final isWide = MediaQuery.of(context).size.width > 800;
+    final screenWidth = MediaQuery.of(context).size.width;
+    final isWide = screenWidth > 800;
+    final isCompactMobile = screenWidth < 430;
 
     return Scaffold(
       appBar: AppBar(
@@ -748,7 +750,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
 
           return Center(
             child: SingleChildScrollView(
-              padding: const EdgeInsets.all(24),
+              padding: EdgeInsets.all(
+                isCompactMobile ? AppSpacing.lg : AppSpacing.xl,
+              ),
               child: ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: 1000),
                 child: Column(
@@ -759,14 +763,16 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                       elevation: 0,
                       shape: AppStyles.cardShape(),
                       child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.lg),
+                        padding: EdgeInsets.all(
+                          isCompactMobile ? AppSpacing.md : AppSpacing.lg,
+                        ),
                         child: GridView.count(
                           crossAxisCount: isWide ? 5 : 2,
                           shrinkWrap: true,
                           physics: const NeverScrollableScrollPhysics(),
-                          mainAxisSpacing: AppSpacing.md,
-                          crossAxisSpacing: AppSpacing.md,
-                          childAspectRatio: isWide ? 2.15 : 1.55,
+                          mainAxisSpacing: isCompactMobile ? AppSpacing.sm : AppSpacing.md,
+                          crossAxisSpacing: isCompactMobile ? AppSpacing.sm : AppSpacing.md,
+                          childAspectRatio: isWide ? 2.15 : 1.75,
                           children: [
                             _TopStat(
                               title: 'Kayıt',
@@ -835,7 +841,9 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                       elevation: 0,
                       shape: AppStyles.cardShape(),
                       child: Padding(
-                        padding: const EdgeInsets.all(AppSpacing.xl),
+                        padding: EdgeInsets.all(
+                          isCompactMobile ? AppSpacing.lg : AppSpacing.xl,
+                        ),
                         child: Column(
                           children: [
                             TextField(
@@ -848,52 +856,68 @@ class _BetHistoryPageState extends State<BetHistoryPage> {
                               ),
                             ),
                             const SizedBox(height: 14),
-                            Wrap(
-                              spacing: 8,
-                              runSpacing: 8,
-                              children: [
-                                _QuickFilterChip(
-                                  label: 'Bugün',
-                                  tone: _quickFilterTone('Bugün'),
-                                  isSelected: _selectedQuickFilter == 'Bugün',
-                                  onTap: () => _applyQuickFilter('Bugün'),
-                                ),
-                                _QuickFilterChip(
-                                  label: 'Son 7 Gün',
-                                  tone: _quickFilterTone('Son 7 Gün'),
-                                  isSelected: _selectedQuickFilter == 'Son 7 Gün',
-                                  onTap: () => _applyQuickFilter('Son 7 Gün'),
-                                ),
-                                _QuickFilterChip(
-                                  label: 'Bu Ay',
-                                  tone: _quickFilterTone('Bu Ay'),
-                                  isSelected: _selectedQuickFilter == 'Bu Ay',
-                                  onTap: () => _applyQuickFilter('Bu Ay'),
-                                ),
-                                _QuickFilterChip(
-                                  label: 'Sadece Kaybedenler',
-                                  tone: _quickFilterTone('Sadece Kaybedenler'),
-                                  isSelected:
-                                  _selectedQuickFilter == 'Sadece Kaybedenler',
-                                  onTap: () =>
-                                      _applyQuickFilter('Sadece Kaybedenler'),
-                                ),
-                                _QuickFilterChip(
-                                  label: 'Sadece Bekleyenler',
-                                  tone: _quickFilterTone('Sadece Bekleyenler'),
-                                  isSelected:
-                                  _selectedQuickFilter == 'Sadece Bekleyenler',
-                                  onTap: () =>
-                                      _applyQuickFilter('Sadece Bekleyenler'),
-                                ),
-                                _QuickFilterChip(
-                                  label: 'Yüksek Güven',
-                                  tone: _quickFilterTone('Yüksek Güven'),
-                                  isSelected:
-                                  _selectedQuickFilter == 'Yüksek Güven',
-                                  onTap: () => _applyQuickFilter('Yüksek Güven'),
-                                ),
-                              ],
+                            LayoutBuilder(
+                              builder: (context, constraints) {
+                                final quickFilterChips = [
+                                  _QuickFilterChip(
+                                    label: 'Bugün',
+                                    tone: _quickFilterTone('Bugün'),
+                                    isSelected: _selectedQuickFilter == 'Bugün',
+                                    onTap: () => _applyQuickFilter('Bugün'),
+                                  ),
+                                  _QuickFilterChip(
+                                    label: 'Son 7 Gün',
+                                    tone: _quickFilterTone('Son 7 Gün'),
+                                    isSelected: _selectedQuickFilter == 'Son 7 Gün',
+                                    onTap: () => _applyQuickFilter('Son 7 Gün'),
+                                  ),
+                                  _QuickFilterChip(
+                                    label: 'Bu Ay',
+                                    tone: _quickFilterTone('Bu Ay'),
+                                    isSelected: _selectedQuickFilter == 'Bu Ay',
+                                    onTap: () => _applyQuickFilter('Bu Ay'),
+                                  ),
+                                  _QuickFilterChip(
+                                    label: 'Sadece Kaybedenler',
+                                    tone: _quickFilterTone('Sadece Kaybedenler'),
+                                    isSelected: _selectedQuickFilter == 'Sadece Kaybedenler',
+                                    onTap: () => _applyQuickFilter('Sadece Kaybedenler'),
+                                  ),
+                                  _QuickFilterChip(
+                                    label: 'Sadece Bekleyenler',
+                                    tone: _quickFilterTone('Sadece Bekleyenler'),
+                                    isSelected: _selectedQuickFilter == 'Sadece Bekleyenler',
+                                    onTap: () => _applyQuickFilter('Sadece Bekleyenler'),
+                                  ),
+                                  _QuickFilterChip(
+                                    label: 'Yüksek Güven',
+                                    tone: _quickFilterTone('Yüksek Güven'),
+                                    isSelected: _selectedQuickFilter == 'Yüksek Güven',
+                                    onTap: () => _applyQuickFilter('Yüksek Güven'),
+                                  ),
+                                ];
+
+                                if (isCompactMobile) {
+                                  return SingleChildScrollView(
+                                    scrollDirection: Axis.horizontal,
+                                    child: Row(
+                                      children: [
+                                        for (int i = 0; i < quickFilterChips.length; i++) ...[
+                                          quickFilterChips[i],
+                                          if (i != quickFilterChips.length - 1)
+                                            const SizedBox(width: AppSpacing.sm),
+                                        ],
+                                      ],
+                                    ),
+                                  );
+                                }
+
+                                return Wrap(
+                                  spacing: 8,
+                                  runSpacing: 8,
+                                  children: quickFilterChips,
+                                );
+                              },
                             ),
                             const SizedBox(height: 14),
                             Align(
