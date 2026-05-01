@@ -52,6 +52,9 @@ IconData _snackBarIcon(StatusTone tone) {
   }
 }
 
+DateTime? _lastWarningSnackBarAt;
+String? _lastWarningSnackBarMessage;
+
 void showAppSnackBar(
     BuildContext context,
     String message, {
@@ -60,8 +63,36 @@ void showAppSnackBar(
       Duration duration = const Duration(seconds: 3),
     }) {
   final messenger = ScaffoldMessenger.of(context);
+  final now = DateTime.now();
   final resolvedTone = tone ?? _snackBarToneFromMessage(message);
-  final color = statusToneColor(resolvedTone);
+
+  var displayTone = resolvedTone;
+  var displayMessage = message;
+  var displayDuration = duration;
+
+  final shouldMergeRecentWarning =
+      clearPrevious &&
+          resolvedTone == StatusTone.success &&
+          _lastWarningSnackBarMessage != null &&
+          _lastWarningSnackBarAt != null &&
+          now.difference(_lastWarningSnackBarAt!) <= const Duration(seconds: 4);
+
+  if (shouldMergeRecentWarning) {
+    displayTone = StatusTone.warning;
+    displayMessage = '$message\n${_lastWarningSnackBarMessage!}';
+
+    if (displayDuration.inMilliseconds < 5000) {
+      displayDuration = const Duration(seconds: 5);
+    }
+
+    _lastWarningSnackBarMessage = null;
+    _lastWarningSnackBarAt = null;
+  } else if (resolvedTone == StatusTone.warning) {
+    _lastWarningSnackBarMessage = message;
+    _lastWarningSnackBarAt = now;
+  }
+
+  final color = statusToneColor(displayTone);
 
   if (clearPrevious) {
     messenger.clearSnackBars();
@@ -69,7 +100,7 @@ void showAppSnackBar(
 
   messenger.showSnackBar(
     SnackBar(
-      duration: duration,
+      duration: displayDuration,
       behavior: SnackBarBehavior.fixed,
       backgroundColor: AppColors.surfaceAlt,
       elevation: 0,
@@ -77,14 +108,14 @@ void showAppSnackBar(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Icon(
-            _snackBarIcon(resolvedTone),
+            _snackBarIcon(displayTone),
             color: color,
             size: 20,
           ),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              message,
+              displayMessage,
               style: const TextStyle(
                 color: AppColors.textPrimary,
                 fontWeight: FontWeight.w600,
