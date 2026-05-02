@@ -3,6 +3,7 @@ import 'package:bet_tracker_app/pages/auth/register_page.dart';
 import 'package:bet_tracker_app/pages/home/widgets/home_common_widgets.dart';
 import 'package:bet_tracker_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -70,6 +71,49 @@ class _LoginPageState extends State<LoginPage> {
       message,
       clearPrevious: true,
     );
+  }
+
+  Future<void> _openPrivacyPolicy() async {
+    final uri = Uri.parse(
+      'https://onurerdil.github.io/bet_tracker_app/PRIVACY_POLICY',
+    );
+
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!mounted) return;
+
+    if (!launched) {
+      _showMessage('Gizlilik politikası açılamadı.');
+    }
+  }
+
+  Future<void> _openAccountDeletionRequestEmail() async {
+    final uri = Uri(
+      scheme: 'mailto',
+      path: 'bettrackerapptr@gmail.com',
+      queryParameters: {
+        'subject': 'Bet Tracker Hesap ve Veri Silme Talebi',
+        'body':
+        'Merhaba,\n\n'
+            'Bet Tracker hesabımın ve hesabıma bağlı verilerimin silinmesini talep ediyorum.\n\n'
+            'Hesap e-posta adresim:\n\n'
+            'Ek not:\n\n',
+      },
+    );
+
+    final launched = await launchUrl(
+      uri,
+      mode: LaunchMode.externalApplication,
+    );
+
+    if (!mounted) return;
+
+    if (!launched) {
+      _showMessage('E-posta uygulaması açılamadı.');
+    }
   }
 
   @override
@@ -208,6 +252,19 @@ class _LoginPageState extends State<LoginPage> {
                           child: const Text('Kayıt Ol'),
                         ),
                       ],
+                    ),
+                    const SizedBox(height: 4),
+                    TextButton.icon(
+                      onPressed: _isLoading ? null : _openPrivacyPolicy,
+                      icon: const Icon(Icons.privacy_tip_outlined, size: 16),
+                      label: const Text('Gizlilik Politikası'),
+                    ),
+                    TextButton.icon(
+                      onPressed: _isLoading
+                          ? null
+                          : _openAccountDeletionRequestEmail,
+                      icon: const Icon(Icons.delete_outline, size: 16),
+                      label: const Text('Hesap ve Veri Silme Talebi'),
                     ),
                   ],
                 ),
